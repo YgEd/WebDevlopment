@@ -1,1 +1,2 @@
-# CS546Project Fitness app work in progress
+# CS546Project 
+fitness app work in progress

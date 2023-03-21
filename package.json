@@ -1,0 +1,21 @@
+{
+  "name": "fitness-app",
+  "version": "1.0.0",
+  "description": "fitness app work in progress",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TriLuu01/CS546Project.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TriLuu01/CS546Project/issues"
+  },
+  "homepage": "https://github.com/TriLuu01/CS546Project#readme"
+}

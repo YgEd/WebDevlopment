@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 import { users } from "../config/mongoCollections.js";
 import * as help from "../helpers.js";
 import validate from "validate-date";
-import md5 from "blueimp-md5"
+import md5 from "blueimp-md5";
 
 //creates user (hashes password using md5)
 export const createUser = async (
@@ -53,11 +53,9 @@ export const createUser = async (
   }
 
   //Test to ensure valid DOB format
-  if (!validate(DOB, "boolean", "mm/dd/yyyy")){
+  if (!validate(DOB, "boolean", "mm/dd/yyyy")) {
     help.err(fun, "DOB is not in proper MM/DD/YYYY form");
   }
-
-
 
   //get current date
   const date = new Date();
@@ -67,25 +65,26 @@ export const createUser = async (
   let inDay = parseInt(DOB.substring(3, 5));
   let inYear = parseInt(DOB.substring(6, 10));
 
-
-  
   //Tests to ensure if DOB is at least 18 years of age
 
-  if (!(inYear <= date.getFullYear()-18)){
+  if (!(inYear <= date.getFullYear() - 18)) {
     help.err(fun, "DOB is not 18 years or older: year is too young");
   }
 
-
-  if (inYear == date.getFullYear()-18 && inMonth > date.getMonth() + 1){
+  if (inYear == date.getFullYear() - 18 && inMonth > date.getMonth() + 1) {
     help.err(fun, "DOB is not 18 years or older: year and month is too young");
   }
 
-
-  if (inMonth == date.getMonth() + 1 && inYear == date.getFullYear()-18 && inDay > date.getDate()){
-    help.err(fun, "DOB is not 18 years or older: year, month, day is too young");
+  if (
+    inMonth == date.getMonth() + 1 &&
+    inYear == date.getFullYear() - 18 &&
+    inDay > date.getDate()
+  ) {
+    help.err(
+      fun,
+      "DOB is not 18 years or older: year, month, day is too young"
+    );
   }
-  
-
 
   let userPosts = [];
   let userStreak = 0;
@@ -109,8 +108,5 @@ export const createUser = async (
     help.err(fun, "could not add user");
   }
 
-  // //convert id to string
-  // const id = insertInfo.insertedId.toString();
-
-  return await userCollection.findOne({_id: insertInfo.insertedId});
+  return await userCollection.findOne({ _id: insertInfo.insertedId });
 };

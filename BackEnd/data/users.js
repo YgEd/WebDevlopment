@@ -2,7 +2,9 @@ import { ObjectId } from "mongodb";
 import { users } from "../config/mongoCollections.js";
 import * as help from "../helpers.js";
 import validate from "validate-date";
+import md5 from "blueimp-md5"
 
+//creates user (hashes password using md5)
 export const createUser = async (
   username,
   userPassword,
@@ -14,7 +16,9 @@ export const createUser = async (
   goals
 ) => {
   let fun = "createUser";
+
   //String test
+  ///MAKE SURE TO HASH PASSWORDS LATER
   if (
     !help.isStr(username) ||
     !help.isStr(userPassword) ||
@@ -50,7 +54,7 @@ export const createUser = async (
 
   //Test to ensure valid DOB format
   if (!validate(DOB, "boolean", "mm/dd/yyyy")){
-    err(fun, "DOB is not in proper MM/DD/YYYY form");
+    help.err(fun, "DOB is not in proper MM/DD/YYYY form");
   }
 
 
@@ -62,10 +66,23 @@ export const createUser = async (
   let inMonth = parseInt(DOB.substring(0, 2));
   let inDay = parseInt(DOB.substring(3, 5));
   let inYear = parseInt(DOB.substring(6, 10));
+
+
   
   //Tests to ensure if DOB is at least 18 years of age
-  if (inYear > 2005 || inMonth > date.getMonth() || inDay > date.getDay()){
-    err(fun, "DOB is not 18 years or older");
+
+  if (!(inYear <= date.getFullYear()-18)){
+    help.err(fun, "DOB is not 18 years or older: year is too young");
+  }
+
+
+  if (inYear == date.getFullYear()-18 && inMonth > date.getMonth() + 1){
+    help.err(fun, "DOB is not 18 years or older: year and month is too young");
+  }
+
+
+  if (inMonth == date.getMonth() + 1 && inYear == date.getFullYear()-18 && inDay > date.getDate()){
+    help.err(fun, "DOB is not 18 years or older: year, month, day is too young");
   }
   
 
@@ -77,7 +94,8 @@ export const createUser = async (
   //create user object to add with trimmed and lowercase fields
   let user = {
     username: username.trim().toLowerCase(),
-    userPassword: userPassword.trim(),
+    userPassword: md5(userPassword.trim()),
+    DOB,
     userPosts,
     userStreak,
     aboutMe: aboutMe.trim(),
@@ -88,11 +106,11 @@ export const createUser = async (
   //insert created user object into the db
   const insertInfo = await userCollection.insertOne(user);
   if (!insertInfo.acknowledged || !insertInfo.insertedId) {
-    err(fun, "could not add user");
+    help.err(fun, "could not add user");
   }
 
   // //convert id to string
   // const id = insertInfo.insertedId.toString();
 
-  return user;
+  return await userCollection.findOne({_id: insertInfo.insertedId});
 };

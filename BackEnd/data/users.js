@@ -11,8 +11,9 @@ export const createUser = async (
   DOB,
   //userPosts,
   //userStreak,
-  aboutMe
+  aboutMe,
   //groupsOwned,
+  goals
 ) => {
   //funcion name to use for error throwing
   let fun = "createUser";
@@ -149,8 +150,11 @@ export const getAllUsers = async () => {
     help.err(fun, "could not get users");
   }
 
+  //put db in an array
+  let userList = await userCollection.find({}).toArray();
+
   //return array of users
-  return userCollection;
+  return userList;
 };
 
 //removes User from the db from id

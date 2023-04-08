@@ -1,8 +1,8 @@
 import { ObjectId } from "mongodb";
 import { users } from "../config/mongoCollections.js";
 import * as help from "../helpers.js";
-import validate from "validate-date";
-import md5 from "blueimp-md5";
+
+
 
 
 //creates user (hashes password using md5)

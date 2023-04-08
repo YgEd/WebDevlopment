@@ -4,6 +4,12 @@ import { users } from "../config/mongoCollections.js";
 import * as help from "../helpers.js";
 import * as user from "./users.js";
 
+//defined workout types
+var workoutTypes = ["running", "lifting", "cycling", "other"];
+
+//valid image types
+var imgTypes = ["jpg", "jpeg", "heic", "avif", "png"];
+
 export const createPost = async (
   userId,
   workoutType,
@@ -28,17 +34,28 @@ export const createPost = async (
   }
 
   //check to see if workoutType is one of the valid types
-  ////////////////////TODO
+  let valid = false;
+  if (!workoutTypes.includes(workoutType.trim().toLowerCase())) {
+    help.err(fun, "invalid workoutType");
+  }
 
   //test to ensure postImgs is an array
   if (!Array.isArray(postImgs)) {
     help.err(fun, "expected postImgs to be of type array");
   }
 
-  //test if valid url is inputted for each img in postImgs
-  // if (webhold.substring(0,11) != "http://www." || webhold.substring(webhold.length-4, webhold.length) != ".com"){
-  //   help.err(fun, "invalid website: has to start with 'http://www.' and end with '.com'");
-  // }
+  //test if valid image type for each img in postImgs
+  for (let i = 0; i < postImgs.length; i++) {
+    //get the current image image type
+    let curr_img_format = help.getFileType(postImgs[i]);
+    //see if the current image type is valid as defined in imgTypes (defined at the top of file)
+    if (!imgTypes.includes(curr_img_format)) {
+      help.err(
+        fun,
+        "img format '" + curr_img_format + "' is of invalid image type"
+      );
+    }
+  }
 
   //test to ensure postToGroup is an array
   if (!Array.isArray(postToGroup)) {
@@ -106,4 +123,85 @@ export const createPost = async (
 
   //return the post obj
   return await postCollection.findOne({ _id: insertInfo.insertedId });
+};
+
+export const getAllPosts = async () => {
+  //function name to use for error throwing
+  let fun = "getAllPosts";
+
+  //get post db
+  const postCollection = await posts()
+
+  //test if userCollection is null
+  if (postCollection == null) {
+    help.err(fun, "could not get posts");
+  }
+
+  //put db in an array
+  let postList = await postCollection.find({}).toArray();
+
+  //return array of users
+  return postList;
+}
+
+export const getPost = async (postId) => {
+  //function name to use for error throwing
+  let fun = "getPost";
+  //test if given id is a valid ObjectId type
+  if (!ObjectId.isValid(postId)) {
+    help.err(fun, "invalid object ID '" + postId + "'");
+  }
+
+  //get post db
+  const postCollection = await posts();
+  const findPost = await postCollection.findOne({ _id: postId });
+
+  //if user is not found throw error
+  if (findPost == null) {
+    help.err(fun, "post with ObjectId '" + postId + "' wasn't found");
+  }
+
+  return findPost;
+};
+
+export const removePost = async (postId) => {
+  //function name to use for error throwing
+  let fun = "removePost";
+  //test if given id is a valid ObjectId type
+  if (!ObjectId.isValid(postId)) {
+    help.err(fun, "invalid object ID '" + postId + "'");
+  }
+  //get post object
+  const targetPost = await getPost(postId);
+
+  //get post db and remove the target post
+  const userCollection = await posts();
+  const deleteInfo = await userCollection.findOneAndDelete({ _id: postId });
+
+  if (deleteInfo.lastErrorObject.n == 0) {
+    help.err(fun, "could not delete post with postId '" + postId + "'");
+  }
+
+  //remove the postobject from the associated user
+  const targetUser = await user.getUser(targetPost.userId);
+
+  //find index of deleted post
+  let index = targetUser.userPosts.indexOf(targetPost._id);
+
+  //remove post form user's userPosts array
+  targetUser.userPosts.splice(index, 1);
+
+  //update the user in the user db
+  await user.updateUser(
+    targetUser._id,
+    targetUser.username,
+    targetUser.userPassword,
+    targetUser.userPosts,
+    targetUser.userStreak,
+    targetUser.aboutMe,
+    targetUser.groupsOwned,
+    targetUser.goals
+  );
+
+  return "post with postId '" + postId + "' successfully deleted";
 };

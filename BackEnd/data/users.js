@@ -1,8 +1,8 @@
 import { ObjectId } from "mongodb";
 import { users } from "../config/mongoCollections.js";
 import * as help from "../helpers.js";
-
-
+import bcrypt from 'bcrypt';
+import validation from '../helpers.js'
 
 
 //creates user (hashes password using md5)

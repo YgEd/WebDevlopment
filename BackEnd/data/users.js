@@ -95,7 +95,10 @@ export const createUser = async (
 
   let userPosts = [];
   let userStreak = 0;
-  let groupsOwned = [];
+  let groupsOwned = []; //groups owned by the user
+  let groupMembers = []; //groups the user is a member of
+  let following = [] //people the user is following
+  let followers = [] //people that are following the user
 
   //create user object to add with trimmed and lowercase fields
   let user = {
@@ -106,7 +109,10 @@ export const createUser = async (
     userStreak,
     aboutMe: aboutMe.trim(),
     groupsOwned,
+    groupMembers,
     goals,
+    following,
+    followers
   };
 
   //insert created user object into the db
@@ -187,7 +193,10 @@ export const updateUser = async (
   userStreak,
   aboutMe,
   groupsOwned,
-  goals
+  groupMembers,
+  goals,
+  following,
+  followers
 ) => {
   //function name to use for error throwing
   let fun = "updateUser";
@@ -207,18 +216,17 @@ export const updateUser = async (
   }
 
   //test to ensure userPosts is either empty or full of only valid ObjectIds
-  for (let i = 0; i < userPosts.length; i++) {
-    if (!ObjectId.isValid(userPosts[i])) {
-      help.err(fun, "userPosts contains non-valid ObjectId");
-    }
-  }
+  if (help.verObjectIds(userPosts)) help.err(fun, "userPosts is not a valid array of valid ObjectIds")
+  
 
   //test to ensure groupsOwned is either empty or full of only valid ObjectIds
-  for (let i = 0; i < groupsOwned.length; i++) {
-    if (!ObjectId.isValid(groupsOwned[i])) {
-      help.err(fun, "groupsOwned contains non-valid ObjectId");
-    }
-  }
+  if (help.verObjectIds(groupsOwned)) help.err(fun, "groupsOwned is not a valid array of valid ObjectIds")
+  
+  //test to ensure following is either empty or full of only valid ObjectIds
+  if (help.verObjectIds(following)) help.err(fun, "following is not a valid array of valid ObjectIds")
+
+  //test to ensure followers is either empty or full of only valid ObjectIds
+  if (!help.verObjectIds(followers)) help.err(fun, "followers is not a valid array of valid ObjectIds")
 
   //test to ensure userStreak is of number type
   if (!help.isNum(userStreak)) {
@@ -274,7 +282,10 @@ export const updateUser = async (
         userStreak,
         aboutMe,
         groupsOwned,
+        groupMembers,
         goals,
+        following,
+        followers
       },
     }
   );

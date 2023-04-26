@@ -1,4 +1,5 @@
 //helper functions to export to other files
+import { ObjectId } from "mongodb";
 
 export function err(from, msg) {
   // Throws specific error message specified in msg from the function specified in from
@@ -34,4 +35,20 @@ export function getFileType(file){
     }
   }
   return file.substring(target, file.length);
+}
+
+export function verObjectIds(arr){
+  //test if all elments of an array are valid ObjectIds
+  if (!Array.isArray(arr)){
+    return false;
+  }
+
+  for(let i=0; i< arr.length; i++){
+    if (!ObjectId.isValid(arr[i])){
+      return false
+    }
+  }
+
+  return true
+
 }

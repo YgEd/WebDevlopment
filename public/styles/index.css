@@ -1,0 +1,25 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+.navbar {
+    display: flex;
+    background-color: #0eb358;
+    font-size: 2rem;
+    height: 2.5rem;
+}
+
+.menu {
+    margin: 0 3rem;
+    justify-content: space-around;
+    font-family: 'Franklin Gothic Medium',
+        'Arial Narrow',
+        Arial, sans-serif;
+}
+
+a {
+    text-decoration: none;
+    color: #fff;
+    padding: 0 4rem;
+}

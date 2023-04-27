@@ -7,27 +7,21 @@ import validation from '../helpers.js'
 
 //creates user (hashes password using md5)
 export const createUser = async (
-  username,
-  userPassword,
+  firstname, 
+  lastname, 
+  email, 
+  password,
   DOB,
   //userPosts,
   //userStreak,
-  aboutMe,
   //groupsOwned,
-  goals
 ) => {
   //funcion name to use for error throwing
   let fun = "createUser";
 
   //String test
   ///MAKE SURE TO HASH PASSWORDS LATER
-  if (
-    !help.isStr(username) ||
-    !help.isStr(userPassword) ||
-    !help.isStr(aboutMe)
-  ) {
-    help.err(fun, "non-string input");
-  }
+
 
   //check if username is already used
 
@@ -35,11 +29,11 @@ export const createUser = async (
   const userCollection = await users();
 
   //find if user exists with given username
-  const findUser = await userCollection.findOne({ username: username.trim() });
+  const findUser = await userCollection.findOne({ email: email.trim() });
 
   //search for lower case instance of username as well
   const findUserLower = await userCollection.findOne({
-    username: username.trim().toLowerCase(),
+    email: email.trim().toLowerCase(),
   });
 
   //check if if user is found with same username
@@ -48,9 +42,7 @@ export const createUser = async (
   }
 
   //Array test
-  if (!Array.isArray(goals)) {
-    help.err(fun, "input goals is not an array");
-  }
+ let goals = []
 
   //Make sure all elements of goals is string
   for (let i = 0; i < goals.length; i++) {
@@ -60,9 +52,9 @@ export const createUser = async (
   }
 
   //Test to ensure valid DOB format
-  if (!validate(DOB, "boolean", "mm/dd/yyyy")) {
-    help.err(fun, "DOB is not in proper MM/DD/YYYY form");
-  }
+  //if (!validate(DOB, "boolean", "mm/dd/yyyy")) {
+   // help.err(fun, "DOB is not in proper MM/DD/YYYY form");
+ // }
 
   //get current date
   const date = new Date();
@@ -96,11 +88,13 @@ export const createUser = async (
   let userPosts = [];
   let userStreak = 0;
   let groupsOwned = [];
-
+  let aboutMe = ""
   //create user object to add with trimmed and lowercase fields
   let user = {
-    username: username.trim(),
-    userPassword: md5(userPassword.trim()),
+    firstname: firstname,
+    lastname: lastname,
+    email: email.trim(),
+    password: bcrypt.hash(password, 10),
     DOB,
     userPosts,
     userStreak,
@@ -117,6 +111,36 @@ export const createUser = async (
 
   return await userCollection.findOne({ _id: insertInfo.insertedId });
 };
+
+export const checkUser = async (emailAddress, password) => {
+  // Retrieve the user record from the database
+  const userCollection = await users();
+  emailAddress = emailAddress.toLowerCase()
+  emailAddress = emailAddress.trim()
+  password = password.trim()
+  const user = await userCollection.findOne({ emailAddress: emailAddress});
+
+  // If the user is not found, return null or an error message
+  if (user === null) {
+    throw "Invalid user"// Or throw new Error('Invalid username or password');
+  }
+
+  console.log(user)
+  
+  // Compare the provided password with the hash stored in the database
+  console.log(user.password)
+  let passwordMatch = false;
+   passwordMatch = await bcrypt.compare(password, user.password);
+  console.log(passwordMatch)
+  // If the passwords match, return the user object
+  if (passwordMatch) {
+    return [user.firstName, user.lastName, user.emailAddress, user.role]
+  } else {
+  
+    throw "Passwords do not match"
+  
+}};
+
 
 //return user by given ObjectId id
 export const getUser = async (id) => {
@@ -282,3 +306,13 @@ export const updateUser = async (
   //return updated user object
   return getUser(id);
 };
+
+
+export default{
+  createUser,
+  getUser,
+  getAllUsers,
+  removeUser,
+  updateUser
+
+}

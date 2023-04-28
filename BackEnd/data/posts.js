@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { posts } from "../config/mongoCollections.js";
 import { users } from "../config/mongoCollections.js";
-import * as help from "../helpers.js";
+import help from "../helpers.js";
 import * as user from "./users.js";
 
 //defined workout types

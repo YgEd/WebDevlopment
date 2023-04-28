@@ -1,13 +1,15 @@
 import { ObjectId } from "mongodb";
 import { users } from "../config/mongoCollections.js";
-import * as help from "../helpers.js";
-import validate from "validate-date";
-import md5 from "blueimp-md5";
+import help from "../helpers.js";
+import bcrypt from "bcryptjs"
 
 
 //creates user (hashes password using md5)
 export const createUser = async (
   username,
+  firstName,
+  lastName,
+  email,
   userPassword,
   DOB,
   //userPosts,
@@ -23,6 +25,10 @@ export const createUser = async (
   ///MAKE SURE TO HASH PASSWORDS LATER
   if (
     !help.isStr(username) ||
+    !help.isStr(firstName) ||
+    !help.isStr(lastName) ||
+    !help.isStr(DOB) ||
+    !help.isStr(email) ||
     !help.isStr(userPassword) ||
     !help.isStr(aboutMe)
   ) {
@@ -47,6 +53,27 @@ export const createUser = async (
     help.err(fun, "username: '" + username.trim() + "' is already in use");
   }
 
+  //format the input strings (trimming and lowercasing where needed)
+  firstName = help.strPrep(firstName);
+  lastName = help.strPrep(lastName);
+  email = help.strPrep(email).toLowerCase();
+  DOB = help.strPrep(DOB);
+  userPassword = userPassword.trim();
+
+  //validate firstName, lastName, and Email
+    help.checkName(firstName, "First Name")
+    help.checkName(lastName, "Last Name")
+    help.checkEmail(email, "Email")
+    help.checkPassword(userPassword, "Password")
+    
+
+  //check if email is already in use
+  const userCollect = await users();
+  const target = await userCollect.findOne({email: email})
+  if (target != null){
+    help.err(fun, "email already in use");
+  }
+
   //Array test
   if (!Array.isArray(goals)) {
     help.err(fun, "input goals is not an array");
@@ -60,38 +87,9 @@ export const createUser = async (
   }
 
   //Test to ensure valid DOB format
-  if (!validate(DOB, "boolean", "mm/dd/yyyy")) {
-    help.err(fun, "DOB is not in proper MM/DD/YYYY form");
-  }
+  help.checkDOB(DOB, "DOB");
 
-  //get current date
-  const date = new Date();
-
-  //numerical form of inputted month, day, and year
-  let inMonth = parseInt(DOB.substring(0, 2));
-  let inDay = parseInt(DOB.substring(3, 5));
-  let inYear = parseInt(DOB.substring(6, 10));
-
-  //Tests to ensure if DOB is at least 18 years of age
-
-  if (!(inYear <= date.getFullYear() - 18)) {
-    help.err(fun, "DOB is not 18 years or older: year is too young");
-  }
-
-  if (inYear == date.getFullYear() - 18 && inMonth > date.getMonth() + 1) {
-    help.err(fun, "DOB is not 18 years or older: year and month is too young");
-  }
-
-  if (
-    inMonth == date.getMonth() + 1 &&
-    inYear == date.getFullYear() - 18 &&
-    inDay > date.getDate()
-  ) {
-    help.err(
-      fun,
-      "DOB is not 18 years or older: year, month, day is too young"
-    );
-  }
+  
 
   let userPosts = [];
   let userStreak = 0;
@@ -100,10 +98,16 @@ export const createUser = async (
   let following = [] //people the user is following
   let followers = [] //people that are following the user
 
+  let salt = bcrypt.genSaltSync(6);
+  let hashed = bcrypt.hashSync(userPassword, salt);
+
   //create user object to add with trimmed and lowercase fields
   let user = {
     username: username.trim(),
-    userPassword: md5(userPassword.trim()),
+    firstName,
+    lastName,
+    email,
+    userPassword: hashed,
     DOB,
     userPosts,
     userStreak,
@@ -187,6 +191,9 @@ export const removeUser = async (id) => {
 export const updateUser = async (
   id,
   username,
+  firstName,
+  lastName,
+  email,
   userPassword,
   //DOB,
   userPosts,
@@ -204,8 +211,11 @@ export const updateUser = async (
   //test if string inputs are valid non-empty strings
   if (
     !help.isStr(username) ||
-    !help.isStr(aboutMe) ||
-    !help.isStr(userPassword)
+    !help.isStr(firstName) ||
+    !help.isStr(lastName) ||
+    !help.isStr(email) ||
+    !help.isStr(userPassword) ||
+    !help.isStr(aboutMe)
   ) {
     help.err(fun, "expected string inputs are not non-empty strings");
   }
@@ -216,14 +226,13 @@ export const updateUser = async (
   }
 
   //test to ensure userPosts is either empty or full of only valid ObjectIds
-  if (help.verObjectIds(userPosts)) help.err(fun, "userPosts is not a valid array of valid ObjectIds")
-  
+  if (!help.verObjectIds(userPosts)) help.err(fun, "userPosts is not a valid array of valid ObjectIds")
 
   //test to ensure groupsOwned is either empty or full of only valid ObjectIds
-  if (help.verObjectIds(groupsOwned)) help.err(fun, "groupsOwned is not a valid array of valid ObjectIds")
+  if (!help.verObjectIds(groupsOwned)) help.err(fun, "groupsOwned is not a valid array of valid ObjectIds")
   
   //test to ensure following is either empty or full of only valid ObjectIds
-  if (help.verObjectIds(following)) help.err(fun, "following is not a valid array of valid ObjectIds")
+  if (!help.verObjectIds(following)) help.err(fun, "following is not a valid array of valid ObjectIds")
 
   //test to ensure followers is either empty or full of only valid ObjectIds
   if (!help.verObjectIds(followers)) help.err(fun, "followers is not a valid array of valid ObjectIds")
@@ -266,8 +275,27 @@ export const updateUser = async (
     }
   }
 
+  
+  firstName = help.strPrep(firstName);
+  lastName = help.strPrep(lastName);
+  email = help.strPrep(email).toLowerCase();
+
+  //validate firstName, lastName, and Email
+    help.checkName(firstName, "First Name")
+    help.checkName(lastName, "Last Name")
+    help.checkEmail(email, "Email")
+
+  //get original email from user
+
+  //check if email is already in use
+  const target = await userCollection.findOne({email: email})
+  if (oldUser.email != email && target != null){
+    help.err(fun, "email already in use");
+  }
+
   //ensure input fields are trimmed and the password is hashed
-  userPassword = md5(userPassword.trim());
+  let salt = bcrypt.genSaltSync(6);
+  userPassword = bcrypt.hashSync(userPassword, salt);
   username = username.trim();
   aboutMe = aboutMe.trim();
 
@@ -277,6 +305,9 @@ export const updateUser = async (
     {
       $set: {
         username,
+        firstName,
+        lastName,
+        email,
         userPassword,
         userPosts,
         userStreak,
@@ -292,4 +323,46 @@ export const updateUser = async (
 
   //return updated user object
   return getUser(id);
+};
+
+export const checkUser = async (emailAddress, password) => {
+  let fun = "checkUser"
+
+  if (
+    help.strPrep(emailAddress).length == 0 ||
+    help.strPrep(password).length == 0
+  ) {
+    help.err(fun, "invalid input")
+  }
+
+    emailAddress = help.strPrep(emailAddress).toLowerCase()
+   //Check if email is valid form
+   help.checkEmail(emailAddress, "Email Address");
+
+   //Check if password is valid form
+   password = password
+   help.checkPassword(password, "Password")
+
+   //connect to db
+   const userCollect = await users();
+   const user = await userCollect.findOne({emailAddress: emailAddress})
+
+   if (user == null){
+      throw "Either the email address or password is invalid";
+   }
+
+   if (!(bcrypt.compareSync(password, user.password))){
+      throw "Either the email address or password is invalid";
+   }
+
+   let retobj = {
+    firstName: user.firstName,
+    lastName: user.lastName,
+    emailAddress: user.email,
+   }
+  
+
+   return retobj
+
+
 };

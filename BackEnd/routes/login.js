@@ -41,7 +41,8 @@ router
       return res.redirect('/login')
       }
     } catch (e){
-      return res.status(400).render("register",{title: "Register Form", error: e})
+      console.log(e)
+     // return res.status(400).render("register",{title: "Register Form", error: e})
     }
     return res.status(500).render('error', {title: 'Error',message: "Internal Server Error"})
   });
@@ -49,6 +50,7 @@ router
 router
   .route('/login')
   .get(async (req, res) => {
+
     //code here for GET
     return res.render('login', {title: "Login Form"})
   })
@@ -62,12 +64,16 @@ router
       return res.status(400).render('login', {title: "Login Form", error: e})
     }
     try {
+      
       let user = await userData.checkUser(emailAddressInput,passwordInput);
       if (user) {
+        
         req.session.user = user;
+        return res.redirect("/")
       }
     }catch (e){
-      return res.status(400).render('login', {title: "Login Form", error: e})
+      
+     return res.status(400).render('login', {title: "Login Form", error: e})
     }
   });
 

@@ -38,7 +38,7 @@ export const createUser = async (
 
   //check if if user is found with same username
   if (findUser != null || findUserLower != null) {
-    help.err(fun, "username: '" + username.trim() + "' is already in use");
+    help.err(fun, "username: '" + email.trim() + "' is already in use");
   }
 
   //Array test
@@ -88,20 +88,24 @@ export const createUser = async (
   let userPosts = [];
   let userStreak = 0;
   let groupsOwned = [];
-  let aboutMe = ""
+  let aboutMe = "";
   //create user object to add with trimmed and lowercase fields
+  console.log(bcrypt.hash(password, 10))
   let user = {
     firstname: firstname,
     lastname: lastname,
     email: email.trim(),
-    password: bcrypt.hash(password, 10),
-    DOB,
-    userPosts,
-    userStreak,
+    password: await bcrypt.hash(password, 10),
+    DOB: DOB,
+    userPosts: userPosts,
+    streak: userStreak,
     aboutMe: aboutMe.trim(),
-    groupsOwned,
-    goals,
+    groupsOwned: groupsOwned,
+    goals: goals,
   };
+
+  console.log(user)
+
 
   //insert created user object into the db
   const insertInfo = await userCollection.insertOne(user);
@@ -118,8 +122,8 @@ export const checkUser = async (emailAddress, password) => {
   emailAddress = emailAddress.toLowerCase()
   emailAddress = emailAddress.trim()
   password = password.trim()
-  const user = await userCollection.findOne({ emailAddress: emailAddress});
-
+  const user = await userCollection.findOne({ email: emailAddress});
+  
   // If the user is not found, return null or an error message
   if (user === null) {
     throw "Invalid user"// Or throw new Error('Invalid username or password');
@@ -134,7 +138,7 @@ export const checkUser = async (emailAddress, password) => {
   console.log(passwordMatch)
   // If the passwords match, return the user object
   if (passwordMatch) {
-    return [user.firstName, user.lastName, user.emailAddress, user.role]
+    return {firstname: user.firstName, lastname: user.lastName, email: user.email, goals: user.goals, streak: user.streak, aboutme: user.aboutMe }
   } else {
   
     throw "Passwords do not match"
@@ -143,17 +147,15 @@ export const checkUser = async (emailAddress, password) => {
 
 
 //return user by given ObjectId id
-export const getUser = async (id) => {
+export const getUser = async (email) => {
   //function name to use for error throwing
   let fun = "getUser";
   //test if given id is a valid ObjectId type
-  if (!ObjectId.isValid(id)) {
-    help.err(fun, "invalid object ID");
-  }
+  
 
   //get users db collection
   const userCollection = await users();
-  const findUser = await userCollection.findOne({ _id: id });
+  const findUser = await userCollection.findOne({ email: email });
 
   //if user is not found throw error
   if (findUser == null) {
@@ -311,6 +313,7 @@ export const updateUser = async (
 export default{
   createUser,
   getUser,
+  checkUser,
   getAllUsers,
   removeUser,
   updateUser

@@ -2,11 +2,7 @@ import homeRoutes from "./home.js"
 import loginRoutes from "./login.js"
 
 const constructorMethod = (app) => {
-    // app.use("/posts", bandRoutes);
-
-    // app.use("/users", albumRoutes);
-
-    // app.use("/groups", albumRoutes);
+    app.use("/", homeRoutes)
     app.use("/", loginRoutes)
 
     app.use('*', (req, res) => {

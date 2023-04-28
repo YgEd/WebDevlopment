@@ -1,24 +1,33 @@
 //helper functions to export to other files
+import { ObjectId } from "mongodb";
+import validate from "validate-date";
+const exportedMethods = {
 
-export function err(from, msg) {
+strPrep(string){
+    if (typeof(string) != "string"){
+        return ""
+    }
+    return string.trim();
+}, 
+err(from, msg) {
   // Throws specific error message specified in msg from the function specified in from
   throw "Error from '" + from + "': " + msg;
-}
+},
 
-export function isStr(str) {
+isStr(str) {
   //returns boolean specifing whether input is non-emptys tring
   if (typeof str != "string" || str.trim().length == 0) {
     return false;
   }
   return true;
-}
+},
 
-export function isNum(num) {
+isNum(num) {
   //return boolean specifing whether input is a number
   return /^\d+$/.test(num);
-}
+},
 
-export function getFileType(file){
+getFileType(file){
   //returns the file type of input file
   //if file type can't be found it returns the whole file name
   if (!isStr(file)){
@@ -34,9 +43,25 @@ export function getFileType(file){
     }
   }
   return file.substring(target, file.length);
-}
-const exportedMethods = {
-  checkString(strVal, varName) {
+},
+
+verObjectIds(arr){
+  //test if all elments of an array are valid ObjectIds
+  if (!Array.isArray(arr)){
+    return false;
+  }
+
+  for(let i=0; i< arr.length; i++){
+    if (!ObjectId.isValid(arr[i])){
+      return false
+    }
+  }
+
+  return true
+
+},
+
+checkString(strVal, varName) {
   if (!strVal) throw `Error: You must supply a ${varName}!`;
   if (typeof strVal !== 'string') throw `Error: ${varName} must be a string!`;
   strVal = strVal.trim();
@@ -72,12 +97,43 @@ checkPassword(str, varName){
   if (!/[^a-zA-Z0-9\s]/.test(str)) throw `${varName} must contain at least one special character`;
   return str
 },
-checkRole(str, varName){
-  str= str.trim()
-  str = str.toLowerCase();
-  if (str !== 'admin' && str !== 'user') throw `invalid values for ${varName}`
-  return str;
+
+checkDOB(str, varName){
+  if (!str) throw `Error: You must supply a ${varName}!`;
+  if (typeof str !== 'string') throw `Error: ${varName} must be a string!`;
+  if (str.length === 0)
+    throw `Error: ${varName} cannot be an empty string or string with just spaces`;
+  if (!validate(str, "boolean", "mm/dd/yyyy")){
+    throw `Error: ${str} is not in proper MM/DD/YYYY form`
+  }
+  //get current date
+  const date = new Date();
+
+  //numerical form of inputted month, day, and year
+  let inMonth = parseInt(str.substring(0, 2));
+  let inDay = parseInt(str.substring(3, 5));
+  let inYear = parseInt(str.substring(6, 10));
+
+  //Tests to ensure if DOB is at least 18 years of age
+
+  if (!(inYear <= date.getFullYear() - 18)) {
+    err(fun, "DOB is not 18 years or older: year is too young");
+  }
+
+  if (inYear == date.getFullYear() - 18 && inMonth > date.getMonth() + 1) {
+    err(fun, "DOB is not 18 years or older: year and month is too young");
+  }
+
+  if (
+    inMonth == date.getMonth() + 1 &&
+    inYear == date.getFullYear() - 18 &&
+    inDay > date.getDate()
+  ) {
+    err(fun,"DOB is not 18 years or older: year, month, day is too young");
+  }
+  return 
 }
+
 }
 
 export default exportedMethods;

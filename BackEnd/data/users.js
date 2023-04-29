@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { users } from "../config/mongoCollections.js";
 import help from "../helpers.js";
-import bcrypt from "bcryptjs"
+import bcrypt from "bcrypt"
 
 
 //creates user (hashes password using md5)
@@ -14,9 +14,9 @@ export const createUser = async (
   DOB,
   //userPosts,
   //userStreak,
-  aboutMe,
+  //aboutMe,
   //groupsOwned,
-  goals
+  //goals
 ) => {
   //funcion name to use for error throwing
   let fun = "createUser";
@@ -25,16 +25,19 @@ export const createUser = async (
   ///MAKE SURE TO HASH PASSWORDS LATER
   if (
     !help.isStr(username) ||
-    !help.isStr(firstName) ||
+    !help.isStr(firstName) || 
     !help.isStr(lastName) ||
     !help.isStr(DOB) ||
     !help.isStr(email) ||
-    !help.isStr(userPassword) ||
-    !help.isStr(aboutMe)
+    !help.isStr(userPassword) //||
+   // !help.isStr(aboutMe)
   ) {
+    console.log(typeof(DOB))
+    console.log(typeof(email))
+    console.log(typeof(userPassword))
+    console.log(typeof(userPassword))
     help.err(fun, "non-string input");
   }
-
   //check if username is already used
 
   //get users db
@@ -50,8 +53,9 @@ export const createUser = async (
 
   //check if if user is found with same username
   if (findUser != null || findUserLower != null) {
-    help.err(fun, "username: '" + username.trim() + "' is already in use");
+    help.err(fun, "username: '" + email.trim() + "' is already in use");
   }
+
 
   //format the input strings (trimming and lowercasing where needed)
   firstName = help.strPrep(firstName);
@@ -75,19 +79,19 @@ export const createUser = async (
   }
 
   //Array test
-  if (!Array.isArray(goals)) {
-    help.err(fun, "input goals is not an array");
-  }
+  //if (!Array.isArray(goals)) {
+   // help.err(fun, "input goals is not an array");
+  //}
 
   //Make sure all elements of goals is string
-  for (let i = 0; i < goals.length; i++) {
-    if (!help.isStr(goals[i])) {
-      help.err(fun, "goals has a non-string element");
-    }
-  }
+ // for (let i = 0; i < goals.length; i++) {
+   // if (!help.isStr(goals[i])) {
+    //  help.err(fun, "goals has a non-string element");
+   // }
+ // }
 
   //Test to ensure valid DOB format
-  help.checkDOB(DOB, "DOB");
+ // help.checkDOB(DOB, "DOB");
 
   
 
@@ -95,13 +99,16 @@ export const createUser = async (
   let userStreak = 0;
   let groupsOwned = []; //groups owned by the user
   let groupMembers = []; //groups the user is a member of
+  let aboutMe = "";
+  let goals = []; //list of goals
   let following = [] //people the user is following
   let followers = [] //people that are following the user
 
-  let salt = bcrypt.genSaltSync(6);
-  let hashed = bcrypt.hashSync(userPassword, salt);
+  let hashed = await bcrypt.hash(userPassword, 10);
+  console.log(hashed)
 
   //create user object to add with trimmed and lowercase fields
+  
   let user = {
     username: username.trim(),
     firstName,
@@ -119,6 +126,9 @@ export const createUser = async (
     followers
   };
 
+  console.log(user)
+
+
   //insert created user object into the db
   const insertInfo = await userCollection.insertOne(user);
   if (!insertInfo.acknowledged || !insertInfo.insertedId) {
@@ -129,17 +139,15 @@ export const createUser = async (
 };
 
 //return user by given ObjectId id
-export const getUser = async (id) => {
+export const getUser = async (email) => {
   //function name to use for error throwing
   let fun = "getUser";
   //test if given id is a valid ObjectId type
-  if (!ObjectId.isValid(id)) {
-    help.err(fun, "invalid object ID");
-  }
+  
 
   //get users db collection
   const userCollection = await users();
-  const findUser = await userCollection.findOne({ _id: id });
+  const findUser = await userCollection.findOne({ email: email });
 
   //if user is not found throw error
   if (findUser == null) {
@@ -295,7 +303,7 @@ export const updateUser = async (
 
   //ensure input fields are trimmed and the password is hashed
   let salt = bcrypt.genSaltSync(6);
-  userPassword = bcrypt.hashSync(userPassword, salt);
+  userPassword = bcrypt.hash(userPassword, 10);
   username = username.trim();
   aboutMe = aboutMe.trim();
 
@@ -345,13 +353,17 @@ export const checkUser = async (emailAddress, password) => {
 
    //connect to db
    const userCollect = await users();
-   const user = await userCollect.findOne({emailAddress: emailAddress})
+   const user = await userCollect.findOne({email: emailAddress})
+   console.log(user)
 
    if (user == null){
+      console.log("what")
       throw "Either the email address or password is invalid";
    }
 
-   if (!(bcrypt.compareSync(password, user.password))){
+   let does_match = await bcrypt.compare(password, user.userPassword)
+   console.log(user.userPassword)
+   if (!( does_match)){
       throw "Either the email address or password is invalid";
    }
 

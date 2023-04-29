@@ -1,6 +1,12 @@
+
+<label for = "username"> Username:</label>
+<p> {{name}}</p>
+
 <form method="PUT" action="/profile/edit">
-  <label for="name">Name:</label>
-  <input type = "text" name="name" value="{{name}}">
+   <label for = "firstname">FirstName</label>
+   <input type = "text" name = "firstname" value = "{{firstname}}">
+   <label for = "lastname">Lastname</label>
+   <input type = "text" name = "lastname" value = "{{lastname}}">
   <label for ="aboutme" > AboutMe</label>
   <input type="text" name="aboutme" value="{{aboutme}}">
    <label for ="streaks" > Streaks</label>
@@ -11,6 +17,8 @@
  
   <button type="submit">Save</button>
 </form>
+
+<a href = "/profile">Profile</a>
 
 
 

@@ -50,8 +50,7 @@ router
         return res.redirect('/')
       }
     } catch (e){
-      console.log(e)
-     // return res.status(400).render("register",{title: "Register Form", error: e})
+     return res.status(400).render("register",{title: "Register Form", error: e})
     }
     return res.status(500).render('error', {title: 'Error',message: "Internal Server Error"})
   });
@@ -80,20 +79,11 @@ router
         return res.redirect("/")
       }
     }catch (e){
-      console.log(e)
-     //return res.status(400).render('login', {title: "Login Form", error: e})
+     return res.status(400).render('login', {title: "Login Form", error: e})
     }
   });
 
-router.route('/protected').get(async (req, res) => {
-  //code here for GET
-  if (req.session.user){
-  if (req.session.user.role === 'admin') 
-    return res.render('protected',{title: 'Protected Page',firstName: req.session.user.firstName, currentTime: new Date().toUTCString(), role: req.session.user.role, admin :"<a href='/admin'>Admin Page</a>"})
-  else return res.render('protected',{title: 'Protected Page',firstName: req.session.user.firstName, currentTime: new Date().toUTCString(), role: req.session.user.role})
-  }
-  
-});
+
 
 
 

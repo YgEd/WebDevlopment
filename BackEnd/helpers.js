@@ -78,6 +78,12 @@ checkName(str, varName){
   if (str.length < 2 || str.length > 25) throw `${varName} should be at least 2 characters long with a max of 25 characters`
   return str
 },
+checkUsername(str, varName){
+  str = this.checkString(str, varName);
+  if (/\s/.test(str)) throw `${varName} can't have any empty spaces`;
+  if (str.length < 2 || str.length > 25) throw `${varName} should be at least 2 characters long with a max of 25 characters`
+  return str
+},
 checkEmail(str, varName){
   str = this.checkString(str, varName);
   str = str.toLowerCase();

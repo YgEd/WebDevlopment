@@ -7,8 +7,11 @@ router
   .route('/')
   .get(async (req, res) => {
     //code here for GET
-    console.log(req.session.user.email)
-    return res.render('profile', {name: req.session.user.email,  streak: req.session.user.streak, aboutme: req.session.user.aboutMe, goals: req.session.user.goals, aboutme : req.session.user.aboutMe })
+    let logged_in = false;
+    if(req.session.user){
+        logged_in = true
+    }
+    return res.render('profile', {name: req.session.user.email,  streak: req.session.user.streak, aboutme: req.session.user.aboutMe, goals: req.session.user.goals, aboutme : req.session.user.aboutMe , logged_in: logged_in})
   })
   .post(async (req, res) => {
     //code here for POST

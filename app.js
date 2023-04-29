@@ -9,6 +9,8 @@ import session from 'express-session';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+
+
 const staticDir = express.static(__dirname + '/public');
 
 const handlebarsInstance = exphbs.create({
@@ -30,7 +32,9 @@ const handlebarsInstance = exphbs.create({
 
 app.use('/public', staticDir);
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: false }));
+
+
 
 app.use(session({
     name: 'AuthCookie',

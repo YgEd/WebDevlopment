@@ -47,7 +47,7 @@ router
       let insertedUser =  (await createUser(username, firstNameInput,lastNameInput,emailAddressInput,passwordInput, dob))
       if(insertedUser){
         console.log(insertedUser)
-        return res.redirect('/')
+        return res.redirect('/login')
       }
     } catch (e){
      return res.status(400).render("register",{title: "Register Form", error: e})

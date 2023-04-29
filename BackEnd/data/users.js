@@ -333,7 +333,7 @@ export const checkUser = async (emailAddress, password) => {
    //connect to db
    const userCollect = await users();
    const user = await userCollect.findOne({email: emailAddress})
-   console.log(user)
+   
 
    if (user == null){
       console.log("what")
@@ -341,7 +341,7 @@ export const checkUser = async (emailAddress, password) => {
    }
 
    let does_match = await bcrypt.compare(password, user.userPassword)
-   console.log(user.userPassword)
+   
    if (!( does_match)){
       throw "Either the email address or password is invalid";
    }

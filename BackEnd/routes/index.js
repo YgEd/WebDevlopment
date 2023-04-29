@@ -1,6 +1,6 @@
 import homeRoutes from "./home.js"
 import loginRoutes from "./login.js"
-
+import privateRoutes from "./private.js"
 const constructorMethod = (app) => {
     app.use("/", homeRoutes)
     app.use("/", loginRoutes)

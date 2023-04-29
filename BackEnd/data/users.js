@@ -14,7 +14,7 @@ export const createUser = async (
   DOB,
   //userPosts,
   //userStreak,
-  aboutMe,
+  aboutMe,  
   //groupsOwned,
   goals
 ) => {
@@ -23,17 +23,17 @@ export const createUser = async (
 
   //String test
   ///MAKE SURE TO HASH PASSWORDS LATER
-  if (
-    !help.isStr(username) ||
-    !help.isStr(firstName) ||
-    !help.isStr(lastName) ||
-    !help.isStr(DOB) ||
-    !help.isStr(email) ||
-    !help.isStr(userPassword) ||
-    !help.isStr(aboutMe)
-  ) {
-    help.err(fun, "non-string input");
-  }
+  // if (
+  //   !help.isStr(username) ||
+  //   !help.isStr(firstName) ||
+  //   !help.isStr(lastName) ||
+  //   !help.isStr(DOB) ||
+  //   !help.isStr(email) ||
+  //   !help.isStr(userPassword) ||
+  //   !help.isStr(aboutMe)
+  // ) {
+  //   help.err(fun, "non-string input");
+  // }
 
   //check if username is already used
 
@@ -47,7 +47,7 @@ export const createUser = async (
   const findUserLower = await userCollection.findOne({
     username: username.trim().toLowerCase(),
   });
-
+  
   //check if if user is found with same username
   if (findUser != null || findUserLower != null) {
     help.err(fun, "username: '" + username.trim() + "' is already in use");

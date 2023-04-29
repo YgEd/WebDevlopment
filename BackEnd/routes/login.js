@@ -34,12 +34,12 @@ router
       emailAddressInput = validation.checkEmail(emailAddressInput, "Email Address");
       passwordInput = validation.checkPassword(passwordInput,"Password")
       if (passwordInput !== confirmPasswordInput) throw "password and confirm Password must match"
-      dob = validation.checkDOB(dob,"Date of Birth")
+      // dob = validation.checkDOB(dob,"Date of Birth")
     } catch (e){
       console.log(e)
     }
     try{
-      let insertedUser =  (await createUser(username, firstNameInput,lastNameInput,emailAddressInput,passwordInput, dob, "", ""))
+      let insertedUser =  (await createUser(username, firstNameInput,lastNameInput,emailAddressInput,passwordInput, dob, "", []))
       if(insertedUser){
         return res.redirect('/private')
       }

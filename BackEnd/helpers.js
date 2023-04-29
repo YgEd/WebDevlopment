@@ -80,6 +80,7 @@ checkName(str, varName){
 },
 checkUsername(str, varName){
   str = this.checkString(str, varName);
+  str = str.toLowerCase();
   if (/\s/.test(str)) throw `${varName} can't have any empty spaces`;
   if (str.length < 2 || str.length > 25) throw `${varName} should be at least 2 characters long with a max of 25 characters`
   return str
@@ -103,7 +104,26 @@ checkPassword(str, varName){
   if (!/[^a-zA-Z0-9\s]/.test(str)) throw `${varName} must contain at least one special character`;
   return str
 },
-
+// checkDate(string){
+//   let date = string.split('/');
+//   if (date.length != 3) throw 'has to be in MM/DD/YYYY format'
+//   date.forEach((value) => parseInt(value,10))
+//   for (let i =0; i<date.length;i++){
+//     if (isNaN(date[i])) throw 'one of the date is not a number' 
+//   }
+//   if (date[1] <1) throw "Not a valid date"
+//   if (date[2] <1900 || date[2] > new Date().getFullYear() +1) throw "release Year is not valid"
+//   if ([1,3,5,7,8,10,12].includes(date[0])){
+//      if (date[1] > 31) throw "Not a valid date"
+//   }else if ([4,6,9,11].includes(date[0])){
+//      if (date[1] >30) throw "Not a Valid date"
+//   }else if (date[0] == 2){
+//       if (date[2] % 4 === 0){
+//         if (date[1] > 29) throw "Not a Valid date"
+//       }
+//       if (date[1] >28) throw "Not a valid date"
+//   }else throw 'Month is not valid'
+// },
 checkDOB(str, varName){
   if (!str) throw `Error: You must supply a ${varName}!`;
   if (typeof str !== 'string') throw `Error: ${varName} must be a string!`;

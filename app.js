@@ -5,8 +5,7 @@ import configRoutes from './BackEnd/routes/index.js';
 import {fileURLToPath} from 'url';
 import {dirname} from 'path';
 import exphbs from 'express-handlebars';
-import session from 'express-session'
-
+import session from 'express-session';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -24,6 +23,10 @@ const handlebarsInstance = exphbs.create({
     }
   }
 });
+
+
+
+
 
 app.use('/public', staticDir);
 app.use(express.json());
@@ -45,7 +48,7 @@ app.set('view engine', 'handlebars');
 
   app.use('/login', async (req, res, next) => {
     if(req.session.user){
-        return res.redirect("/protected")
+        return res.redirect("/")
     }
     next();
   });
@@ -53,14 +56,14 @@ app.set('view engine', 'handlebars');
   app.use('/register', async (req, res, next) => {
     console.log("nice to meet you")
     if(req.session.user){
-        return res.redirect("/protected")
+        return res.redirect("/")
     }
     next();
   });
 
-  app.use('/protected', async (req, res, next) => {
+  app.use('/profile', async (req, res, next) => {
     if(!req.session.user){
-        return res.redirect('/login')
+        return res.redirect('/')
     }
     next();
   });
@@ -69,7 +72,7 @@ app.set('view engine', 'handlebars');
 
   app.use('/logout', async (req, res, next) => {
     if(!req.session.user){
-        return res.redirect('/login')
+        return res.redirect('/')
     }
     next();
   });

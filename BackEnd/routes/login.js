@@ -5,7 +5,12 @@ const router = Router();
 import validation from '../helpers.js';
 router.route('/')
   .get(async (req, res) =>{
-        return res.render('posts/home')
+    let logged_in = false
+    if(req.session.user){
+      logged_in = true;
+    }
+    console.log(logged_in)
+        return res.render('posts/home', {logged_in: logged_in})
   }
 );
 router
@@ -28,23 +33,24 @@ router
     if  (!dob) missing.push("enter date of birth")
     if (missing.length >0) return res.status(400).render("register",{title: "Register Form", error: `Missing: ${missing.join(', ')}`})
     try{
-      username = validation.checkUsername(username, "UserName")
+      username = validation.checkUsername(username, "UserName");
       firstNameInput = validation.checkName(firstNameInput,"First Name");
       lastNameInput = validation.checkName(lastNameInput,"Last Name");
       emailAddressInput = validation.checkEmail(emailAddressInput, "Email Address");
-      passwordInput = validation.checkPassword(passwordInput,"Password")
+      passwordInput = validation.checkPassword(passwordInput,"Password");
       if (passwordInput !== confirmPasswordInput) throw "password and confirm Password must match"
       // dob = validation.checkDOB(dob,"Date of Birth")
     } catch (e){
       console.log(e)
     }
     try{
-      let insertedUser =  (await createUser(username, firstNameInput,lastNameInput,emailAddressInput,passwordInput, dob, "", []))
+      let insertedUser =  (await createUser(username, firstNameInput,lastNameInput,emailAddressInput,passwordInput, dob))
       if(insertedUser){
-        return res.redirect('/private')
+        console.log(insertedUser)
+        return res.redirect('/')
       }
     } catch (e){
-      return res.status(400).render("register",{title: "Register Form", error: e})
+     return res.status(400).render("register",{title: "Register Form", error: e})
     }
     return res.status(500).render('error', {title: 'Error',message: "Internal Server Error"})
   });
@@ -52,6 +58,7 @@ router
 router
   .route('/login')
   .get(async (req, res) => {
+
     //code here for GET
     return res.render('login', {title: "Login Form"})
   })
@@ -67,22 +74,16 @@ router
     try {
       let user = await checkUser(emailAddressInput,passwordInput);
       if (user) {
+        
         req.session.user = user;
+        return res.redirect("/profile")
       }
     }catch (e){
-      return res.status(400).render('login', {title: "Login Form", error: e})
+     return res.status(400).render('login', {title: "Login Form", error: e})
     }
   });
 
-router.route('/protected').get(async (req, res) => {
-  //code here for GET
-  if (req.session.user){
-  if (req.session.user.role === 'admin') 
-    return res.render('protected',{title: 'Protected Page',firstName: req.session.user.firstName, currentTime: new Date().toUTCString(), role: req.session.user.role, admin :"<a href='/admin'>Admin Page</a>"})
-  else return res.render('protected',{title: 'Protected Page',firstName: req.session.user.firstName, currentTime: new Date().toUTCString(), role: req.session.user.role})
-  }
-  
-});
+
 
 
 

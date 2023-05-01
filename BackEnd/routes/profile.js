@@ -17,7 +17,7 @@ import {createUser,checkUser,getUser}  from '../data/users.js'
    // }
 //});
 
-const upload=multer({storage: storage});
+//const upload=multer({storage: storage});
 router
   .route('/')
   .get(async (req, res) => {

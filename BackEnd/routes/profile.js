@@ -1,7 +1,9 @@
 import {Router} from 'express';
+import {createUser,checkUser, getUser }  from '../data/users.js'
 import { ObjectId } from 'mongodb';
 const router = Router();
 import multer from 'multer';
+import { userData } from '../data/index.js';
 
 //route code
 const storage=multer.diskStorage({
@@ -24,14 +26,16 @@ router
     if(req.session.user){
         logged_in = true
     }
-    return res.render('profile', {name: req.session.user.email,  streak: req.session.user.streak, aboutme: req.session.user.aboutMe, goals: req.session.user.goals, aboutme : req.session.user.aboutMe , logged_in: true})
+    const userstuff = await getUser(req.session.user.emailAddress)
+    console.log(userData)
+    return res.render('profile', {userid: req.session.user.username,  streak: req.session.user.streak, aboutme: req.session.user.aboutMe, goals: req.session.user.goals,  logged_in: true})
   })
 
- router.get('/upload', async (req, res) =>{
-        return res.render('image/upload', {logged_in: true})
+ router.get('/edit', async (req, res) =>{
+        return res.render('editprofile', {logged_in: true, userid:req.session.user.username})
      })
    
-router.post('/upload', (req, res, next) => {
+router.post('/edit', (req, res, next) => {
         upload.single('photo')(req, res, (err) => {
           if (err) {
             // handle the error

@@ -327,7 +327,6 @@ export const checkUser = async (emailAddress, password) => {
    help.checkEmail(emailAddress, "Email Address");
 
    //Check if password is valid form
-   password = password
    help.checkPassword(password, "Password")
 
    //connect to db
@@ -339,6 +338,7 @@ export const checkUser = async (emailAddress, password) => {
       console.log("what")
       throw "Either the email address or password is invalid";
    }
+   console.log("user", user.userPassword)
 
    let does_match = await bcrypt.compare(password, user.userPassword)
    

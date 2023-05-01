@@ -1,24 +1,19 @@
 
 <label for = "username"> Username:</label>
-<p> {{name}}</p>
+<p> {{userid}}</p>
 
-<form method="PUT" action="/profile/edit">
-   <label for = "firstname">FirstName</label>
-   <input type = "text" name = "firstname" value = "{{firstname}}">
-   <label for = "lastname">Lastname</label>
-   <input type = "text" name = "lastname" value = "{{lastname}}">
-  <label for ="aboutme" > AboutMe</label>
-  <input type="text" name="aboutme" value="{{aboutme}}">
-   <label for ="streaks" > Streaks</label>
-  <input type = "text" name = " streaks" value = "{{streak}}">
-  <label for = "goals">Goals</label>
+<form action="/profile/upload" method="POST" enctype="multipart/form-data">
+  <label for = "aboutme">About me</label>
+  <input type = "text" name = "aboutme" value = "{{aboutme}}">
+  <label for = "goals"> goals</label>
   <input type = "text" name = "goals" value = "{{goals}}">
-  
- 
-  <button type="submit">Save</button>
+  <input type="file" name="photo" />
+  <input id='button' type="submit"/>
 </form>
 
 <a href = "/profile">Profile</a>
+
+
 
 
 

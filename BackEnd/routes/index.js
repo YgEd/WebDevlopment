@@ -1,7 +1,11 @@
-import homeRoutes from "./home.js"
 
+import loginRoutes from "./login.js"
+import privateRoutes from "./private.js"
+import profileRoutes from "./profile.js"
 const constructorMethod = (app) => {
-    app.use("/", homeRoutes);
+    app.use("/", loginRoutes)
+    app.use("/profile", profileRoutes )
+
     app.use('*', (req, res) => {
         res.status(404).json({error: 'Route Not found'});
       });

@@ -1,0 +1,24 @@
+
+<label for = "username"> Username:</label>
+<p> {{name}}</p>
+
+<form method="PUT" action="/profile/edit">
+   <label for = "firstname">FirstName</label>
+   <input type = "text" name = "firstname" value = "{{firstname}}">
+   <label for = "lastname">Lastname</label>
+   <input type = "text" name = "lastname" value = "{{lastname}}">
+  <label for ="aboutme" > AboutMe</label>
+  <input type="text" name="aboutme" value="{{aboutme}}">
+   <label for ="streaks" > Streaks</label>
+  <input type = "text" name = " streaks" value = "{{streak}}">
+  <label for = "goals">Goals</label>
+  <input type = "text" name = "goals" value = "{{goals}}">
+  
+ 
+  <button type="submit">Save</button>
+</form>
+
+<a href = "/profile">Profile</a>
+
+
+

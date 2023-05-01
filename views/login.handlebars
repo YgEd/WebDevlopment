@@ -1,0 +1,21 @@
+{{!--
+
+login form handlebar template
+
+--}}
+<h1>
+    {{title}}
+</h1>
+<p>{{error}}</p>
+<main>
+    <form action="/login" method="POST" id="login-form">
+        <label for="emailAddressInput">Email:</label>
+        <input id="emailAddressInput" type="email" name="emailAddressInput" placeholder="example@example.com"/>
+        <label for="passwordInput">Password:</label>
+        <input id="passwordInput" type="password" name="passwordInput" placeholder="MyPassword123!"/>
+        <label for="button">Click here to Log in</label>
+        <input id='button' type="submit"/>
+    </form>
+    <a href="/register">Click here to register!</a> <br>
+    <div id="error" class="error" hidden>I'm an error. I will change through Client-Side JS</div>
+</main>

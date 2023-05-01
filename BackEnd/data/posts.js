@@ -107,6 +107,9 @@ export const createPost = async (postObj) => {
   //update the user's document in the user db
   user.updateUser(
     targetUser._id,
+    targetUser.username,
+    targetUser.firstName,
+    targetUser.lastName,
     targetUser.email,
     newPosts, //the new posts array is added
     targetUser.userStreak,
@@ -201,6 +204,9 @@ export const removePost = async (postId) => {
   //update the user in the user db
   await user.updateUser(
     targetUser._id,
+    targetUser.username,
+    targetUser.firstName,
+    targetUser.lastName,
     targetUser.email,
     targetUser.userPosts,
     targetUser.userStreak,

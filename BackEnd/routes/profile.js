@@ -4,17 +4,18 @@ const router = Router();
 import multer from 'multer';
 import {createUser,checkUser,getUser}  from '../data/users.js'
 
+
 //route code
-const storage=multer.diskStorage({
-    destination: function(req,file,cb)
-    {
-        cb(null,"./public/img");
-    },
-    filename: function(req,file,cb)
-    {
-        cb(null,file.originalname);
-    }
-});
+//const storage=multer.diskStorage({
+  //  destination: function(req,file,cb)
+   // {
+   //     cb(null,"./public/img");
+    //},
+    //filename: function(req,file,cb)
+    //{
+       // cb(null,file.originalname);
+   // }
+//});
 
 const upload=multer({storage: storage});
 router
@@ -25,7 +26,8 @@ router
     if(req.session.user){
         logged_in = true
     }
-    const userstuff = await getUser(req.session.user.emailAddress)
+    console.log(req.session.user)
+    const userstuff = await getUser(req.session.user.id)
     let goals = "N/A"
     let goalsempty = true
     if (userstuff.goals.length !== 0){
@@ -45,7 +47,8 @@ router
   })
 
  router.get('/edit', async (req, res) =>{
-        return res.render('editprofile', {logged_in: true, userid:req.session.user.username})
+  const userstuff = await getUser(req.session.user.id)
+        return res.render('editprofile', {logged_in: true, userid: userstuff.username})
      })
    
 router.post('/edit', (req, res, next) => {

@@ -1,9 +1,8 @@
 import {Router} from 'express';
-import {createUser,checkUser, getUser }  from '../data/users.js'
 import { ObjectId } from 'mongodb';
 const router = Router();
 import multer from 'multer';
-import { userData } from '../data/index.js';
+import {createUser,checkUser,getUser}  from '../data/users.js'
 
 //route code
 const storage=multer.diskStorage({
@@ -27,8 +26,22 @@ router
         logged_in = true
     }
     const userstuff = await getUser(req.session.user.emailAddress)
-    console.log(userData)
-    return res.render('profile', {userid: req.session.user.username,  streak: req.session.user.streak, aboutme: req.session.user.aboutMe, goals: req.session.user.goals,  logged_in: true})
+    let goals = "N/A"
+    let goalsempty = true
+    if (userstuff.goals.length !== 0){
+      goals = "";
+      for(let i = 0; i < userstuff.goals.length; i++){
+        goals = goals + userstuff.goals[i]
+      }
+      goalsempty = false
+
+      goals = goals + ",";
+    }
+  let aboutme = "N/A"
+  if(userstuff.aboutMe.length !== 0){
+    aboutme = userstuff.aboutMe
+  }
+    return res.render('profile', {userid: userstuff.username,  streak: userstuff.userStreak, aboutme: aboutme, goals: goals,  logged_in: true, goalsempty: true})
   })
 
  router.get('/edit', async (req, res) =>{

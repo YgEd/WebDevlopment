@@ -100,6 +100,7 @@ export const createUser = async (
     aboutMe: aboutMe.trim(),
     groupsOwned,
     groupMembers,
+    profileimg: "",
     goals,
     following,
     followers

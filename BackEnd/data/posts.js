@@ -76,6 +76,7 @@ export const createPost = async (
   let postLikes = [];
   let comments = [];
 
+
   //create the postObj that will be inserted into the db
   let postObj = {
     userId,

@@ -1,22 +1,26 @@
 
-<h1> Name:</h1>
-<h1> {{name}} </h1>
+
 
 
 <h1>Name: {{userid}}</h1>
 <h2> About me</h2>
-<h3> {{description}}</h3>
+<h3> {{aboutme}}</h3>
+
 
 <h2> Streaks</h2>
 <h3> {{streak}}</h3>
 
 <h2> Goals</h2>
+{{#if goalsempty}}
+ <h3> {{goals}}</h3>
+{{else}}
 <ul>
     {{#each goals}}
       <li> {{this}} <li>
 
     {{/each}}
 </ul>
+{{/if}}
 
 <h3>
     <a href = "/profile/edit/{{userid}}">Edit Profile</a>

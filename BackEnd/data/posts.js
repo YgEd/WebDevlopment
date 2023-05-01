@@ -10,16 +10,16 @@ var workoutTypes = ["running", "lifting", "cycling", "other"];
 //valid image types
 var imgTypes = ["jpg", "jpeg", "heic", "avif", "png"];
 
-export const createPost = async (
-  userId,
-  workoutType,
-  postDescription,
-  postImgs,
+export const createPost = async (postObj) => {
+  let userId = postObj.userId
+  let postTitle = postObj.postTitle
+  let workoutType = postObj.workoutType
+  let postDescription = postObj.postDescription
+  let postImgs = postObj.postImgs
   //postTime,
   //postLikes,
   //comments,
-  postToGroup
-) => {
+  let postToGroup = postObj.postToGroup;
   //function name to use for error throwing
   let fun = "createPost";
 
@@ -44,16 +44,10 @@ export const createPost = async (
     help.err(fun, "expected postImgs to be of type array");
   }
 
-  //test if valid image type for each img in postImgs
+  //test if valid objectId for each img in postImgs
   for (let i = 0; i < postImgs.length; i++) {
-    //get the current image image type
-    let curr_img_format = help.getFileType(postImgs[i]);
-    //see if the current image type is valid as defined in imgTypes (defined at the top of file)
-    if (!imgTypes.includes(curr_img_format)) {
-      help.err(
-        fun,
-        "img format '" + curr_img_format + "' is of invalid image type"
-      );
+    if (!ObjectId.isValid(postImgs[i])) {
+      help.err(fun, "postImgs contains a non valid ObjectId");
     }
   }
 
@@ -78,8 +72,9 @@ export const createPost = async (
 
 
   //create the postObj that will be inserted into the db
-  let postObj = {
+  postObj = {
     userId,
+    postTitle,
     workoutType: workoutType.trim(),
     postDescription: postDescription.trim(),
     postImgs,
@@ -113,13 +108,15 @@ export const createPost = async (
   //update the user's document in the user db
   user.updateUser(
     targetUser._id,
-    targetUser.username,
-    targetUser.userPassword,
+    targetUser.email,
     newPosts, //the new posts array is added
     targetUser.userStreak,
     targetUser.aboutMe,
     targetUser.groupsOwned,
-    targetUser.goals
+    targetUser.groupMembers,
+    targetUser.goals,
+    targetUser.following,
+    targetUser.followers
   );
 
   //return the post obj
@@ -148,6 +145,16 @@ export const getAllPosts = async () => {
 export const getPost = async (postId) => {
   //function name to use for error throwing
   let fun = "getPost";
+
+  //ensure input is string and trim input
+  if (typeof postId !== "string") {
+    throw `postId must be a string`
+  }
+  postId = postId.trim();
+  if (postId == "") {
+    throw `postId cannot be an empty string`
+  }
+
   //test if given id is a valid ObjectId type
   if (!ObjectId.isValid(postId)) {
     help.err(fun, "invalid object ID '" + postId + "'");
@@ -155,7 +162,7 @@ export const getPost = async (postId) => {
 
   //get post db
   const postCollection = await posts();
-  const findPost = await postCollection.findOne({ _id: postId });
+  const findPost = await postCollection.findOne({ _id: new ObjectId(postId) });
 
   //if user is not found throw error
   if (findPost == null) {
@@ -195,13 +202,15 @@ export const removePost = async (postId) => {
   //update the user in the user db
   await user.updateUser(
     targetUser._id,
-    targetUser.username,
-    targetUser.userPassword,
+    targetUser.email,
     targetUser.userPosts,
     targetUser.userStreak,
     targetUser.aboutMe,
     targetUser.groupsOwned,
-    targetUser.goals
+    targetUser.groupMembers,
+    targetUser.goals,
+    targetUser.following,
+    targetUser.followers
   );
 
   return "post with postId '" + postId + "' successfully deleted";

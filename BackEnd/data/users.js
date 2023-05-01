@@ -24,8 +24,7 @@ export const createUser = async (
     !help.isStr(lastName) ||
     !help.isStr(DOB) ||
     !help.isStr(email) ||
-    !help.isStr(userPassword) ||
-    !help.isStr(aboutMe)
+    !help.isStr(userPassword)
   ) {
     help.err(fun, "non-string input");
   }

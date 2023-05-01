@@ -89,6 +89,7 @@ export const createUser = async (
   //create user object to add with trimmed and lowercase fields
   
   let user = {
+    _id : new ObjectId(),
     username: username.trim(),
     firstName,
     lastName,

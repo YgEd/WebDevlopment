@@ -14,7 +14,7 @@ router
     .get(async (req, res) => {
         //go to record page for workout creation
         try {
-            return res.render("record", {title: "Record an activity!"});
+            return res.render("record", {title: "Record an activity!", logged_in: true });
         }catch (e) {
             return res.status(500).render('error', {title: 'Error',message: "Internal Server Error"})
         }
@@ -106,11 +106,15 @@ router
 
         try {
             if (!req.file) {
-
+                //do nothing because images arent required
             }
             else {
+                //upload image
+
+                //create doc for mongo storage
                 let doc = {
                     imageName: req.file.originalname,
+                    //creates src link using bufferdata
                     imageSrc: `data:${req.file.fieldname};base64,${req.file.buffer.toString('base64')}`
                 };
                 const photoColl = await photos();
@@ -191,6 +195,6 @@ router
             console.log(e);
             return res.status(404).send("could not find image");
         }
-        return res.render("post", {postTitle: thisPost.postTitle, imgSrc: postImgs[0], postDescription: thisPost.postDescription, workoutType: thisPost.workoutType});
+        return res.render("post", {title: thisPost.postTitle, postTitle: thisPost.postTitle, imgSrc: postImgs[0], postDescription: thisPost.postDescription, workoutType: thisPost.workoutType, logged_in: true});
     });
 export default router

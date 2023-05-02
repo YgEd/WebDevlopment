@@ -6,6 +6,8 @@
 <h2> About me</h2>
 <h3> {{aboutme}}</h3>
 
+<h2> Following: {{following}}</h2>
+<h2> Followers: {{followers}}</h2>
 
 <h2> Streaks</h2>
 <h3> {{streak}}</h3>
@@ -22,9 +24,12 @@
 </ul>
 {{/if}}
 
+{{#if isprofile}}
 <h3>
-    <a href = "/profile/edit/{{userid}}">Edit Profile</a>
+    <a href = "/profile/edit/">Edit Profile</a>
 </h3>
+
+{{/if}}
 
 
 

@@ -138,6 +138,24 @@ export const getUser = async (id) => {
   return findUser;
 };
 
+export const getUsername = async (username) => {
+  //function name to use for error throwing
+  let fun = "getUser";
+  //test if given id is a valid ObjectId type
+  
+
+  //get users db collection
+  const userCollection = await users();
+  const findUser = await userCollection.findOne({ username: username });
+
+  //if user is not found throw error
+  if (findUser == null) {
+    help.err(fun, "user with ObjectId '" + id + "' wasn't found");
+  }
+
+  return findUser;
+};
+
 //returns array of users
 export const getAllUsers = async () => {
   //function name to use for error throwing

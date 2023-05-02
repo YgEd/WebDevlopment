@@ -1,0 +1,13 @@
+<label for = "username"> Username:</label>
+<p> {{userid}}</p>
+
+<form action="/search" method="POST" >
+  <label for = "searchuser">Search user</label>
+  <input type = "text" name = "searchuser">
+    <label for="button">Click here to search user</label>
+        <input id='button' type="submit"/>
+</form>
+{{#if error}}
+   <p> {{error}}</p>
+   {{/if}}
+<a href = "/profile">Profile</a>

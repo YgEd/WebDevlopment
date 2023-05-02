@@ -26,7 +26,7 @@ router
     if(req.session.user){
         logged_in = true
     }
-    console.log(req.session.user)
+    
     const userstuff = await getUser(req.session.user.id)
     let goals = "N/A"
     let goalsempty = true
@@ -43,7 +43,7 @@ router
   if(userstuff.aboutMe.length !== 0){
     aboutme = userstuff.aboutMe
   }
-    return res.render('profile', {userid: userstuff.username,  streak: userstuff.userStreak, aboutme: aboutme, goals: goals,  logged_in: true, goalsempty: true})
+    return res.render('profile', {userid: userstuff.username,  streak: userstuff.userStreak, aboutme: aboutme, goals: goals,  logged_in: true, goalsempty: true, following: userstuff.following.length, followers: userstuff.followers.length, isprofile: true})
   })
 
  router.get('/edit', async (req, res) =>{

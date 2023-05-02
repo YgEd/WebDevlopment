@@ -2,7 +2,8 @@ import {Router} from 'express';
 import { ObjectId } from 'mongodb';
 const router = Router();
 import multer from 'multer';
-
+import { recsData } from '../data/index.js';
+import helper from "../helpers.js"
 //route code
 const storage=multer.diskStorage({
     destination: function(req,file,cb)
@@ -24,7 +25,8 @@ router
     if(req.session.user){
         logged_in = true
     }
-    return res.render('profile', {name: req.session.user.email,  streak: req.session.user.streak, aboutme: req.session.user.aboutMe, goals: req.session.user.goals, aboutme : req.session.user.aboutMe , logged_in: true})
+    let recsList = await recsData.getAllRecs()
+    return res.render('profile', {name: req.session.user.email,  streak: req.session.user.streak, aboutme: req.session.user.aboutMe, goals: req.session.user.goals, aboutme : req.session.user.aboutMe , logged_in: true, workout: helper.getRandomItem(recsList) })
   })
 
  router.get('/upload', async (req, res) =>{

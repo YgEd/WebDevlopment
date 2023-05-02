@@ -60,7 +60,15 @@ verObjectIds(arr){
   return true
 
 },
-
+checkId(id, varName) {
+  if (!id) throw `Error: You must provide a ${varName}`;
+  if (typeof id !== 'string') throw `Error:${varName} must be a string`;
+  id = id.trim();
+  if (id.length === 0)
+    throw `Error: ${varName} cannot be an empty string or just spaces`;
+  if (!ObjectId.isValid(id)) throw `Error: ${varName} invalid object ID`;
+  return id;
+},
 checkString(strVal, varName) {
   if (!strVal) throw `Error: You must supply a ${varName}!`;
   if (typeof strVal !== 'string') throw `Error: ${varName} must be a string!`;
@@ -72,11 +80,36 @@ checkString(strVal, varName) {
     throw `Error: ${strVal} is not a valid value for ${varName} as it only contains digits`;
   return strVal;
 },
+checkStringArray(arr, varName) {
+  //We will allow an empty array for this,
+  //if it's not empty, we will make sure all tags are strings
+  if (!arr || !Array.isArray(arr))
+    throw `You must provide an array of ${varName}`;
+  if (arr.length <1) throw 'array must have at least 1'
+  for (let i in arr) {
+    if (typeof arr[i] !== 'string' || arr[i].trim().length === 0) {
+      throw `One or more elements in ${varName} array is not a string or is an empty string`;
+    }
+    arr[i] = arr[i].trim();
+  }
+
+  return arr;
+},
 checkName(str, varName){
   str = this.checkString(str, varName);
   if (/\d/.test(str)) throw `${varName} cannot contain any numbers`
   if (str.length < 2 || str.length > 25) throw `${varName} should be at least 2 characters long with a max of 25 characters`
   return str
+},
+checkNumber(num, varName){
+  if (!num) throw `${num} is not supplied`
+  if (typeof num !== 'number') {
+    throw `${variableName || 'provided variable'} is not a number`;
+  }
+
+  if (isNaN(val)) {
+    throw `${variableName || 'provided variable'} is NaN`;
+  }
 },
 checkUsername(str, varName){
   str = this.checkString(str, varName);
@@ -104,6 +137,7 @@ checkPassword(str, varName){
   if (!/[^a-zA-Z0-9\s]/.test(str)) throw `${varName} must contain at least one special character`;
   return str
 },
+
 // checkDate(string){
 //   let date = string.split('/');
 //   if (date.length != 3) throw 'has to be in MM/DD/YYYY format'
@@ -158,6 +192,16 @@ checkDOB(str, varName){
     err(fun,"DOB is not 18 years or older: year, month, day is too young");
   }
   return 
+},
+getRandomItem(arr) {
+
+  // get random index value
+  const randomIndex = Math.floor(Math.random() * arr.length);
+
+  // get random item
+  const item = arr[randomIndex];
+
+  return item;
 }
 
 }

@@ -184,7 +184,7 @@ export const updateUser = async (
   firstName,
   lastName,
   email,
-  //userPassword,
+  userPassword,
   //DOB,
   userPosts,
   userStreak,

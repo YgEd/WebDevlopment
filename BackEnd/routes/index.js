@@ -5,6 +5,8 @@ import profileRoutes from "./profile.js"
 import postRoutes from "./posts.js"
 
 import feedRoutes from "./feed.js"
+import postRoutes from "./posts.js"
+
 const constructorMethod = (app) => {
     app.use("/", loginRoutes)
     app.use("/profile", profileRoutes )

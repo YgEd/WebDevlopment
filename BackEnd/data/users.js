@@ -283,8 +283,8 @@ export const updateUser = async (
   }
 
   //ensure input fields are trimmed and the password is hashed
-  let hashed = await bcrypt.hash(userPassword, 10);
-  console.log("from update: hashed password = " + hashed)
+  //let hashed = await bcrypt.hash(userPassword, 10);
+  //console.log("from update: hashed password = " + hashed)
   username = username.trim();
   aboutMe = aboutMe.trim();
 
@@ -297,7 +297,7 @@ export const updateUser = async (
         firstName,
         lastName,
         email,
-        userPassword: hashed,
+        //userPassword: hashed,
         userPosts,
         userStreak,
         aboutMe,

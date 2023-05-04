@@ -12,6 +12,7 @@ var imgTypes = ["jpg", "jpeg", "heic", "avif", "png"];
 
 export const createPost = async (
   userId,
+  postTitle,
   workoutType,
   postDescription,
   postImgs,
@@ -28,8 +29,9 @@ export const createPost = async (
     help.err(fun, "invalid object ID '" + userId + "'");
   }
 
-  //ensure workoutTYpe and postDescription are non-empty strings
-  if (!help.isStr(postDescription) || !help.isStr(workoutType)) {
+
+  //ensure workoutTYpe, postTitle, and postDescription are non-empty strings
+  if (!help.isStr(postDescription) || !help.isStr(workoutType) || !help.isStr(postTitle)) {
     help.err(fun, "expected string inputs to be of non-empty string type");
   }
 
@@ -81,6 +83,7 @@ export const createPost = async (
   //create the postObj that will be inserted into the db
   let postObj = {
     userId,
+    postTitle: postTitle.trim(),
     workoutType: workoutType.trim(),
     postDescription: postDescription.trim(),
     postImgs,
@@ -272,6 +275,7 @@ export const removePost = async (postId) => {
 
 export const updatePost = async (
   postId,
+  postTitle,
   workoutType,
   postDescription,
   postImgs,
@@ -282,7 +286,9 @@ export const updatePost = async (
   let fun = "updatePost";
   //Make sure fields are valid
   if (
+
     !postId ||
+    !postTitle ||
     !workoutType ||
     !postDescription ||
     !postImgs ||
@@ -309,6 +315,11 @@ export const updatePost = async (
   //Ensure postDescription is a non-empty string
   if (help.strPrep(postDescription).length == 0) {
     help.err(fun, "postDescription needs to be non-empty string");
+  }
+
+  //Ensure postTitle is a non-empty string
+  if (help.strPrep(postTitle).length == 0) {
+    help.err(fun, "postTitle needs to be non-empty string");
   }
 
   //Ensure postImgs is an array
@@ -338,6 +349,7 @@ export const updatePost = async (
     { _id: new ObjectId(postId) },
     {
       $set: {
+        postTitle: postTitle,
         workoutType: workoutType,
         postDescription: postDescription,
         postImgs: postImgs,

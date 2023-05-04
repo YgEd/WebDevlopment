@@ -79,7 +79,7 @@ export const createUser = async (
   let followers = [] //people that are following the user
 
   let hashed = await bcrypt.hash(userPassword, 10);
-  console.log("user password = " + hashed)
+
 
   //create user object to add with trimmed and lowercase fields
   
@@ -102,6 +102,7 @@ export const createUser = async (
 
 
 
+
   //insert created user object into the db
   const insertInfo = await userCollection.insertOne(user);
   if (!insertInfo.acknowledged || !insertInfo.insertedId) {
@@ -117,7 +118,7 @@ export const createUser = async (
 
 //return user by given ObjectId id
 export const getUser = async (id) => {
-  console.log("trying to find user with id " + id)
+
   //function name to use for error throwing
   let fun = "getUser";
   //test if given id is a valid ObjectId type
@@ -176,13 +177,15 @@ export const removeUser = async (id) => {
   return "user with id '" + id + "' successfully deleted";
 };
 
+//added back username, firstname, and last as updateable parameters
+//use other function for password updates
 export const updateUser = async (
   id,
   username,
   firstName,
   lastName,
   email,
-  userPassword,
+  //userPassword,
   //DOB,
   userPosts,
   userStreak,
@@ -202,8 +205,8 @@ export const updateUser = async (
     !help.isStr(firstName) ||
     !help.isStr(lastName) ||
     !help.isStr(email) ||
-    !help.isStr(userPassword) ||
-    !help.isStr(aboutMe)
+    //!help.isStr(userPassword) ||
+    typeof aboutMe !== "string" // shouldnt check against empty string because we initialize it as one
   ) {
     help.err(fun, "expected string inputs are not non-empty strings");
   }
@@ -246,6 +249,7 @@ export const updateUser = async (
   //get original username for user that is being updated
   let oldUser = await getUser(id);
 
+  
   if (oldUser.username.toLowerCase() != username.trim().toLowerCase()) {
     //find if user exists with given username
     const findUser = await userCollection.findOne({
@@ -285,6 +289,7 @@ export const updateUser = async (
   let hashed = await bcrypt.hash(userPassword, 10);
   console.log("from update: hashed password = " + hashed)
   username = username.trim();
+
   aboutMe = aboutMe.trim();
 
   //update the oldUser
@@ -312,6 +317,59 @@ export const updateUser = async (
   //return updated user object
   return getUser(id);
 };
+
+export const updatePass = async (userId, currentPass, newPass) => {
+  //error handling
+  if (!userId || !currentPass || !newPass) {
+    throw `Error from updatePass, must provide userId, currentPass, and newPass`
+  }
+  if (!help.isStr(userId) || !help.isStr(currentPass) || !help.isStr(newPass)) {
+    throw `Error from updatePass, parameters must be non-empty strings`
+  }
+  userId = userId.trim();
+  currentPass = currentPass.trim();
+  newPass = newPass.trim();
+  if (!ObjectId.isValid(userId)) {
+    throw `Error from updatePass, invalid userId`
+  }
+
+  //get users old password
+  const userColl = await users();
+
+  const target = await userCollection.findOne({_id: userId});
+  if (!target) {
+    throw `Error from updatePass, could not find user with that Id`
+  }
+
+  currPassHash = target.userPassword;
+  
+  //confirm user provided correct password
+  let correctPass = (await bcrypt.compare(currentPass, currPassHash));
+
+  if (!correctPass) {
+    throw `Error from updatePass, incorrect password supplied for old password`
+  }
+
+  //hash new password
+  let hashed = await bcrypt.hash(newPass, 10);
+
+  //update pass
+  const updateInfo = await userCollection.updateOne(
+    { _id: id },
+    {
+      $set: {
+        userPassword: hashed
+      },
+    }
+  );
+
+  //confirm success
+  if (!updateInfo.acknowledged) {
+    throw `Error from updatePass, could not update password`
+  }
+
+  return {updatedPass: true};
+}
 
 export const checkUser = async (emailAddress, password) => {
   let fun = "checkUser"
@@ -353,6 +411,7 @@ export const checkUser = async (emailAddress, password) => {
     emailAddress: user.email,
     user_id: user._id,
     userName: user.username
+
    }
   
 

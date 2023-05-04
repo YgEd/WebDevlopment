@@ -79,7 +79,7 @@ export const createUser = async (
   let followers = [] //people that are following the user
 
   let hashed = await bcrypt.hash(userPassword, 10);
-  console.log("user password = " + hashed)
+
 
   //create user object to add with trimmed and lowercase fields
   
@@ -102,6 +102,7 @@ export const createUser = async (
 
 
 
+
   //insert created user object into the db
   const insertInfo = await userCollection.insertOne(user);
   if (!insertInfo.acknowledged || !insertInfo.insertedId) {
@@ -117,7 +118,7 @@ export const createUser = async (
 
 //return user by given ObjectId id
 export const getUser = async (id) => {
-  console.log("trying to find user with id " + id)
+
   //function name to use for error throwing
   let fun = "getUser";
   //test if given id is a valid ObjectId type
@@ -184,7 +185,7 @@ export const updateUser = async (
   firstName,
   lastName,
   email,
-  userPassword,
+  //userPassword,
   //DOB,
   userPosts,
   userStreak,
@@ -288,6 +289,7 @@ export const updateUser = async (
   let hashed = await bcrypt.hash(userPassword, 10);
   console.log("from update: hashed password = " + hashed)
   username = username.trim();
+
   aboutMe = aboutMe.trim();
 
   //update the oldUser
@@ -409,6 +411,7 @@ export const checkUser = async (emailAddress, password) => {
     emailAddress: user.email,
     user_id: user._id,
     userName: user.username
+
    }
   
 

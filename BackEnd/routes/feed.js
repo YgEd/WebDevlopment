@@ -7,15 +7,20 @@ import { Router } from "express";
 const router = Router();
 
 router.get("/", async (req, res) => {
-  console.log(req.session.user.firstName + "is accessing feed page");
-  console.log(req.session.user.user_id);
+  if (!req.session.user){
+    console.log("user not authenticated");
+    return res.redirect("/login")
+  }
+
+  var logged_in = false;
+
+  if (req.session.user.user_id){
+    logged_in = true;
+  }
   let userId = req.session.user.user_id;
   let userName = req.session.user.userName
   let firstName = req.session.user.firstName;
-  if (!userId) {
-    console.log("user not authenticated");
-    return;
-  }
+  
 try {
   let targetUser = await userFuns.getUser(userId);
   let target_following = [];
@@ -98,6 +103,7 @@ try {
     userName: userName,
     posts: displayPosts,
     userId: userId,
+    logged_in: logged_in
   });
 } catch (error) {
   console.log("Error from get feed route: " + error);

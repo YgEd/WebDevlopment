@@ -129,8 +129,13 @@ export const createPost = async (
 //returns limits amout of most recent posts by userId
 export const getPostByUser = async (userId, limit) => {
   let fun = "getPostByUser";
-  if (!userId) {
+  if (!userId || !limit) {
     help.err(fun, "no userId provided");
+  }
+
+  //ensure limit is a number
+  if (!help.isNum(limit)) {
+    help.err(fun, "limit is not a number");
   }
 
   if (!ObjectId.isValid(userId)) {
@@ -164,8 +169,13 @@ export const getPostByUser = async (userId, limit) => {
 //returns limits amout of most recent posts by groupId
 export const getPostByGroup = async (groupId, limit) => {
   let fun = "getPostbyGroup";
-  if (!groupId) {
+  if (!groupId || !limit) {
     help.err(fun, "no groupId provided");
+  }
+
+  //ensure limit is a number
+  if (!help.isNum(limit)) {
+    help.err(fun, "limit is not a number");
   }
 
   if (!ObjectId.isValid(groupId)) {
@@ -194,9 +204,19 @@ export const getPostByGroup = async (groupId, limit) => {
   return postList;
 };
 
-export const getAllPosts = async () => {
+export const getAllPosts = async (limit) => {
   //function name to use for error throwing
   let fun = "getAllPosts";
+
+  //ensure limit is provided
+  if (!limit) {
+    help.err(fun, "no limit provided");
+  }
+
+  //ensure limit is a number
+  if (!help.isNum(limit)) {
+    help.err(fun, "limit is not a number");
+  }
 
   //get post db
   const postCollection = await posts();
@@ -207,7 +227,7 @@ export const getAllPosts = async () => {
   }
 
   //put db in an array
-  let postList = await postCollection.find({}).sort({ postTime: -1 }).toArray();
+  let postList = await postCollection.find({}).sort({ postTime: -1 }).limit(limit).toArray();
 
   //return array of users
   return postList;

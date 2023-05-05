@@ -136,9 +136,19 @@ export const getUser = async (id) => {
 };
 
 //returns array of users
-export const getAllUsers = async () => {
+export const getAllUsers = async (limit) => {
   //function name to use for error throwing
   let fun = "getAllUsers";
+
+  //ensure limit is provided
+  if (limit == null) {
+    help.err(fun, "limit not provided");
+  }
+
+  //test if limit is a valid number
+  if (!help.isNum(limit)) {
+    help.err(fun, "limit is not a number");
+  }
   //get users db collection
   const userCollection = await users();
 
@@ -148,7 +158,7 @@ export const getAllUsers = async () => {
   }
 
   //put db in an array
-  let userList = await userCollection.find({}).toArray();
+  let userList = await userCollection.find({}).limit(limit).toArray();
 
   //return array of users
   return userList;

@@ -9,19 +9,19 @@ let exportedMethods = {
     level,
     reps,
     rounds,
-    tags = []
+    tags 
   ) {
     workoutName = validation.checkString(workoutName, "Workout name").toUpperCase();
-    equipment = validation.checkStringArray(equipment, "array of equipment");
-    validation.checkNumber(duration, "duration")
+    equipment = validation.checkString(equipment, "name of equipment");
+    validation.isNum(duration)
     if (duration <= 0 || duration >= 60) throw "The work out is too long or invalid number of minutes"
     level = validation.checkString(level, "level").toLowerCase()
-    if (level !== "easy" || level !== "medium" || level !== "hard" ) throw "not valid level"
-    validation.checkNumber(reps, "reps number")
+    if (level !== "beginner" && level !== "intermediate" && level !== "advanced" ) throw "not valid level"
+    validation.isNum(reps)
     if (reps <= 0 || reps >1000) throw "Invalid reps number for this work out"
-    validation.checkNumber(rounds, "rounds number")
+    validation.isNum(rounds)
     if (rounds <= 0 || rounds >= 20) throw "Invalid rounds number for this work out"
-    tags = validation.checkStringArray(tags, "tags")
+    // tags = validation.checkStringArray(tags, "tags")
 
     let recsCollection = await recs()
     let newRec = {

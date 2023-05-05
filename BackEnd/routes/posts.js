@@ -6,8 +6,22 @@ import multer from 'multer';
 import {photos} from "../config/mongoCollections.js";
 import { createPost, getPost } from '../data/posts.js';
 import { ObjectId } from 'mongodb';
+import {uploadPhoto, upload, getPhotoSrc } from '../data/photos.js';
 
-const upload = multer({storage: multer.memoryStorage()});
+/*const upload = multer({
+    storage: multer.memoryStorage(),
+    //max 5 files of 10mb
+    limits: {fields: 5,
+            fileSize: 10 * 1024 * 1024,
+            fieldSize: 10 * 1024 * 1024},
+    fileFilter: function (req, file, cb) {
+        console.log(file.mimetype);
+        if (file.mimetype != "image/jpg" && file.mimetype != "image/png" && file.mimetype != "image/jpeg") {
+            return cb(new Error("Files must be of type jpg, jpeg, or png"));
+        }
+        cb(null, true);
+    }
+});*/
 
 router
     .route('/create')
@@ -19,13 +33,13 @@ router
             return res.status(500).render('error', {title: 'Error',message: "Internal Server Error"})
         }
     })
-    .post(upload.single('postImgs'), async (req, res) => {
+    .post(upload.array('postImgs[]', 5), async (req, res, err) => {
         //console.log(req.file);
         let fun = "createPostRoute";
         var workoutTypes = ["running", "lifting", "cycling", "other"];
         //create post
         const postData = req.body;
-        let userId = req.session.user.id;
+        let userId = req.session.user.user_id;
         let workoutType = postData.workoutType;
         let postDescription = postData.postDescription;
         let postImgs = []
@@ -34,6 +48,10 @@ router
         let postTitle = postData.postTitle;
         let badData = {};
         let posted;
+
+        if(err instanceof multer.MulterError) {
+            res.status(400).render('error', {error: err});
+        }
 
         try {
             //none of these should ever really error because its just pulled from the cookie
@@ -105,27 +123,17 @@ router
         }
 
         try {
-            if (!req.file) {
+            if (!req.files) {
                 //do nothing because images arent required
             }
             else {
                 //upload image
-
-                //create doc for mongo storage
-                let doc = {
-                    imageName: req.file.originalname,
-                    //creates src link using bufferdata
-                    imageSrc: `data:${req.file.fieldname};base64,${req.file.buffer.toString('base64')}`
-                };
-                const photoColl = await photos();
-                const insertPhoto = await photoColl.insertOne(doc);
-                //test to see if insert was successful
-                if (!insertPhoto.acknowledged || !insertPhoto.insertedId) {
-                  throw "error could not upload image"
+                for (let x of req.files) {
+                    let xId = await uploadPhoto(x)
+                    //console.log(xId)
+                    postImgs.push(xId);
                 }
-                else {
-                    postImgs.push(insertPhoto.insertedId);
-                }
+                //console.log(postImgs);
             }   
         }catch(e) {
             badData.postImgs = e;
@@ -141,15 +149,20 @@ router
             postToGroup: postToGroup
         }
         try {
-            posted = await createPost(postObj);
+            console.log(postObj.userId)
+            console.log("is userId valid " + ObjectId.isValid(postObj.userId))
+            console.log(postObj)
+            posted = await createPost(userId, postTitle, workoutType, postDescription, postImgs, postToGroup);
             if (!posted) {
                 throw `Error: could not post workout`
             }
+            console.log(posted)
+            let postId = posted._id
+            res.redirect(`/posts/${postId}`)
         }catch(e) {
             console.log(e);
         }
-        let postId = posted._id
-        res.redirect(`/posts/${postId}`)
+        
     });
 
 router
@@ -181,20 +194,17 @@ router
             return res.status(404).send("could not find post");
         }
         try {
+            //get photos
             if (thisPost.postImgs.length != 0) {
-                const photoColl = await photos();
                 for (let x of thisPost.postImgs) {
-                    let currImg = await photoColl.findOne({_id: x})
-                    if (!currImg) {
-                        throw `Error: could not find image with id ${x}`
-                    }
-                    postImgs.push(currImg.imageSrc);
+                    let src = await getPhotoSrc(x);
+                    postImgs.push(src);
                 }
             }
         }catch(e) {
             console.log(e);
             return res.status(404).send("could not find image");
         }
-        return res.render("post", {title: thisPost.postTitle, postTitle: thisPost.postTitle, imgSrc: postImgs[0], postDescription: thisPost.postDescription, workoutType: thisPost.workoutType, logged_in: true});
+        return res.render("post", {title: thisPost.postTitle, postTitle: thisPost.postTitle, images: postImgs, postDescription: thisPost.postDescription, workoutType: thisPost.workoutType, logged_in: true});
     });
 export default router

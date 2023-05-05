@@ -1,0 +1,80 @@
+
+
+<div class="feed-wrapper">
+    <div class="side-bar">
+        <h1 id="welcome-msg">Hey {{firstName}}, welcome!</h1>
+    </div>  
+    
+    
+    <div hidden id="session-user">{{userId}}</div>
+    <div class="feed-container">
+        
+        <div id="feed-body">
+            {{#each posts}}
+            <div class="post-item">
+                {{#if this.liked}}
+                    <div hidden class="liked">true</div>
+                {{else}}
+                    <div hidden class="liked">false</div>
+                {{/if}}
+                
+                {{#if this.commented}}
+                    <div hidden class="commented">true</div>
+                {{else}}
+                    <div hidden class="commented">false</div>
+                {{/if}}
+                <div hidden class="postId">{{this._id}}</div>
+                <br>
+                <p class="post-type">{{this.workoutType}}</p>
+                <br>
+                <p class="post-title">{{this.postTitle}}</p>
+                {{#each this.postImgs}}
+                    
+                        <img src={{this}} alt="hold"width="300" height="300">
+                    
+                {{/each}}
+                <div class="post-caption">
+                    <br>
+                    {{!-- Like button --}}
+                    <p class="comment-username">{{../userName}}</p>
+                    <br>
+                    <img src="/public/img/unfilled_heart.png" alt="like button" class="together like-button">
+                    {{!-- <input type="image" class="together like-button" alt="Login" src="/public/img/unfilled_heart.png"> --}}
+                    {{#when this.postLikes.length 'eq' 1}}
+                        <p class="together likes"><strong>{{../this.postLikes.length}}</strong> Like</p>
+                    {{/when}}
+                    {{#when this.postLikes.length 'noteq' 1}}
+                        <p class="together likes"><strong>{{../this.postLikes.length}}</strong> Likes</p>
+                    {{/when}}
+
+                    <p class="together post-des">{{this.postDescription}}</p>
+                </div>
+                <div class="comment-wrapper">
+                    {{#each this.comments}}
+                        
+                        {{> comment}}
+                    {{/each}}
+                </div>
+                {{!-- {{#if no-comment}} --}}
+                    <button type="button" class="remove-comment">Remove Your Comment</button>
+                    <div class="error-comment"></div>&nbsp;
+                    <textarea class="comment-body" rows="4" cols="30" maxlength="100"></textarea>
+                    <br>
+                    <button type="button" class="comment-button">Comment</button>
+               
+                {{!-- {{/if}} --}}
+                
+                
+                
+            </div>
+            {{/each}}
+        </div>
+    </div>
+</div>
+
+<!-- Below  Url In src="" is Of Font Awesome Kit Create your own Kit and Use that Url below  Or also you can use Link of font Awesome Cdn if you don't want to create a kit and use older version of Font Awesome Icons     -->
+   
+ <script src="https://code.jquery.com/jquery-3.5.1.js"
+		integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+<script src="/public/js/feed.js" ></script>
+

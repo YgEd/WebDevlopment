@@ -1,0 +1,29 @@
+{
+  "name": "fitnessapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "helpers.js",
+  "type": "module",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/laddhasuneedhi/CS546Project.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/laddhasuneedhi/CS546Project/issues"
+  },
+  "homepage": "https://github.com/laddhasuneedhi/CS546Project#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "express": "^4.18.2",
+    "express-handlebars": "^7.0.7",
+    "express-session": "^1.17.3",
+    "mongodb": "^5.3.0"
+  }
+}

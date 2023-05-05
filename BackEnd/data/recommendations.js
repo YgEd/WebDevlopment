@@ -52,8 +52,30 @@ async deleteRec (id) {
         _id: ObjectId(id)
       });
       if (deletionInfo.lastErrorObject.n === 0)
-        throw [404, `Could not delete post with id of ${id}`];
+        throw [404, `Could not delete reccomendation with id of ${id}`];
     return true
+},
+async getRec(recId){
+  //function name to use for error throwing
+  let fun = "getRec";
+  //test if given id is a valid ObjectId type
+  if (!ObjectId.isValid(recId)) {
+    help.err(fun, "invalid object ID '" + recId + "'");
+  }
+
+  //if recId is ObjectId turn into String
+  recId = recId.toString().trim();
+
+  //get rec db
+  const recCollection = await recs();
+  const findRec = await recCollection.findOne({ _id: new ObjectId(recId) });
+
+  //if user is not found throw error
+  if (findRec == null) {
+    help.err(fun, "reccommendation with ObjectId '" + recId + "' wasn't found");
+  }
+
+  return findRec;
 },
 async getAllRecs() {
     //function name to use for error throwing

@@ -48,4 +48,34 @@ router
             return res.status(400).render("coach",{title: "Adding Recommendations", error: e})
         }
 })
+router
+    .route('/:recId')
+    .get(async (req, res) => {
+        //get rec by id and send to rec specific page
+        let recId = req.params.recId;
+        let thisRec;
+        try {
+            if (typeof recId !== "string") {
+                throw `recId must be a string`
+            }
+            recId = recId.trim();
+            if (recId == "") {
+                throw `recId cannot be empty`
+            }
+            if (!ObjectId.isValid(new ObjectId(recId))) {
+                throw `invalid recId`
+            }
+        }catch(e) {
+            console.log(e);
+            return res.status(400).send(e);
+        }
+        try {
+            thisRec = await recData.getRec(recId);
+        }catch(e) {
+            console.log(e);
+            return res.status(404).send("could not find reccomendation");
+        }
+        
+        return res.render("rec", {title: thisRec.workoutName, workout: thisRec});
+    });
 export default router

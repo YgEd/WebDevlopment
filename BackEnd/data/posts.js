@@ -10,17 +10,17 @@ var workoutTypes = ["running", "lifting", "cycling", "other"];
 //valid image types
 var imgTypes = ["jpg", "jpeg", "heic", "avif", "png"];
 
-export const createPost = async (postObj) => {
-  let userId = postObj.userId
-  let postTitle = postObj.postTitle
-  let workoutType = postObj.workoutType
-  let postDescription = postObj.postDescription
-  let postImgs = postObj.postImgs
+export const createPost = async (
+  userId,
+  postTitle,
+  workoutType,
+  postDescription,
+  postImgs,
   //postTime,
   //postLikes,
   //comments,
-  
-  let postToGroup = postObj.postToGroup;
+  postToGroup
+) => {
   //function name to use for error throwing
   let fun = "createPost";
 
@@ -29,8 +29,9 @@ export const createPost = async (postObj) => {
     help.err(fun, "invalid object ID '" + userId + "'");
   }
 
-  //ensure workoutTYpe and postDescription are non-empty strings
-  if (!help.isStr(postDescription) || !help.isStr(workoutType)) {
+
+  //ensure workoutTYpe, postTitle, and postDescription are non-empty strings
+  if (!help.isStr(postDescription) || !help.isStr(workoutType) || !help.isStr(postTitle)) {
     help.err(fun, "expected string inputs to be of non-empty string type");
   }
 
@@ -45,10 +46,16 @@ export const createPost = async (postObj) => {
     help.err(fun, "expected postImgs to be of type array");
   }
 
-  //test if valid objectId for each img in postImgs
+  //test if valid image type for each img in postImgs
   for (let i = 0; i < postImgs.length; i++) {
-    if (!ObjectId.isValid(postImgs[i])) {
-      help.err(fun, "postImgs contains a non valid ObjectId");
+    //get the current image image type
+    let curr_img_format = help.getFileType(postImgs[i]);
+    //see if the current image type is valid as defined in imgTypes (defined at the top of file)
+    if (!imgTypes.includes(curr_img_format)) {
+      help.err(
+        fun,
+        "img format '" + curr_img_format + "' is of invalid image type"
+      );
     }
   }
 
@@ -59,27 +66,28 @@ export const createPost = async (postObj) => {
 
   //test to ensure postToGroup is empty or of full of valid ObjectIds
   for (let i = 0; i < postToGroup.length; i++) {
-    if (!ObjectId.isValid(postToGroup[i])) {
+    if (!Object.isValid(postToGroup[i])) {
       help.err(fun, "postToGroup contains a non valid ObjectId");
     }
   }
 
   //get current time
-  const date = new Date();
+  let date = new Date();
+  const offset = date.getTimezoneOffset();
+  date = new Date(date.getTime() - offset * 60 * 1000);
 
   //setup default variables
   let postLikes = [];
   let comments = [];
 
-
   //create the postObj that will be inserted into the db
-  postObj = {
+  let postObj = {
     userId,
-    postTitle,
+    postTitle: postTitle.trim(),
     workoutType: workoutType.trim(),
     postDescription: postDescription.trim(),
     postImgs,
-    postTime: date.toLocaleTimeString(),
+    postTime: date,
     postLikes,
     comments,
     postToGroup,
@@ -107,24 +115,79 @@ export const createPost = async (postObj) => {
   newPosts.push(insertInfo.insertedId);
 
   //update the user's document in the user db
-  user.updateUser(
-    targetUser._id,
-    targetUser.username,
-    targetUser.firstName,
-    targetUser.lastName,
-    targetUser.email,
-    newPosts, //the new posts array is added
-    targetUser.userStreak,
-    targetUser.aboutMe,
-    targetUser.groupsOwned,
-    targetUser.groupMembers,
-    targetUser.goals,
-    targetUser.following,
-    targetUser.followers
+  const updateInfo = await userCollection.updateOne(
+    { _id: userId },
+    { $set: { userPosts: newPosts } }
   );
 
   //return the post obj
   return await postCollection.findOne({ _id: insertInfo.insertedId });
+};
+
+//returns limits amout of most recent posts by userId
+export const getPostByUser = async (userId, limit) => {
+  let fun = "getPostByUser";
+  if (!userId) {
+    help.err(fun, "no userId provided");
+  }
+
+  if (!ObjectId.isValid(userId)) {
+    help.err(fun, "userId is invalid ObjectId");
+  }
+
+  //if userId is ObjectId in turn into string
+  userId = userId.toString().trim()
+
+  //get post db
+  const postCollection = await posts();
+
+  //test if userCollection is null
+  if (postCollection == null) {
+    help.err(fun, "could not get posts");
+  }
+
+  //put db in an array
+  let postList = await postCollection
+    .find({ userId: new ObjectId(userId) })
+    .limit(limit)
+    .sort({ postTime: 1 })
+    .toArray();
+
+  //return array of users
+  return postList;
+};
+
+//returns limits amout of most recent posts by groupId
+export const getPostByGroup = async (groupId, limit) => {
+  let fun = "getPostbyGroup";
+  if (!groupId) {
+    help.err(fun, "no groupId provided");
+  }
+
+  if (!ObjectId.isValid(groupId)) {
+    help.err(fun, "groupId is invalid ObjectId");
+  }
+
+  //if groupId is ObjectId in turn into string
+  groupId = groupId.toString().trim()
+
+  //get post db
+  const postCollection = await posts();
+
+  //test if userCollection is null
+  if (postCollection == null) {
+    help.err(fun, "could not get posts");
+  }
+
+  //put db in an array
+  let postList = await postCollection
+    .find({ postToGroup: new ObjectId(groupId) })
+    .limit(limit)
+    .sort({ postTime: 1 })
+    .toArray();
+
+  //return array of users
+  return postList;
 };
 
 export const getAllPosts = async () => {
@@ -132,7 +195,7 @@ export const getAllPosts = async () => {
   let fun = "getAllPosts";
 
   //get post db
-  const postCollection = await posts()
+  const postCollection = await posts();
 
   //test if userCollection is null
   if (postCollection == null) {
@@ -144,25 +207,18 @@ export const getAllPosts = async () => {
 
   //return array of users
   return postList;
-}
+};
 
 export const getPost = async (postId) => {
   //function name to use for error throwing
   let fun = "getPost";
-
-  //ensure input is string and trim input
-  if (typeof postId !== "string") {
-    throw `postId must be a string`
-  }
-  postId = postId.trim();
-  if (postId == "") {
-    throw `postId cannot be an empty string`
-  }
-
   //test if given id is a valid ObjectId type
   if (!ObjectId.isValid(postId)) {
     help.err(fun, "invalid object ID '" + postId + "'");
   }
+
+  //if postId is ObjectId turn into String
+  postId = postId.toString().trim();
 
   //get post db
   const postCollection = await posts();
@@ -183,12 +239,17 @@ export const removePost = async (postId) => {
   if (!ObjectId.isValid(postId)) {
     help.err(fun, "invalid object ID '" + postId + "'");
   }
+
+  //if postId is ObjectId turn into String
+  postId = postId.toString().trim();
+
+  
   //get post object
   const targetPost = await getPost(postId);
 
   //get post db and remove the target post
   const userCollection = await posts();
-  const deleteInfo = await userCollection.findOneAndDelete({ _id: postId });
+  const deleteInfo = await userCollection.findOneAndDelete({ _id: new ObjectId(postId) });
 
   if (deleteInfo.lastErrorObject.n == 0) {
     help.err(fun, "could not delete post with postId '" + postId + "'");
@@ -204,21 +265,105 @@ export const removePost = async (postId) => {
   targetUser.userPosts.splice(index, 1);
 
   //update the user in the user db
-  await user.updateUser(
-    targetUser._id,
-    targetUser.username,
-    targetUser.firstName,
-    targetUser.lastName,
-    targetUser.email,
-    targetUser.userPosts,
-    targetUser.userStreak,
-    targetUser.aboutMe,
-    targetUser.groupsOwned,
-    targetUser.groupMembers,
-    targetUser.goals,
-    targetUser.following,
-    targetUser.followers
+  await userCollection.updateOne(
+    { _id: targetUser._id },
+    { $set: { userPosts: targetUser.userPosts } }
   );
 
   return "post with postId '" + postId + "' successfully deleted";
+};
+
+export const updatePost = async (
+  postId,
+  postTitle,
+  workoutType,
+  postDescription,
+  postImgs,
+  postLikes,
+  comments,
+  postToGroup
+) => {
+  let fun = "updatePost";
+  //Make sure fields are valid
+  if (
+
+    !postId ||
+    !postTitle ||
+    !workoutType ||
+    !postDescription ||
+    !postImgs ||
+    !postLikes ||
+    !comments ||
+    !postToGroup
+  ) {
+    help.err(fun, "missing field(s)");
+  }
+
+  //Ensure postId is a valid ObjectId
+  if (!ObjectId.isValid(postId)) {
+    help.err(fun, "postId is invalid ObjectId");
+  }
+
+  //if postId is ObjectId turn into string
+  postId = postId.toString().trim();
+
+  //Ensure workoutType is a non-empty string
+  if (help.strPrep(workoutType).length == 0) {
+    help.err(fun, "workoutType needs to be non-empty string");
+  }
+
+  //Ensure postDescription is a non-empty string
+  if (help.strPrep(postDescription).length == 0) {
+    help.err(fun, "postDescription needs to be non-empty string");
+  }
+
+  //Ensure postTitle is a non-empty string
+  if (help.strPrep(postTitle).length == 0) {
+    help.err(fun, "postTitle needs to be non-empty string");
+  }
+
+  //Ensure postImgs is an array
+  if (!Array.isArray(postImgs)) {
+    help.err(fun, "postImgs needs to be an array");
+  }
+
+  //Ensure postLikes is an array
+  if (!Array.isArray(postLikes)) {
+    help.err(fun, "postLikes needs to be an array");
+  }
+
+  //Ensure comments is an array
+  if (!Array.isArray(comments)) {
+    help.err(fun, "comments needs to be an array");
+  }
+
+  //Ensure postToGroup is a non-empty string
+  if (!Array.isArray(postToGroup)) {
+    help.err(fun, "postToGroup needs to be a non-empty string");
+  }
+
+  //get post db
+  const postCollection = await posts();
+
+  const updateInfo = await postCollection.updateOne(
+    { _id: new ObjectId(postId) },
+    {
+      $set: {
+        postTitle: postTitle,
+        workoutType: workoutType,
+        postDescription: postDescription,
+        postImgs: postImgs,
+        postLikes: postLikes,
+        comments: comments,
+        postToGroup: postToGroup,
+      },
+    }
+  );
+
+  if (updateInfo.modifiedCount == 0) {
+    help.err(fun, "could not update post with postId '" + postId + "'");
+  }
+
+  return true
+
 };

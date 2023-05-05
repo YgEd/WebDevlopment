@@ -30,7 +30,7 @@ isNum(num) {
 getFileType(file){
   //returns the file type of input file
   //if file type can't be found it returns the whole file name
-  if (!isStr(file)){
+  if (typeof file != "string" || file.trim().length==0){
     return "";
   }
   

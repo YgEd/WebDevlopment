@@ -52,25 +52,20 @@ export const createUser = async (
     help.err(fun, "username: '" + email + "' is already in use");
   }
 
-  const target = await userCollection.findOne({email: email})
+  //format the input strings (trimming and lowercasing where needed)
+  firstName = help.strPrep(firstName);
+  lastName = help.strPrep(lastName);
+  email = help.strPrep(email).toLowerCase();
+  DOB = help.strPrep(DOB);
+  userPassword = userPassword.trim();
+
+
+  //check if email is already in use
+  const userCollect = await users();
+  const target = await userCollect.findOne({email: email})
   if (target != null){
     help.err(fun, "email already in use");
   }
-
-  //Array test
-  //if (!Array.isArray(goals)) {
-   // help.err(fun, "input goals is not an array");
-  //}
-
-  //Make sure all elements of goals is string
- // for (let i = 0; i < goals.length; i++) {
-   // if (!help.isStr(goals[i])) {
-    //  help.err(fun, "goals has a non-string element");
-   // }
- // }
-
-  //Test to ensure valid DOB format
- // help.checkDOB(DOB, "DOB");
 
   
 
@@ -84,7 +79,6 @@ export const createUser = async (
   let followers = [] //people that are following the user
 
   let hashed = await bcrypt.hash(userPassword, 10);
-  //console.log(hashed)
 
   //create user object to add with trimmed and lowercase fields
   
@@ -106,7 +100,6 @@ export const createUser = async (
     followers
   };
 
-  //console.log(user)
 
 
   //insert created user object into the db
@@ -114,8 +107,12 @@ export const createUser = async (
   if (!insertInfo.acknowledged || !insertInfo.insertedId) {
     help.err(fun, "could not add user");
   }
+
+  const Id = insertInfo.insertedId.toString()
+  let userId = await userCollection.findOne({_id: new ObjectId(Id)})
   //return this object if success
-  return {insertedUser: true}
+  // return {insertedUser: true}
+  return userId
 };
 
 //return user by given ObjectId id
@@ -123,7 +120,9 @@ export const getUser = async (id) => {
   //function name to use for error throwing
   let fun = "getUser";
   //test if given id is a valid ObjectId type
-  
+  if (!ObjectId.isValid(id)){
+    help.err(fun, "Object id is not valid")
+  }
 
   //get users db collection
   const userCollection = await users();
@@ -302,8 +301,10 @@ export const updateUser = async (
     help.err(fun, "email already in use");
   }
 
-  //ensure input fields are trimmed
-  //username = username.trim();
+  //ensure input fields are trimmed and the password is hashed
+  //let hashed = await bcrypt.hash(userPassword, 10);
+  //console.log("from update: hashed password = " + hashed)
+  username = username.trim();
   aboutMe = aboutMe.trim();
 
   //update the oldUser
@@ -315,7 +316,7 @@ export const updateUser = async (
         firstName,
         lastName,
         email,
-        //userPassword,
+        //userPassword: hashed,
         userPosts,
         userStreak,
         aboutMe,
@@ -411,8 +412,7 @@ export const checkUser = async (emailAddress, password) => {
       console.log("what")
       throw "Either the email address or password is invalid";
    }
-   console.log("user", user.userPassword)
-
+   console.log(user.userPassword)
    let does_match = await bcrypt.compare(password, user.userPassword)
    
    if (!( does_match)){
@@ -423,7 +423,8 @@ export const checkUser = async (emailAddress, password) => {
     firstName: user.firstName,
     lastName: user.lastName,
     emailAddress: user.email,
-    id: user._id
+    user_id: user._id,
+    userName: user.username
    }
   
 

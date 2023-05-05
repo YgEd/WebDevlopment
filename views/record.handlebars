@@ -1,18 +1,31 @@
 <form method="POST" id="recordForm" enctype="multipart/form-data">
     <label for="postTitle">Post Title</label>
+    <br>
     <input name="postTitle" id="postTitle" type="text">
+    <br>
     <label for="workoutType">Workout Type</label>
+    <br>
     <select name="workoutType" id="workoutType">
         <option value="lifting">lift</option>
         <option value="running">run</option>
         <option value="cycling">bike</option>
         <option value="other">other</option>
     </select>
+    <br>
     <label for="postDescription">Workout Description</label>
-    <input name="postDescription" id="postDescription" type="text">
+    <br>
+    <textarea name="postDescription" id="postDescription" rows="5" cols="50">Describe the workout!, include things like sets, reps, breaktime etc...</textarea>
+    <br>
     <label for="postImgs">Upload Images</label>
-    <input name="postImgs" id="postImgs" type="file" >
-    <label for="postToGroup">Group visibility</label>
-    <input name="postToGroup" id="postToGroup" type="text">
+    <div id="imgDiv">
+    <input name="postImgs[]" id="postImgs" type="file" accept="image/jpg, image/png, image/jpeg">
+    <br>
+    </div>
+    <button type="button" onclick="addImg()">add image</button>
+    <button type="button" onclick="removeImg()">remove image</button>
     <input id="button" type="submit">
 </form>
+
+<script src="/public/js/recordScript.js"></script>
+<br><br>
+<a href = "/profile">Back to profile</a>

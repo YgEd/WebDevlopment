@@ -1,5 +1,7 @@
 $( document ).ready(function() {
     console.log( 'ready!' );
+    var input = 0;
+    var post = 0;
 
     //Finds all posts the user has already commented on or liked
     $(".post-item").each(function (index){
@@ -116,9 +118,10 @@ $( document ).ready(function() {
 
 
 
-  });
+  // });
 
   $(".like-button").click(function (e){
+    sessionStorage.clear();
     console.log("like button pressed!")
 
 
@@ -129,19 +132,26 @@ $( document ).ready(function() {
     //sometimes the the postId is duplicated so this makes sure only one instance of the id is used as postId
     postId = postId.substring(0,24)
 
-    let like_date = {
-      "postId": postId
-    }
-
+    // let like_date = {
+    //   "postId": postId
+    // }
+    post = postId
+    sessionStorage.setItem("post", post)
+    console.log("like button pressed post = " + post)
   
     if ($(this).attr('src') == "/public/img/unfilled_heart.png")  {
-      $.ajax({
-        type: "POST",
-        url: "/feed/like",
-        data: like_date,
-        success: function (response){
-          console.log(response)
-      }})
+      // $.ajax({
+      //   type: "POST",
+      //   url: "/feed/like",
+      //   data: like_date,
+      //   success: function (response){
+      //     console.log(response)
+      // }})
+
+      //update like in db later
+      input +=1
+      sessionStorage.setItem("input", input)
+      console.log("unliked input = " + input)
 
       //update local like counter
       let counter = parent.find(".likes").text()
@@ -162,13 +172,18 @@ $( document ).ready(function() {
       $(this).attr('src',"/public/img/filled_heart.png")
     }else{
 
-      $.ajax({
-        type: "POST",
-        url: "/feed/unlike",
-        data: like_date,
-        success: function (response){
-          console.log(response)
-      }})
+      //update like in db later
+      input -=1
+      sessionStorage.setItem("input", input)
+      console.log("liked input = " + input)
+
+      // $.ajax({
+      //   type: "POST",
+      //   url: "/feed/unlike",
+      //   data: like_date,
+      //   success: function (response){
+      //     console.log(response)
+      // }})
       $(this).attr('src',"/public/img/unfilled_heart.png")
       //update local like counter
       let counter = parent.find(".likes").text()
@@ -187,3 +202,50 @@ $( document ).ready(function() {
 
 
   })
+
+  //only update db for likes on page reload so no delay
+  function updateDb() {
+    let input = sessionStorage.getItem("input")
+    let postId = sessionStorage.getItem("post")
+    console.log("page reloaded")
+    console.log("input = " + input)
+    console.log("postId = " + postId)
+    let like_date = {
+      "postId": postId
+    }
+
+    if (postId != 0 && input != 0){
+      if (input == 1){
+    
+        $.ajax({
+          type: "POST",
+          url: "/feed/like",
+          data: like_date,
+          success: function (response){
+            console.log(response)
+        }})
+
+      }
+      if (input == -1){
+        $.ajax({
+          type: "POST",
+          url: "/feed/unlike",
+          data: like_date,
+          success: function (response){
+            console.log(response)
+        }})
+      }
+      window.location.reload()
+  }
+    sessionStorage.setItem("input", 0)
+    sessionStorage.setItem("post", 0)
+    
+  }
+
+
+  window.onload = updateDb(input, post)
+
+
+
+})
+  

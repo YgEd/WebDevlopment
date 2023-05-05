@@ -1,6 +1,7 @@
 import * as postFuns from "../data/posts.js";
 import * as userFuns from "../data/users.js";
 import * as commentFuns from "../data/comment.js";
+import * as photoFuns from "../data/photos.js"
 
 import { Router } from "express";
 const router = Router();
@@ -9,6 +10,7 @@ router.get("/", async (req, res) => {
   console.log(req.session.user.firstName + "is accessing feed page");
   console.log(req.session.user.user_id);
   let userId = req.session.user.user_id;
+  let userName = req.session.user.userName
   let firstName = req.session.user.firstName;
   if (!userId) {
     console.log("user not authenticated");
@@ -32,9 +34,11 @@ try {
   let displayPosts = [];
   //get user following posts, 15 per user
   for (let i = 0; i < target_following.length; i++) {
+    
     displayPosts = displayPosts.concat(
       await postFuns.getPostByUser(target_following[i], 15)
     );
+    
   }
 
   //get user own posts, 15 per user
@@ -59,6 +63,12 @@ try {
         displayPosts[i].liked = true;
       }
     }
+
+    //get image src to be able to display on feed
+    for (let j=0; j<displayPosts[i].postImgs.length; j++){
+      displayPosts[i].postImgs[j]=await photoFuns.getPhotoSrc(displayPosts[i].postImgs[j])
+      
+    }
     
     for (let j = 0; j < displayPosts[i].comments.length; j++) {
       //find all the posts the user commented on
@@ -67,15 +77,30 @@ try {
       }
     }
   }
-
   
+  //sort the posts by the most recently posted
+  function ObjCompare( a, b ) {
+    if ( a.postTime < b.postTime ){
+      return 1;
+    }
+    if ( a.postTime > b.postTime ){
+      return -1;
+    }
+    return 0;
+  }
+
+  //sort the display posts
+  displayPosts.sort(ObjCompare);
+
+
   return res.render("feed", {
     firstName: firstName,
+    userName: userName,
     posts: displayPosts,
     userId: userId,
   });
 } catch (error) {
-  console.log(error)
+  console.log("Error from get feed route: " + error);
 }
   
 });
@@ -84,12 +109,12 @@ router.post("/", async (req, res) => {
   let data = req.body;
   let userName = req.session.user.userName;
   let userId = req.session.user.user_id;
-  console.log(data);
   try {
     await commentFuns.createComment(data.postId, userId, userName, data.msg);
   } catch (error) {
-    console.log("create log failed");
+    console.log("Error from post feed route: " + error);
     return res.send({ error: error });
+    
   }
 
   return res.render("partials/comment", {
@@ -103,9 +128,7 @@ router.post("/", async (req, res) => {
 router.post("/remove", async (req, res) => {
   let postId = req.body.postId;
   let userId = req.session.user.user_id;
-  console.log(req.body);
-  console.log("postId = " + postId);
-  console.log("userId = " + userId);
+ 
   try {
     await commentFuns.deleteComment(postId, userId);
   } catch (error) {
@@ -123,6 +146,7 @@ router.post("/remove", async (req, res) => {
 router.post("/like", async (req, res) => {
   let postId = req.body.postId;
   let userId = req.session.user.user_id;
+  console.log("current user = " + req.session.user.userName + " is liking post " + postId + "")
 
   try {
     let target_post = await postFuns.getPost(postId);
@@ -137,6 +161,7 @@ router.post("/like", async (req, res) => {
     target_post.postLikes.push(userId);
     await postFuns.updatePost(
       postId,
+      target_post.postTitle,
       target_post.workoutType,
       target_post.postDescription,
       target_post.postImgs,
@@ -145,13 +170,14 @@ router.post("/like", async (req, res) => {
       target_post.postToGroup
     );
   } catch (error) {
-    console.log(error);
+    console.log("Error from like route: " + error);
   }
 });
 
 router.post("/unlike", async (req, res) => {
   let postId = req.body.postId;
   let userId = req.session.user.user_id;
+  console.log("current user = " + req.session.user.userName + " is unliking post " + postId + "")
 
   try {
     let target_post = await postFuns.getPost(postId);
@@ -168,6 +194,7 @@ router.post("/unlike", async (req, res) => {
     target_post.postLikes.push(userId);
     await postFuns.updatePost(
       postId,
+      target_post.postTitle,
       target_post.workoutType,
       target_post.postDescription,
       target_post.postImgs,
@@ -176,7 +203,7 @@ router.post("/unlike", async (req, res) => {
       target_post.postToGroup
     );
   } catch (error) {
-    console.log(error);
+    console.log("Error from unlike route: " + error);
   }
 });
 

@@ -137,6 +137,7 @@ export const memberAdd = async (groupId, userId) => {
 
     //check if user is already in the group
     const group = await groupCollection.findOne({ _id: new ObjectId(groupId) })
+
     if (group.groupMembers.includes(new ObjectId(userId))) {
         help.err(fun, "user is already in group")
     }
@@ -194,11 +195,20 @@ export const memberRemove = async (groupId, userId) => {
     //check if user is already in the group
     const group = await groupCollection.findOne({ _id: new ObjectId(groupId) })
 
-    if (!group.groupMembers.includes(new ObjectId(userId))) {
+    let ingroup = false
+    for (let i = 0; i < group.groupMembers.length; i++) {
+        console.log(group.groupMembers[i] == userId)
+        if (group.groupMembers[i] == userId) {
+            ingroup = true
+            break;
+        }
+    }
+
+    if (!ingroup){
         help.err(fun, "user is not in group")
     }
 
-    if (group.groupOwner == new ObjectId(userId)) {
+    if (group.groupOwner == userId) {
         help.err(fun, "owner can't leave the group, delete the group instead")
     }
 

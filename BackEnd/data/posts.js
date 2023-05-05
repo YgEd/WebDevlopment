@@ -29,6 +29,9 @@ export const createPost = async (
     help.err(fun, "invalid object ID '" + userId + "'");
   }
 
+  //if userId is ObjectId in turn into string
+  userId = userId.toString().trim()
+
 
   //ensure workoutTYpe, postTitle, and postDescription are non-empty strings
   if (!help.isStr(postDescription) || !help.isStr(workoutType) || !help.isStr(postTitle)) {
@@ -46,16 +49,10 @@ export const createPost = async (
     help.err(fun, "expected postImgs to be of type array");
   }
 
-  //test if valid image type for each img in postImgs
+  //test if valid image objectId
   for (let i = 0; i < postImgs.length; i++) {
-    //get the current image image type
-    let curr_img_format = help.getFileType(postImgs[i]);
-    //see if the current image type is valid as defined in imgTypes (defined at the top of file)
-    if (!imgTypes.includes(curr_img_format)) {
-      help.err(
-        fun,
-        "img format '" + curr_img_format + "' is of invalid image type"
-      );
+    if (!ObjectId.isValid(postImgs[i])) {
+      help.err(fun, "postImgs contains a non valid ObjectId");
     }
   }
 
@@ -82,7 +79,7 @@ export const createPost = async (
 
   //create the postObj that will be inserted into the db
   let postObj = {
-    userId,
+    userId: new ObjectId(userId),
     postTitle: postTitle.trim(),
     workoutType: workoutType.trim(),
     postDescription: postDescription.trim(),
@@ -116,9 +113,14 @@ export const createPost = async (
 
   //update the user's document in the user db
   const updateInfo = await userCollection.updateOne(
-    { _id: userId },
+    { _id: new ObjectId(userId) },
     { $set: { userPosts: newPosts } }
   );
+
+  //test to see if update was successful
+  if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0) {
+    help.err(fun, "could not update user");
+  }
 
   //return the post obj
   return await postCollection.findOne({ _id: insertInfo.insertedId });
@@ -138,6 +140,8 @@ export const getPostByUser = async (userId, limit) => {
   //if userId is ObjectId in turn into string
   userId = userId.toString().trim()
 
+
+
   //get post db
   const postCollection = await posts();
 
@@ -150,7 +154,7 @@ export const getPostByUser = async (userId, limit) => {
   let postList = await postCollection
     .find({ userId: new ObjectId(userId) })
     .limit(limit)
-    .sort({ postTime: 1 })
+    .sort({ postTime: -1 })
     .toArray();
 
   //return array of users
@@ -183,7 +187,7 @@ export const getPostByGroup = async (groupId, limit) => {
   let postList = await postCollection
     .find({ postToGroup: new ObjectId(groupId) })
     .limit(limit)
-    .sort({ postTime: 1 })
+    .sort({ postTime: -1 })
     .toArray();
 
   //return array of users
@@ -203,7 +207,7 @@ export const getAllPosts = async () => {
   }
 
   //put db in an array
-  let postList = await postCollection.find({}).toArray();
+  let postList = await postCollection.find({}).sort({ postTime: -1 }).toArray();
 
   //return array of users
   return postList;
@@ -343,12 +347,12 @@ export const updatePost = async (
   }
 
   //Ensure postImgs is an array
-  if (!Array.isArray(postImgs)) {
+  if (!Array.isArray(postImgs) || !help.verObjectIds(postImgs)) {
     help.err(fun, "postImgs needs to be an array");
   }
 
   //Ensure postLikes is an array
-  if (!Array.isArray(postLikes)) {
+  if (!Array.isArray(postLikes) || !help.verObjectIds(postLikes)) {
     help.err(fun, "postLikes needs to be an array");
   }
 
@@ -358,7 +362,7 @@ export const updatePost = async (
   }
 
   //Ensure postToGroup is a non-empty string
-  if (!Array.isArray(postToGroup)) {
+  if (!Array.isArray(postToGroup) || !help.verObjectIds(postToGroup)) {
     help.err(fun, "postToGroup needs to be a non-empty string");
   }
 

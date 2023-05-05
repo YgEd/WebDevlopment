@@ -47,9 +47,24 @@ router
   })
 
  router.get('/edit', async (req, res) =>{
-  const userstuff = await getUser(req.session.user.id)
+        const userstuff = await getUser(req.session.user.id)
         return res.render('editprofile', {logged_in: true, userid: userstuff.username})
      })
+router.get('/get-analytics', async(req,res) =>{
+    res.render('analytics');
+
+})
+router.get('/analytics', async (req, res) =>{
+    
+      const data = [100, 50, 300, 40, 350, 250]; // assuming this is coming from the database
+      const data2 = [0.5, 10, 1, 3, 4, 5]
+      let json_obj = {
+        data: data,
+        data2: data2
+      }
+      res.send(json_obj);
+      //return res.render('editprofile', {logged_in: true, userid: userstuff.username})
+   })
    
 router.post('/edit', (req, res, next) => {
         upload.single('photo')(req, res, (err) => {

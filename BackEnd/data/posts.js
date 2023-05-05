@@ -19,6 +19,7 @@ export const createPost = async (postObj) => {
   //postTime,
   //postLikes,
   //comments,
+  
   let postToGroup = postObj.postToGroup;
   //function name to use for error throwing
   let fun = "createPost";
@@ -58,7 +59,7 @@ export const createPost = async (postObj) => {
 
   //test to ensure postToGroup is empty or of full of valid ObjectIds
   for (let i = 0; i < postToGroup.length; i++) {
-    if (!Object.isValid(postToGroup[i])) {
+    if (!ObjectId.isValid(postToGroup[i])) {
       help.err(fun, "postToGroup contains a non valid ObjectId");
     }
   }

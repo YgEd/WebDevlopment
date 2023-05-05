@@ -188,6 +188,7 @@ router
                     if (!currImg) {
                         throw `Error: could not find image with id ${x}`
                     }
+                    console.log(currImg.imageSrc)
                     postImgs.push(currImg.imageSrc);
                 }
             }

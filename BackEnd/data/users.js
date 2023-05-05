@@ -94,7 +94,6 @@ export const createUser = async (
     aboutMe: aboutMe.trim(),
     groupsOwned,
     groupMembers,
-    profileimg: "",
     goals,
     following,
     followers
@@ -127,24 +126,6 @@ export const getUser = async (id) => {
   //get users db collection
   const userCollection = await users();
   const findUser = await userCollection.findOne({ _id: new ObjectId(id) });
-
-  //if user is not found throw error
-  if (findUser == null) {
-    help.err(fun, "user with ObjectId '" + id + "' wasn't found");
-  }
-
-  return findUser;
-};
-
-export const getUsername = async (username) => {
-  //function name to use for error throwing
-  let fun = "getUser";
-  //test if given id is a valid ObjectId type
-  
-
-  //get users db collection
-  const userCollection = await users();
-  const findUser = await userCollection.findOne({ username: username });
 
   //if user is not found throw error
   if (findUser == null) {
@@ -401,6 +382,7 @@ export const checkUser = async (emailAddress, password) => {
    help.checkEmail(emailAddress, "Email Address");
 
    //Check if password is valid form
+   password = password
    help.checkPassword(password, "Password")
 
    //connect to db

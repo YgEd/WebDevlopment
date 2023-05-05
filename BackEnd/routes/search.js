@@ -1,4 +1,4 @@
-import {Router} from 'express';
+```import {Router} from 'express';
 import { ObjectId } from 'mongodb';
 const router = Router();
 import multer from 'multer';
@@ -50,9 +50,9 @@ router
       userr = userr.trim()
       //get the userobj
       let userobj = await getUsername(userr)
-      //redirect if found the user 
-      return res.redirect(`/search/${userr}`)
-
+      //redirect if found the user ```
+      //return res.redirect(`/search/${userr}`)
+```
     }catch(e){
         // rednder the search user with the error
        return res.render('searchuser', {logged_in: logged_in, error: e })
@@ -118,4 +118,4 @@ router
 
 
 
-export default router
+export default router```

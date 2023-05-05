@@ -27,7 +27,7 @@ router
         logged_in = true
     }
     
-    const userstuff = await getUser(req.session.user.id)
+    const userstuff = await getUser(req.session.user.user_id)
     let goals = "N/A"
     let goalsempty = true
     if (userstuff.goals.length !== 0){

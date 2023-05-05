@@ -27,6 +27,7 @@
                 <br>
                 <p class="post-type">{{this.workoutType}}</p>
                 <br>
+                <p class="post-title">{{this.postTitle}}</p>
                 {{#each this.postImgs}}
                     
                         <img src={{this}} alt="hold"width="300" height="300">
@@ -35,6 +36,8 @@
                 <div class="post-caption">
                     <br>
                     {{!-- Like button --}}
+                    <p class="comment-username">{{../userName}}</p>
+                    <br>
                     <img src="/public/img/unfilled_heart.png" alt="like button" class="together like-button">
                     {{!-- <input type="image" class="together like-button" alt="Login" src="/public/img/unfilled_heart.png"> --}}
                     {{#when this.postLikes.length 'eq' 1}}
@@ -73,5 +76,5 @@
    
  <script src="https://code.jquery.com/jquery-3.5.1.js"
 		integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
-<script src="/public/js/feed.js" async></script>
+<script src="/public/js/feed.js" ></script>
 

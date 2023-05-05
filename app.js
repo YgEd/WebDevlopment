@@ -1,5 +1,6 @@
 import * as postFuns from "./BackEnd/data/posts.js"
 import * as userFuns from "./BackEnd/data/users.js"
+import * as groupFuns from "./BackEnd/data/groups.js"
 
 import express from 'express';
 const app = express();
@@ -155,11 +156,17 @@ app.listen(3000, () => {
 
 import {dbConnection, closeConnection} from './BackEnd/config/mongoConnection.js';
 
-// const db = await dbConnection();
-// await db.dropDatabase();
+const db = await dbConnection();
+await db.dropDatabase();
 
-// let j = await userFuns.createUser("james", "james", "greenwood", "jgreenwood@yahoo.com", "HeyMans1!2##4#12", "03/04/2002")
-// console.log("created james")
+let j = await userFuns.createUser("james", "james", "greenwood", "jgreenwood@yahoo.com", "HeyMans1!2##4#12", "03/04/2002")
+console.log("created james")
+let steve = await userFuns.createUser("sDog", "steve", "ringwood", "swood@gmail.com", "!@#123QWEasd", "03/04/2002")
+console.log("created Steve")
+await userFuns.updateUser(steve._id, "sDog","steve","ringwood","swood@gmail.com",[],0,"hey man",[],[],[],[j._id],[j._id])
+let gK = await groupFuns.createGroup("the Killers",j._id)
+await groupFuns.memberAdd(gK._id, steve._id)
+
 // let first = await postFuns.createPost(j._id, "great day", "running", "I love to runddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", ["/public/img/cutedog.jpg"],[])
 // await postFuns.updatePost(first._id, "great day", first.workoutType, "I love to run", ["/public/img/cutedog.jpg"],[j._id], [], [])
 // await postFuns.createPost(j._id, "great day","running", "I love to run", ["/public/img/cutedog.jpg"],[])
@@ -172,10 +179,5 @@ import {dbConnection, closeConnection} from './BackEnd/config/mongoConnection.js
 // await postFuns.createPost(j._id, "great day","running", "I love to run", ["/public/img/cutedog.jpg"],[])
 // await postFuns.createPost(j._id, "great day","running", "I love to run", ["/public/img/cutedog.jpg"],[])
 // await postFuns.createPost(j._id, "great day","running", "I love to run", ["/public/img/cutedog.jpg"],[])
-// let steve = await userFuns.createUser("sDog", "steve", "ringwood", "swood@gmail.com", "!@#123QWEasd", "03/04/2002")
-// console.log("created Steve")
-// await userFuns.updateUser(steve._id, "sDog","steve","ringwood","swood@gmail.com","!@#123QWEasd",[],0,"hey man",[],[],[],[j._id],[j._id])
-
-
 
 

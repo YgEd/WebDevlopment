@@ -273,6 +273,26 @@ export const removePost = async (postId) => {
   return "post with postId '" + postId + "' successfully deleted";
 };
 
+export const getAnalytics = async(
+  userId, 
+  start_time_interval, 
+  end_time_interval
+) =>{
+  const result = await postsCollection.aggregate([
+    {
+      $match: {
+        userId: userId,
+        timestamp: {
+          $gte: start_time_interval,
+          $lte: end_time_interval,
+        },
+      },
+    },
+  ]).toArray();
+
+  return result;
+};
+
 export const updatePost = async (
   postId,
   postTitle,

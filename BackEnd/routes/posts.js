@@ -39,7 +39,7 @@ router
         var workoutTypes = ["running", "lifting", "cycling", "other"];
         //create post
         const postData = req.body;
-        let userId = req.session.user.id;
+        let userId = req.session.user.user_id;
         let workoutType = postData.workoutType;
         let postDescription = postData.postDescription;
         let postImgs = []
@@ -149,15 +149,20 @@ router
             postToGroup: postToGroup
         }
         try {
-            posted = await createPost(postObj);
+            console.log(postObj.userId)
+            console.log("is userId valid " + ObjectId.isValid(postObj.userId))
+            console.log(postObj)
+            posted = await createPost(userId, postTitle, workoutType, postDescription, postImgs, postToGroup);
             if (!posted) {
                 throw `Error: could not post workout`
             }
+            console.log(posted)
+            let postId = posted._id
+            res.redirect(`/posts/${postId}`)
         }catch(e) {
             console.log(e);
         }
-        let postId = posted._id
-        res.redirect(`/posts/${postId}`)
+        
     });
 
 router

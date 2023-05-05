@@ -15,6 +15,9 @@ if (!ObjectId.isValid(userId)){
     help.err(fun,"userId is invalid ObjectId")
 }
 
+//if userId is ObjectId in turn into string
+  userId = userId.toString().trim()
+
 //Ensure postId is a valid ObjectId
 if (!ObjectId.isValid(postId)){
     help.err(fun,"userId is invalid ObjectId")

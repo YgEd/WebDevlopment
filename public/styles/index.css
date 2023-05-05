@@ -38,6 +38,13 @@ a {
     background-color: #0eb358;
 }
 
+.post-title{
+    font-family:  arial, sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+    margin:auto;
+}
+
 .feed-wrapper{
     display:flex;
     justify-content: space-between;
@@ -195,5 +202,12 @@ textarea {
 }
 
 .together{
+    font-family:  arial, sans-serif;
     display: inline-block;
+}
+
+.comment-username{
+    font-family:  arial, sans-serif;
+    text-align: left;
+    font-size: 15px;
 }

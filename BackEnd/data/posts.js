@@ -391,3 +391,65 @@ export const updatePost = async (
   return true
 
 };
+
+export const updateLikes = async (postId, userId) => {
+  let fun = "updateLikes";
+
+  //ensure input is valid
+  if (!postId || !userId) {
+    help.err(fun, "missing field(s)");
+  }
+
+  //Ensure postId is a valid ObjectId
+  if (!ObjectId.isValid(postId)) {
+    help.err(fun, "postId is invalid ObjectId");
+  }
+
+  //if postId is ObjectId turn into string
+  postId = postId.toString().trim();
+
+  //Ensure userId is a valid ObjectId
+  if (!ObjectId.isValid(userId)) {
+    help.err(fun, "userId is invalid ObjectId");
+  }
+
+  //if userId is ObjectId turn into string
+  userId = userId.toString().trim();
+
+  //get post db
+  const postCollection = await posts();
+
+  //get post object
+  const targetPost = await getPost(postId);
+
+  //get user object
+  const targetUser = await user.getUser(userId);
+
+
+  let hasliked = false;
+
+  //if user has already liked post, remove like
+  for (let i = 0; i < targetPost.postLikes.length; i++) {
+    if (targetPost.postLikes[i].toString() == userId) {
+      targetPost.postLikes.splice(i, 1);
+      hasliked = true;
+      break;
+    }
+  }
+
+  if (!hasliked) {
+    targetPost.postLikes.push(new ObjectId(userId));
+  }
+
+  //update post in post db
+  const updateInfo = await postCollection.updateOne({ _id: new ObjectId(postId) }, { $set: { postLikes: targetPost.postLikes } });
+
+  //ensure post was updated
+  if (updateInfo.modifiedCount == 0) {
+    help.err(fun, "could not update post with postId '" + postId + "'");
+  }
+
+return true
+
+
+}

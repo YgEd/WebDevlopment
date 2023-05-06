@@ -25,6 +25,7 @@ try {
   let targetUser = await userFuns.getUser(userId);
   let target_following = [];
   let groups_mem = [];
+  let displayPosts = [];
 
   //get all the userIds the target user is following
   for (let i = 0; i < targetUser.following.length; i++) {
@@ -36,7 +37,6 @@ try {
     groups_mem.push(targetUser.groupMembers[i]);
   }
 
-  let displayPosts = [];
   //get user following posts, 15 per user
   for (let i = 0; i < target_following.length; i++) {
     
@@ -60,11 +60,12 @@ try {
     );
   }
 
-  //find all the posts the user commented in
+  //iterate through all display posts
   for (let i = 0; i < displayPosts.length; i++) {
+
     //find all the posts the user has liked
     for (let j=0; j<displayPosts[i].postLikes.length; j++){ 
-      if (displayPosts[i].postLikes[j].toString() == userId){
+      if (displayPosts[i].postLikes[j].toString() == userId.toString()){
         displayPosts[i].liked = true;
       }
     }
@@ -77,10 +78,29 @@ try {
     
     for (let j = 0; j < displayPosts[i].comments.length; j++) {
       //find all the posts the user commented on
-      if (displayPosts[i].comments[j].userId == userId) {
+      if (displayPosts[i].comments[j].userId.toString() == userId.toString()) {
         displayPosts[i].commented = true;
       }
     }
+
+  }
+
+  //add the post owners username to each post object
+  try {
+    let postUsers = []
+    displayPosts.forEach((post) => {postUsers.push(post.userId)});
+    postUsers.forEach(async (userId) => {
+      let user = await userFuns.getUser(userId);
+      let username = user.username;
+      displayPosts.forEach((post) => {
+        if (post.userId.toString() == userId.toString()) {
+          post.username = username;
+        }
+      });
+    })
+
+  } catch (error) {
+    console.log("Error from get feed route: " + error);
   }
   
   //sort the posts by the most recently posted
@@ -97,6 +117,7 @@ try {
   //sort the display posts
   displayPosts.sort(ObjCompare);
 
+  
 
   return res.render("feed", {
     firstName: firstName,
@@ -112,6 +133,10 @@ try {
 });
 
 router.post("/", async (req, res) => {
+  if (!req.session.user){
+    console.log("user not logged in")
+    res.redirect("/login");
+  }
   let data = req.body;
   let userName = req.session.user.userName;
   let userId = req.session.user.user_id;
@@ -132,6 +157,10 @@ router.post("/", async (req, res) => {
 });
 
 router.post("/remove", async (req, res) => {
+  if (!req.session.user){
+    console.log("user not logged in")
+    res.redirect("/login");
+  }
   let postId = req.body.postId;
   let userId = req.session.user.user_id;
  
@@ -150,6 +179,10 @@ router.post("/remove", async (req, res) => {
 });
 
 router.post("/like", async (req, res) => {
+  if (!req.session.user){
+    console.log("user not logged in")
+    res.redirect("/login");
+  }
   let postId = req.body.postId;
   let userId = req.session.user.user_id;
   console.log("current user = " + req.session.user.userName + " is liking post " + postId + "")
@@ -164,23 +197,19 @@ router.post("/like", async (req, res) => {
       }
     }
 
-    target_post.postLikes.push(userId);
-    await postFuns.updatePost(
-      postId,
-      target_post.postTitle,
-      target_post.workoutType,
-      target_post.postDescription,
-      target_post.postImgs,
-      target_post.postLikes,
-      target_post.comments,
-      target_post.postToGroup
-    );
+    await postFuns.updateLikes(postId, userId);
+    return res.send({ success: true });
   } catch (error) {
     console.log("Error from like route: " + error);
+    return res.send({ error: error });
   }
 });
 
 router.post("/unlike", async (req, res) => {
+  if (!req.session.user){
+    console.log("user not logged in")
+    res.redirect("/login");
+  }
   let postId = req.body.postId;
   let userId = req.session.user.user_id;
   console.log("current user = " + req.session.user.userName + " is unliking post " + postId + "")
@@ -191,25 +220,16 @@ router.post("/unlike", async (req, res) => {
     let newLikes = [];
     //check if the user hasn't liked the post
     for (let i = 0; i < target_post.postLikes.length; i++) {
-      if (target_post.postLikes[i] == userId) {
-        continue;
+      if (target_post.postLikes[i] != userId && i == target_post.postLikes.length - 1) {
+        throw "user hasn't like post"
       }
-      newLikes.push(target_post.postLikes[i]);
     }
 
-    target_post.postLikes.push(userId);
-    await postFuns.updatePost(
-      postId,
-      target_post.postTitle,
-      target_post.workoutType,
-      target_post.postDescription,
-      target_post.postImgs,
-      newLikes,
-      target_post.comments,
-      target_post.postToGroup
-    );
+    await postFuns.updateLikes(postId, userId);
+    return res.send({ success: true });
   } catch (error) {
     console.log("Error from unlike route: " + error);
+    return res.send({ error: error });``
   }
 });
 

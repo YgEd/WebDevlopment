@@ -27,6 +27,11 @@ router
     .route('/create')
     .get(async (req, res) => {
         //go to record page for workout creation
+        if (!req.session.user){
+            console.log("user not authenticated");
+            return res.redirect("/login")
+        }
+
         try {
             return res.render("record", {title: "Record an activity!", logged_in: true });
         }catch (e) {
@@ -34,6 +39,7 @@ router
         }
     })
     .post(upload.array('postImgs[]', 5), async (req, res, err) => {
+
         //console.log(req.file);
         let fun = "createPostRoute";
         var workoutTypes = ["running", "lifting", "cycling", "other"];

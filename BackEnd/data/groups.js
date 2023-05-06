@@ -197,7 +197,7 @@ export const memberRemove = async (groupId, userId) => {
 
     let ingroup = false
     for (let i = 0; i < group.groupMembers.length; i++) {
-        console.log(group.groupMembers[i] == userId)
+        
         if (group.groupMembers[i] == userId) {
             ingroup = true
             break;
@@ -298,4 +298,100 @@ export const updateGroup = async (groupId, groupName, groupOwner, groupMembers, 
     }
 
     return true
+}
+
+export const deleteGroup = async (groupId, userId) => {
+    let fun = "deleteGroup";
+
+    //Ensure no missing fields
+    if (!groupId || !userId) {
+        help.err(fun, "missing field")
+    }
+
+    //Ensure groupId is a valid ObjectId
+    if (!ObjectId.isValid(groupId)) {
+        help.err(fun, "groupId is invalid ObjectId")
+    }
+
+    //Ensure userId is a valid ObjectId
+    if (!ObjectId.isValid(userId)) {
+        help.err(fun, "userId is invalid ObjectId")
+    }
+
+    //if groupId is ObjectId in turn into string
+    userId = userId.toString().trim()
+
+    //if groupId is ObjectId in turn into string
+    groupId = groupId.toString().trim()
+
+    //ensure user initiating delete is group owner
+
+    //get group db
+
+    const groupCollection = await groups();
+
+    //get target group
+
+    const targetGroup = await groupCollection.findOne({ _id: new ObjectId(groupId) })
+
+    //get groupOwner
+    const groupOwner = targetGroup.groupOwner
+
+    
+    //ensure user initiating delete is group owner
+    if (groupOwner != userId) {
+        help.err(fun, "user is not group owner")
+    }
+
+    //remove groupOwner first
+    groupCollection.updateOne({ _id: new ObjectId(groupId) }, { $set: { groupOwner: null } })
+
+    //update groupOwner
+    const userCollection = await users();
+    const updateInfo = await userCollection.updateOne({ _id: new ObjectId(userId) }, { $pull: { groupsOwned: new ObjectId(groupId) } })
+
+    //remove all groupMembers besides groupOwner
+    for (let i = 0; i < targetGroup.groupMembers.length; i++) {
+            await memberRemove(groupId, targetGroup.groupMembers[i])
+    }
+
+    //dete groupObject
+    const deleteInfo = await groupCollection.deleteOne({ _id: new ObjectId(groupId) })
+
+    //ensure group was deleted
+    if (deleteInfo.deletedCount === 0) {
+        help.err(fun, "could not delete group")
+    }
+
+    return true
+
+
+
+}
+
+export const getAllGroups = async (limit) => {
+    let fun = "getAllGroups";
+
+    //Ensure no missing fields
+    if (!limit) {
+        help.err(fun, "missing field")
+    }
+
+    //Ensure limit is a number
+    if (typeof limit !== "number") {
+        help.err(fun, "limit is not a number")
+    }
+
+    //get group db
+    const groupCollection = await groups();
+
+    //get all groups
+    const allGroups = await groupCollection.find({}).limit(limit).toArray()
+
+    //ensure groups were fetched
+    if (!allGroups) {
+        help.err(fun, "could not get all groups")
+    }
+
+    return allGroups
 }

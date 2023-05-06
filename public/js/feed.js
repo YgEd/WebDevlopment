@@ -1,7 +1,6 @@
+
 $( document ).ready(function() {
     console.log( 'ready!' );
-    var input = 0;
-    var post = 0;
 
     //Finds all posts the user has already commented on or liked
     $(".post-item").each(function (index){
@@ -121,9 +120,9 @@ $( document ).ready(function() {
   // });
 
   $(".like-button").click(function (e){
-    sessionStorage.clear();
     console.log("like button pressed!")
-
+    console.log("session storage before doing like button process:")
+    console.log(JSON.parse(sessionStorage.getItem("like_cache")))
 
     e.preventDefault();
     var parent = $(this).parent()
@@ -132,26 +131,31 @@ $( document ).ready(function() {
     //sometimes the the postId is duplicated so this makes sure only one instance of the id is used as postId
     postId = postId.substring(0,24)
 
-    // let like_date = {
-    //   "postId": postId
-    // }
-    post = postId
-    sessionStorage.setItem("post", post)
-    console.log("like button pressed post = " + post)
   
     if ($(this).attr('src') == "/public/img/unfilled_heart.png")  {
-      // $.ajax({
-      //   type: "POST",
-      //   url: "/feed/like",
-      //   data: like_date,
-      //   success: function (response){
-      //     console.log(response)
-      // }})
 
-      //update like in db later
-      input +=1
-      sessionStorage.setItem("input", input)
-      console.log("unliked input = " + input)
+
+      let like_cache = JSON.parse(sessionStorage.getItem("like_cache"))
+      console.log("from like " + like_cache)
+      //sessionsStorage is empty
+      if (like_cache == null){
+          like_cache = []
+          like_cache.push({"postId": postId, "liked": 1})
+          sessionStorage.setItem("like_cache", JSON.stringify(like_cache))
+      }else{
+
+        if (like_cache.filter(e => e.postId == postId).length == 0){
+          like_cache.push({"postId": postId, "liked": 1})
+          //update sessionStorage
+          sessionStorage.setItem("like_cache", JSON.stringify(like_cache))
+        } else if (like_cache.filter(e => e.postId == postId).length == 1){
+          like_cache.filter(e => e.postId == postId)[0].liked += 1
+          //update sessionStorage
+          sessionStorage.setItem("like_cache", JSON.stringify(like_cache))
+        }
+      }
+      
+
 
       //update local like counter
       let counter = parent.find(".likes").text()
@@ -172,18 +176,27 @@ $( document ).ready(function() {
       $(this).attr('src',"/public/img/filled_heart.png")
     }else{
 
-      //update like in db later
-      input -=1
-      sessionStorage.setItem("input", input)
-      console.log("liked input = " + input)
+      let like_cache = JSON.parse(sessionStorage.getItem("like_cache"))
+      console.log("from unlike " + like_cache)
+      if (like_cache == null){
+        like_cache = []
+          like_cache.push({"postId": postId, "liked": -1})
+          sessionStorage.setItem("like_cache", JSON.stringify(like_cache))
+      }else{
 
-      // $.ajax({
-      //   type: "POST",
-      //   url: "/feed/unlike",
-      //   data: like_date,
-      //   success: function (response){
-      //     console.log(response)
-      // }})
+        if (like_cache.filter(e => e.postId == postId).length == 0){
+          like_cache.push({"postId": postId, "liked": -1})
+          //update sessionStorage
+          sessionStorage.setItem("like_cache", JSON.stringify(like_cache))
+
+        } else if (like_cache.filter(e => e.postId == postId).length == 1){
+          like_cache.filter(e => e.postId == postId)[0].liked -= 1
+          //update sessionStorage
+          sessionStorage.setItem("like_cache", JSON.stringify(like_cache))
+        }
+
+      }
+ 
       $(this).attr('src',"/public/img/unfilled_heart.png")
       //update local like counter
       let counter = parent.find(".likes").text()
@@ -205,45 +218,66 @@ $( document ).ready(function() {
 
   //only update db for likes on page reload so no delay
   function updateDb() {
-    let input = sessionStorage.getItem("input")
-    let postId = sessionStorage.getItem("post")
-    console.log("page reloaded")
-    console.log("input = " + input)
-    console.log("postId = " + postId)
-    let like_date = {
-      "postId": postId
+    let like_cache = JSON.parse(sessionStorage.getItem("like_cache"))
+    //alert(like_cache)
+    console.log("from updateDb " + like_cache)
+    if (!like_cache){
+      return
     }
 
-    if (postId != 0 && input != 0){
-      if (input == 1){
-    
-        $.ajax({
-          type: "POST",
-          url: "/feed/like",
-          data: like_date,
-          success: function (response){
-            console.log(response)
-        }})
-
+    for (let i = 0; i < like_cache.length; i++){
+      let postId = like_cache[i].postId
+      let input = like_cache[i].liked
+      let like_date = {
+        "postId": postId
       }
-      if (input == -1){
-        $.ajax({
-          type: "POST",
-          url: "/feed/unlike",
-          data: like_date,
-          success: function (response){
-            console.log(response)
-        }})
-      }
-      window.location.reload()
-  }
-    sessionStorage.setItem("input", 0)
-    sessionStorage.setItem("post", 0)
-    
+
+      if (postId != 0 && input != 0){
+        if (input == 1){
+      
+          $.ajax({
+            type: "POST",
+            url: "/feed/like",
+            data: like_date,
+            success: function (response){
+              console.log(response)
+          }})
+
+        }
+        if (input == -1){
+          $.ajax({
+            type: "POST",
+            url: "/feed/unlike",
+            data: like_date,
+            success: function (response){
+              console.log(response)
+          }})
+        }
+    }                       
+    }
+    sessionStorage.clear()
   }
 
+  //make sure to update db if user reloads or leaves
+  // window.onload = updateDb()
+  window.onbeforeunload = function(e){
+    e.preventDefault();
+    updateDb()
 
-  window.onload = updateDb(input, post)
+    // setTimeout(location.reload(), 500) 
+    location.reload()
+  }
+
+  //update db if user clicks on a link
+  $(".menu a").click(function(e) {
+    // Remember the link href
+    var href = this.href;
+
+    // Don't follow the link
+    e.preventDefault();
+    updateDb()
+    window.location = href
+});
 
 
 

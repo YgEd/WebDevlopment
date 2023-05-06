@@ -428,7 +428,8 @@ export const checkUser = async (emailAddress, password) => {
     lastName: user.lastName,
     emailAddress: user.email,
     user_id: user._id,
-    userName: user.username
+    userName: user.username,
+    groupsOwned: user.groupsOwned
    }
   
 

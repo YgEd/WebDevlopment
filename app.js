@@ -114,7 +114,7 @@ app.set('view engine', 'handlebars');
     }
     next();
   });
-
+  
   
 
   app.use('/logout', async (req, res, next) => {
@@ -123,7 +123,16 @@ app.set('view engine', 'handlebars');
     }
     next();
   });
- 
+  app.use('/recommendation/add', async (req, res, next) => {
+    if (!req.session.user){
+      return res.status(400).redirect('/error')
+    }
+    if(req.session.user.groupOwned != 0){
+        return res.status(400).redirect('/error')
+    }
+
+    next();
+  });
 
   app.use(async (req, res, next) => {
    console.log(`[${new Date().toUTCString()}] ${req.method} ${req.originalUrl} - authenticated: ${req.session.user ? 'true' : 'false'}`);

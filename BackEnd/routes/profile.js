@@ -8,37 +8,23 @@ import * as help from "../helpers.js"
 import {uploadPhoto, upload, getPhotoSrc } from '../data/photos.js';
 
 
+import {createUser,checkUser,getUser,updateUser}  from '../data/users.js'
+import {photos} from "../config/mongoCollections.js";
+import * as help from "../helpers.js"
+import {uploadPhoto, upload, getPhotoSrc } from '../data/photos.js';
+
+
 
 
 router
   .route('/')
   .get(async (req, res) => {
     //code here for GET
-    let imgSrc;
-    try {
-      let logged_in = false;
-      if(req.session.user){
-          logged_in = true
-      }
-      //console.log(req.session.user)
-      const userstuff = await getUser(req.session.user.user_id)
-      let goals = userstuff.goals
-      let aboutme = "N/A"
-      if(userstuff.aboutMe.length !== 0){
-        aboutme = userstuff.aboutMe
-      }
-      if (userstuff.profileimg == "default" || !ObjectId.isValid(userstuff.profileimg)) {
-        imgSrc = "/public/img/cutedog.jpg"
-      }
-      else {
-        imgSrc = await getPhotoSrc(userstuff.profileimg)
-      }
-      return res.render('profile', {name: `${userstuff.firstName} ${userstuff.lastName}`,  streak: userstuff.userStreak, description: aboutme, goals: goals,  logged_in: true, isCurr: true, imgSrc: imgSrc})
-    }catch (e) {
-      return res.status(500).render("error", {message: e});
+    let logged_in = false;
+    if(req.session.user){
+        logged_in = true
     }
-    let recsList = await recsData.getAllRecs()
-    return res.render('profile', {name: req.session.user.email,  streak: req.session.user.streak, aboutme: req.session.user.aboutMe, goals: req.session.user.goals, aboutme : req.session.user.aboutMe , logged_in: true, workout: helper.getRandomItem(recsList) })
+    return res.render('profile', {name: req.session.user.email,  streak: req.session.user.streak, aboutme: req.session.user.aboutMe, goals: req.session.user.goals, aboutme : req.session.user.aboutMe , logged_in: true})
   })
 
 router

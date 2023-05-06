@@ -36,6 +36,7 @@ let checkPassword = (str, varName) =>{
     return str
   }
 let checkDateFormat = (string) => {
+    let date1 = string;
     let date = string.split('/');
     if (date.length != 3) throw 'has to be in MM/DD/YYYY format'
     date.forEach((value) => parseInt(value,10))
@@ -74,7 +75,7 @@ loginForm.addEventListener('submit', (event) => {
     errorDiv.hidden = false;
     errorDiv.innerHTML = e;
     loginForm.className = 'error';
-    if (e.inclues('email')){
+    if (e.includes('email')){
         emailInput.value = '';
         emailInput.focus();
         emailInput.className = 'inputClass';
@@ -117,7 +118,7 @@ if (registrationForm){
       emailInput.classList.remove('inputClass');
       passwordInput.classList.remove('inputClass');
       confirmPasswordInput.classList.remove('inputClass');
-      roleInput.classList.remove('inputClass');
+      dob.classList.remove('inputClass');
       errorDivReg.hidden = true;
       registrationForm.classList.remove('error');
     } catch (e) {
@@ -144,9 +145,9 @@ if (registrationForm){
         passwordInput.focus();
         passwordInput.className = 'inputClass';
         confirmPasswordInput.className = 'inputClass';
-      } else if (e.includes('role')) {
-        roleInput.focus();
-        roleInput.className = 'inputClass';
+      } else if (e.includes('dob')) {
+        dob.focus();
+        dob.className = 'inputClass';
       }
     }
   });

@@ -71,6 +71,11 @@ router
             else if (!help.isStr(postTitle)){
                 throw "title must be a non-empty string";
             }
+            let titlelines = postTitle.split('\n')
+            let len = postTitle.length - (titlelines.length - 1);
+            if (len > 40) {
+                throw `title can be max 40 characters`
+            }
         }catch(e) {
             badData.postTitle = e;
         }
@@ -80,6 +85,11 @@ router
             }
             else if (!help.isStr(postDescription)) {
                 throw "description must be a non-empty string";
+            }
+            let desclines = postDescription.split('\n')
+            let len = postDescription.length - (desclines.length - 1);
+            if (len > 500) {
+                throw "postDescription cannot be over 500 characters"
             }
         } catch(e) {
             badData.postDescription = e;

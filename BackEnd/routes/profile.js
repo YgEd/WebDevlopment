@@ -4,7 +4,7 @@ const router = Router();
 import multer from 'multer';
 import {createUser,checkUser,getUser,updateUser}  from '../data/users.js'
 import {photos} from "../config/mongoCollections.js";
-import * as help from "../helpers.js"
+import help from "../helpers.js"
 import {uploadPhoto, upload, getPhotoSrc } from '../data/photos.js';
 
 
@@ -103,6 +103,11 @@ router
               help.err(fun, "about me must be a string");
             }
           }
+          let aboutlines = aboutMe.split('\n')
+          let len = aboutMe.length - (aboutlines.length - 1);
+          if (len > 300) {
+            help.err(fun, "about me can be a max of 300 characters")
+          }
         }catch(e) {
           console.log(e);
           badData.aboutMe = e
@@ -118,6 +123,11 @@ router
             for (let x of goals) {
               if (typeof x !== "string") {
                 help.err(fun, "goals must all be strings");
+              }
+              let xlines = x.split('\n')
+              let len = x.length - (xlines.length - 1);
+              if (len > 50) {
+                help.err(fun, "goals can be a max of 50 characters");
               }
             }
           }

@@ -157,7 +157,7 @@ app.listen(3000, () => {
 import {dbConnection, closeConnection} from './BackEnd/config/mongoConnection.js';
 
 const db = await dbConnection();
-await db.dropDatabase();
+
 
 // let j = await userFuns.createUser("james", "james", "greenwood", "jgreenwood@yahoo.com", "HeyMans1!2##4#12", "03/04/2002")
 // console.log("created james")

@@ -369,7 +369,7 @@ export const updatePass = async (userId, currentPass, newPass) => {
 
 export const checkUser = async (emailAddress, password) => {
   let fun = "checkUser"
-
+  console.log("email", emailAddress)
   if (
     help.strPrep(emailAddress).length == 0 ||
     help.strPrep(password).length == 0
@@ -388,13 +388,13 @@ export const checkUser = async (emailAddress, password) => {
    //connect to db
    const userCollect = await users();
    const user = await userCollect.findOne({email: emailAddress})
-   
+ 
 
    if (user == null){
       console.log("what")
       throw "Either the email address or password is invalid";
    }
-   console.log(user.userPassword)
+   
    let does_match = await bcrypt.compare(password, user.userPassword)
    
    if (!( does_match)){

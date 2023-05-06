@@ -2,7 +2,9 @@ import {Router} from 'express';
 import { ObjectId } from 'mongodb';
 const router = Router();
 import multer from 'multer';
+import help from "../helpers.js";
 import {createUser,checkUser,getUser}  from '../data/users.js'
+import { getAnalytics } from '../data/posts.js';
 
 
 //route code
@@ -51,18 +53,23 @@ router
         return res.render('editprofile', {logged_in: true, userid: userstuff.username})
      })
 router.get('/get-analytics', async(req,res) =>{
-    res.render('analytics');
+    res.render('analytics', {logged_in: true});
 
 })
 router.get('/analytics', async (req, res) =>{
     
-      const data = [100, 50, 300, 40, 350, 250]; // assuming this is coming from the database
-      const data2 = [0.5, 10, 1, 3, 4, 5]
-      let json_obj = {
-        data: data,
-        data2: data2
-      }
-      res.send(json_obj);
+      //const data = [100, 50, 300, 40, 350, 250]; // assuming this is coming from the database
+      //const data2 = [0.5, 10, 1, 3, 4, 5]
+    try{
+     let week_obj = await help.return_week_values(req.session.user.user_id)
+     let month_obj = await help.return_month_values(req.session.user.user_id)
+     let year_obj = await help.return_year_values(req.session.user.user_id)
+     let new_obj = {data: week_obj.data, data2: week_obj.data2, month_entries: month_obj.month_entries, 
+      array_val: month_obj.array_val , shuffledMonths: year_obj.shuffledMonths, shuffledcounter: year_obj.shuffledcounter }
+      return res.send(new_obj)
+     }catch(e){
+      return res.send({error: e})
+     }
       //return res.render('editprofile', {logged_in: true, userid: userstuff.username})
    })
    

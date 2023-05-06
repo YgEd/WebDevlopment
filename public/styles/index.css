@@ -229,11 +229,9 @@ h1 {
     padding: 10px;
 }
 .center{
-    font-family: 'Franklin Gothic Medium',
-    'Arial Narrow',
-    Arial, sans-serif;
     margin:auto;
     text-align: center;
+    
 }
 
 h3 {
@@ -243,5 +241,55 @@ h3 {
 }
 
 #search-description {
+    font-family:
+    'Arial Narrow',
+    Arial, sans-serif;
     padding-bottom: 30px;
+    font-weight: normal;
 }
+
+.search-res{
+    font-family:  arial, sans-serif;
+    padding: 15px;
+    font-size: 30px;
+
+}
+
+.search-res-title{
+    font-family:  arial, sans-serif;
+    font-weight: bolder;
+    text-decoration: underline;
+    font-size: 40px;
+    padding-top: 50px;
+    
+}
+
+.join-button .leave-button{
+    text-align: center !important;
+    display: inline-block;
+    cursor:pointer;
+    margin-left: 46.5%;
+}
+
+.follow-button {
+    text-align: center !important;
+    display: inline-block;
+    cursor:pointer;
+    margin-left: 46.5%;
+}
+
+.unfollow-button{
+    text-align: center !important;
+    display: inline-block;
+    cursor:pointer;
+    margin-left: 46.5%;
+}
+
+.leave-button{
+    text-align: center !important;
+    display: inline-block;
+    cursor:pointer;
+    margin-left: 46.5%;
+}
+
+

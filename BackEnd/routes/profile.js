@@ -2,10 +2,6 @@ import {Router} from 'express';
 import { ObjectId } from 'mongodb';
 const router = Router();
 import multer from 'multer';
-import {createUser,checkUser,getUser,updateUser}  from '../data/users.js'
-import {photos} from "../config/mongoCollections.js";
-import * as help from "../helpers.js"
-import {uploadPhoto, upload, getPhotoSrc } from '../data/photos.js';
 
 
 import {createUser,checkUser,getUser,updateUser}  from '../data/users.js'

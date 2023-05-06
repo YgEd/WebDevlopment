@@ -1,23 +1,29 @@
 
 <label for = "username"> Username:</label>
-<p> {{name}}</p>
-
-<form method="PUT" action="/profile/edit">
-   <label for = "firstname">FirstName</label>
-   <input type = "text" name = "firstname" value = "{{firstname}}">
-   <label for = "lastname">Lastname</label>
-   <input type = "text" name = "lastname" value = "{{lastname}}">
-  <label for ="aboutme" > AboutMe</label>
-  <input type="text" name="aboutme" value="{{aboutme}}">
-   <label for ="streaks" > Streaks</label>
-  <input type = "text" name = " streaks" value = "{{streak}}">
-  <label for = "goals">Goals</label>
-  <input type = "text" name = "goals" value = "{{goals}}">
-  
- 
-  <button type="submit">Save</button>
+<p> {{userid}}</p>
+<img src={{imgsrc}} width=100px height=100px>
+<form action="/profile/edit" method="POST" enctype="multipart/form-data">
+  <label for = "aboutme">About me</label>
+  <br>
+  <input type = "text" name = "aboutme" id="aboutme" value = "{{aboutme}}">
+  <br>
+  <label for = "goals">goals</label>
+  <div id="goalDiv">
+    {{#each goals}}
+    <input type = "text" name = "goals[]" value = "{{this}}">
+    <br>
+    {{/each}}
+  </div>
+  <button type="button" onclick="addGoal()">add goal</button>
+  <button type="button" onclick="removeGoal()">remove goal</button>
+  <br>
+  <label for="photo">Change profile picture</label>
+  <input type="file" name="photo" id="photo"/>
+  <br>
+  <input id='button' type="submit"/>
 </form>
 
+<script src="/public/js/editScript.js"></script>
 <a href = "/profile">Profile</a>
 
 

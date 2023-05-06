@@ -1,0 +1,29 @@
+{{error}}
+<form method="POST" action="/recommendation/add" id="newRecForm">
+  <label for="workoutName">Workout Name:</label>
+  <input type="text" name="workoutName" id="workoutName">
+  <br>
+  <label for="equipment">Equipment:</label>
+  <input type="text" name="equipment" id="equipment">
+  <br>
+  <label for="duration">Duration:</label>
+  <input type="number" name="duration" id="duration" min="1">
+  <br>
+  <label for="level">Level:</label>
+  <select name="level" id="level">
+    <option value="beginner">Beginner</option>
+    <option value="intermediate">Intermediate</option>
+    <option value="advanced">Advanced</option>
+  </select>
+  <br>
+  <label for="reps">Reps:</label>
+  <input type="number" name="reps" id="reps" min="1">
+  <br>
+  <label for="rounds">Rounds:</label>
+  <input type="number" name="rounds" id="rounds" min="1">
+  <br>
+  <label for="tags">Tags:</label>
+  <input type="text" name="tags" id="tags">
+  <br>
+  <button type="submit">Submit</button>
+</form>

@@ -1,41 +1,40 @@
+<h1> {{name}} </h1>
 
+<img src={{imgSrc}} width=100px height=100px>
 
-
-
-<h1>Name: {{userid}}</h1>
 <h2> About me</h2>
-<h3> {{aboutme}}</h3>
-
-<h2> Following: {{following}}</h2>
-<h2> Followers: {{followers}}</h2>
+<h3> {{description}}</h3>
 
 <h2> Streaks</h2>
 <h3> {{streak}}</h3>
 
 <h2> Goals</h2>
-{{#if goalsempty}}
- <h3> {{goals}}</h3>
-{{else}}
 <ul>
     {{#each goals}}
       <li> {{this}} <li>
 
     {{/each}}
 </ul>
-{{/if}}
 
-{{#if isprofile}}
+{{#if isCurr}}
 <h3>
-    <a href = "/profile/edit/">Edit Profile</a>
+    <a href = "/profile/edit">Edit Profile</a>
 </h3>
-
 <h3>
   <a href = "/profile/get-analytics"> Get analytics</a>
 </h3>
 
 {{/if}}
 
-
-
+<h4>Perfect work out for you</h4>
+{{#with workout}}
+<p>{{workoutName}}</p>
+<p>{{equipment}}</p>
+    <p>{{duration}} minutes</p>
+    <p>{{level}}</p>
+    <p>{{reps}} reps</p>
+    <p>{{rounds}} rounds</p>
+    <p>{{tags}}</p>
+{{/with}}
 
 

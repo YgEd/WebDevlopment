@@ -74,6 +74,7 @@ export const createUser = async (
   let groupsOwned = []; //groups owned by the user
   let groupMembers = []; //groups the user is a member of
   let aboutMe = "";
+  let profileimg = "default";
   let goals = []; //list of goals
   let following = [] //people the user is following
   let followers = [] //people that are following the user
@@ -83,6 +84,7 @@ export const createUser = async (
   //create user object to add with trimmed and lowercase fields
   
   let user = {
+    
     username: username.trim(),
     firstName,
     lastName,
@@ -96,7 +98,8 @@ export const createUser = async (
     groupMembers,
     goals,
     following,
-    followers
+    followers,
+    profileimg
   };
 
 
@@ -174,13 +177,13 @@ export const removeUser = async (id) => {
   return "user with id '" + id + "' successfully deleted";
 };
 
-//added back username, firstname, and last as updateable parameters
-//use other function for password updates
+//removed username, firstname, and last as updateable parameters
+//added new function for password updates
 export const updateUser = async (
   id,
-  username,
+  /*username,
   firstName,
-  lastName,
+  lastName,*/
   email,
   //userPassword,
   //DOB,
@@ -189,6 +192,7 @@ export const updateUser = async (
   aboutMe,
   groupsOwned,
   groupMembers,
+  profileimg,
   goals,
   following,
   followers
@@ -198,9 +202,9 @@ export const updateUser = async (
 
   //test if string inputs are valid non-empty strings
   if (
-    !help.isStr(username) ||
+    /*!help.isStr(username) ||
     !help.isStr(firstName) ||
-    !help.isStr(lastName) ||
+    !help.isStr(lastName) ||*/
     !help.isStr(email) ||
     //!help.isStr(userPassword) ||
     typeof aboutMe !== "string" // shouldnt check against empty string because we initialize it as one
@@ -211,6 +215,10 @@ export const updateUser = async (
   //test if given id is a valid ObjectId type
   if (!ObjectId.isValid(id)) {
     help.err(fun, "invalid object ID");
+  }
+
+  if (profileimg != "default" && !ObjectId.isValid(profileimg)) {
+    help.err(fun, "invalid profile picture");
   }
 
   //test to ensure userPosts is either empty or full of only valid ObjectIds
@@ -246,7 +254,7 @@ export const updateUser = async (
   //get original username for user that is being updated
   let oldUser = await getUser(id);
 
-  
+  /*
   if (oldUser.username.toLowerCase() != username.trim().toLowerCase()) {
     //find if user exists with given username
     const findUser = await userCollection.findOne({
@@ -263,15 +271,15 @@ export const updateUser = async (
       help.err(fun, "username: '" + username.trim() + "' is already in use");
     }
   }
-
-  
+*/
+  /*
   firstName = help.strPrep(firstName);
-  lastName = help.strPrep(lastName);
+  lastName = help.strPrep(lastName);*/
   email = help.strPrep(email).toLowerCase();
 
   //validate firstName, lastName, and Email
-    help.checkName(firstName, "First Name")
-    help.checkName(lastName, "Last Name")
+    /*help.checkName(firstName, "First Name")
+    help.checkName(lastName, "Last Name")*/
     help.checkEmail(email, "Email")
 
   //get original email from user
@@ -293,9 +301,9 @@ export const updateUser = async (
     { _id: id },
     {
       $set: {
-        username,
+/*        username,
         firstName,
-        lastName,
+        lastName,*/
         email,
         //userPassword: hashed,
         userPosts,
@@ -303,12 +311,17 @@ export const updateUser = async (
         aboutMe,
         groupsOwned,
         groupMembers,
+        profileimg,
         goals,
         following,
         followers
       },
     }
   );
+
+  if (!updateInfo.acknowledged) {
+    throw `Error from updateInfo, could not update user`
+  }
 
   //return updated user object
   return getUser(id);
@@ -394,7 +407,7 @@ export const checkUser = async (emailAddress, password) => {
       console.log("what")
       throw "Either the email address or password is invalid";
    }
-   
+   //console.log(user.userPassword)
    let does_match = await bcrypt.compare(password, user.userPassword)
    
    if (!( does_match)){

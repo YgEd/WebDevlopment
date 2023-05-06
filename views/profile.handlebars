@@ -1,8 +1,6 @@
-
-<h1> Name:</h1>
 <h1> {{name}} </h1>
 
-
+<img src={{imgSrc}} width=100px height=100px>
 
 <h2> About me</h2>
 <h3> {{description}}</h3>
@@ -18,9 +16,11 @@
     {{/each}}
 </ul>
 
+{{#if isCurr}}
 <h3>
     <a href = "/profile/edit">Edit Profile</a>
 </h3>
+{{/if}}
 
 <h4>Perfect work out for you</h4>
 {{#with workout}}

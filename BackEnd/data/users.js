@@ -74,6 +74,7 @@ export const createUser = async (
   let groupsOwned = []; //groups owned by the user
   let groupMembers = []; //groups the user is a member of
   let aboutMe = "";
+  let profileimg = "default";
   let goals = []; //list of goals
   let following = [] //people the user is following
   let followers = [] //people that are following the user
@@ -97,7 +98,8 @@ export const createUser = async (
     groupMembers,
     goals,
     following,
-    followers
+    followers,
+    profileimg
   };
 
 
@@ -190,6 +192,7 @@ export const updateUser = async (
   aboutMe,
   groupsOwned,
   groupMembers,
+  profileimg,
   goals,
   following,
   followers
@@ -212,6 +215,10 @@ export const updateUser = async (
   //test if given id is a valid ObjectId type
   if (!ObjectId.isValid(id)) {
     help.err(fun, "invalid object ID");
+  }
+
+  if (profileimg != "default" && !ObjectId.isValid(profileimg)) {
+    help.err(fun, "invalid profile picture");
   }
 
   //test to ensure userPosts is either empty or full of only valid ObjectIds
@@ -304,12 +311,17 @@ export const updateUser = async (
         aboutMe,
         groupsOwned,
         groupMembers,
+        profileimg,
         goals,
         following,
         followers
       },
     }
   );
+
+  if (!updateInfo.acknowledged) {
+    throw `Error from updateInfo, could not update user`
+  }
 
   //return updated user object
   return getUser(id);
@@ -395,7 +407,7 @@ export const checkUser = async (emailAddress, password) => {
       console.log("what")
       throw "Either the email address or password is invalid";
    }
-   console.log(user.userPassword)
+   //console.log(user.userPassword)
    let does_match = await bcrypt.compare(password, user.userPassword)
    
    if (!( does_match)){

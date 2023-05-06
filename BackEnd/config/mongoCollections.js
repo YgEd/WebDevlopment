@@ -18,4 +18,5 @@ export const users = getCollectionFn("users");
 export const posts = getCollectionFn("posts");
 export const groups = getCollectionFn("groups");
 export const photos = getCollectionFn("photos");
+export const recs = getCollectionFn("recommendations");
 // export const albums = getCollectionFn("albums");

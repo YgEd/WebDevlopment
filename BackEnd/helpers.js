@@ -1,6 +1,7 @@
 //helper functions to export to other files
-import { ObjectId } from "mongodb";
+import { ObjectId} from "mongodb";
 import validate from "validate-date";
+import { getAnalytics } from './data/posts.js';
 const exportedMethods = {
 
 strPrep(string){
@@ -202,8 +203,122 @@ getRandomItem(arr) {
   const item = arr[randomIndex];
 
   return item;
+},
+
+async return_week_values(userid){
+  const currentDate = new Date();
+  const lastWeek = new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000); // subtract 7 days in milliseconds
+  const get_stuff = await getAnalytics(userid,lastWeek)
+  
+  let days_of_week = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]
+  let current_day = new Date().getDay()
+  let reorganized_days = days_of_week.slice(current_day + 1).concat(days_of_week.slice(0, current_day + 1))
+  let times_day_occured = [0, 0, 0, 0, 0, 0, 0]
+  let index = 0
+  for(let i = 0; i < get_stuff.length; i++) {
+    let post_date = get_stuff[i].postTime
+    let day_index = post_date.getDay()
+    if (day_index < current_day){
+       let indice = day_index + (6- current_day)
+      times_day_occured[ indice]++
+      console.log(times_day_occured[indice])
+    }
+    if(day_index === current_day){
+       times_day_occured[6]++
+    }
+    if(day_index > current_day){
+      times_day_occured[day_index - (current_day + 1)]++
+    }
+   // let reorganized_index = current_day - (day_index - current_day + 7) % 7 -1
+   // times_day_occured[reorganized_index]++
+  }
+  let week_obj = {
+    data: reorganized_days,
+    data2: times_day_occured
+  }
+
+  return week_obj
+},
+
+async return_month_values(userid){
+  // Create a new date object for today
+  const today = new Date();
+  const prev_month = today.getMonth()
+ 
+  const oneMonthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+  oneMonthAgo.setDate(oneMonthAgo.getDate() - 1); // set the date to one day before to get the last day of the previous month
+  const datesArray = [];
+  const datestracker = Array(30).fill(0);
+
+  for (let d = oneMonthAgo; d <= today; d.setDate(d.getDate() + 1)) {
+       let new_date = new Date(d)
+       if((new_date.getDate() > today.getDate() && new_date.getMonth() + 1 === today.getMonth()) || (new_date.getMonth() ===  today.getMonth()
+       && new_date.getDate() <= today.getDate())){
+        datesArray.push(new Date(d));
+       }
+  }
+  
+  const get_stuff = await getAnalytics(userid, datesArray[0])
+  let index = 0
+ 
+  for(let i = 0; i < get_stuff.length; i ++){
+    for(let j = 0; j < datesArray.length; j++){
+       
+       
+       if((datesArray[j].getMonth() === get_stuff[i].postTime.getMonth()) && (datesArray[j].getDate() === get_stuff[i].postTime.getDate()) ){
+         datestracker[j]++
+         break;
+       }
+       
+    }
+  }
+
+  
+
+
+
+// Print the array of values for the past month
+let month_obj = {month_entries:datesArray, array_val: datestracker }
+
+return month_obj
+
+},
+
+async return_year_values(userid){
+const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+let month_counter = [0, 0, 0, 0, 0,0 ,0 ,0, 0,0,0,0]
+const d = new Date();
+const currentMonth = d.getMonth(); // get the current month, represented as a number from 0 to 11
+
+// slice the array into two parts and concatenate them in reverse order
+
+
+const lastYear = d.getFullYear() - 1; // get the year before the current year
+const sameDayLastYear = new Date(lastYear, d.getMonth() + 1, d.getDate());
+
+
+
+
+
+const get_stuff = await getAnalytics(userid,sameDayLastYear )
+for(let i = 0; i < get_stuff.length; i++){
+   month_counter[get_stuff[i].postTime.getMonth()]++
+}
+
+const shuffledMonths = months.slice(currentMonth + 1).concat(months.slice(0, currentMonth + 1))
+const shuffledcounter = month_counter.slice(currentMonth + 1).concat(month_counter.slice(0, currentMonth + 1))
+
+return {shuffledMonths: shuffledMonths, shuffledcounter: shuffledcounter }
+
+
+
+
 }
 
 }
+
+
+
+
 
 export default exportedMethods;

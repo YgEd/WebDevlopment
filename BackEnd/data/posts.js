@@ -84,7 +84,7 @@ export const createPost = async (
     workoutType: workoutType.trim(),
     postDescription: postDescription.trim(),
     postImgs,
-    postTime: date,
+    postTime:  date,
     postLikes,
     comments,
     postToGroup,
@@ -275,6 +275,48 @@ export const removePost = async (postId) => {
   );
 
   return "post with postId '" + postId + "' successfully deleted";
+};
+
+export const getAnalytics = async(
+  userId, 
+  start_time_interval
+) =>{
+  let fun = "getPostByUser";
+  if (!userId) {
+    help.err(fun, "no userId provided");
+  }
+
+  if (!ObjectId.isValid(userId)) {
+    help.err(fun, "userId is invalid ObjectId");
+  }
+
+  //if userId is ObjectId in turn into string
+  userId = userId.toString().trim()
+
+
+
+  //get post db
+  const postCollection = await posts();
+
+  //test if userCollection is null
+  if (postCollection == null) {
+    help.err(fun, "could not get posts");
+  }
+  
+  //put db in an array
+  let postList = await postCollection
+    .find({ userId: new ObjectId(userId) })
+    .toArray();
+  let return_list = []
+  for(let i = 0; i < postList.length; i++){
+
+      if(postList[i].postTime > start_time_interval ){
+        return_list.push(postList[i])
+      }
+  }
+
+  //return array of users
+  return return_list;
 };
 
 export const updatePost = async (

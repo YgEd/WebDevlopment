@@ -382,7 +382,7 @@ export const updatePass = async (userId, currentPass, newPass) => {
 
 export const checkUser = async (emailAddress, password) => {
   let fun = "checkUser"
-
+  console.log("email", emailAddress)
   if (
     help.strPrep(emailAddress).length == 0 ||
     help.strPrep(password).length == 0
@@ -401,7 +401,7 @@ export const checkUser = async (emailAddress, password) => {
    //connect to db
    const userCollect = await users();
    const user = await userCollect.findOne({email: emailAddress})
-   
+ 
 
    if (user == null){
       console.log("what")

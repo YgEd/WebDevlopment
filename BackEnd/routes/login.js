@@ -1,4 +1,3 @@
-
 import {createUser,checkUser}  from '../data/users.js'
 import {Router} from 'express';
 const router = Router();

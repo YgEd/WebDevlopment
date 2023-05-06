@@ -21,7 +21,7 @@ router
     if(req.session.user){
         logged_in = true
     }
-    return res.render('profile', {name: req.session.user.email,  streak: req.session.user.streak, aboutme: req.session.user.aboutMe, goals: req.session.user.goals, aboutme : req.session.user.aboutMe , logged_in: true})
+    return res.render('profile', {name: req.session.user.email,  streak: req.session.user.streak, goals: req.session.user.goals, aboutme : req.session.user.aboutMe , logged_in: true})
     
   })
 

@@ -108,6 +108,11 @@ app.set('view engine', 'handlebars');
     next();
   });
 
+ 
+  
+  // Add the middleware function to the app
+  
+
   app.use('/profile', async (req, res, next) => {
     if(!req.session.user){
         return res.redirect('/')

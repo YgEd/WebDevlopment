@@ -19,7 +19,7 @@
     word-wrap: break-word !important;
 }
 
-a {
+.menu a {
     text-decoration: none;
     color: #fff;
     padding: 0 4rem;

@@ -102,8 +102,6 @@ export const createUser = async (
     profileimg
   };
 
-
-
   //insert created user object into the db
   const insertInfo = await userCollection.insertOne(user);
   if (!insertInfo.acknowledged || !insertInfo.insertedId) {
@@ -191,9 +189,9 @@ export const removeUser = async (id) => {
 //added new function for password updates
 export const updateUser = async (
   id,
-  /*username,
-  firstName,
-  lastName,*/
+  username,
+  // firstName,
+  // lastName,
   email,
   //userPassword,
   //DOB,
@@ -227,6 +225,7 @@ export const updateUser = async (
     help.err(fun, "invalid object ID");
   }
 
+  console.log("profileimg: " + profileimg)
   if (profileimg != "default" && !ObjectId.isValid(profileimg)) {
     help.err(fun, "invalid profile picture");
   }

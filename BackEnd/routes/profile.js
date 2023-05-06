@@ -2,9 +2,6 @@ import {Router} from 'express';
 import { ObjectId } from 'mongodb';
 const router = Router();
 import multer from 'multer';
-
-
-
 import {createUser,checkUser,getUser,updateUser}  from '../data/users.js'
 import {photos} from "../config/mongoCollections.js";
 import help from "../helpers.js"
@@ -17,17 +14,33 @@ router
   .route('/')
   .get(async (req, res) => {
     //code here for GET
-    let logged_in = false;
-    if(req.session.user){
-        logged_in = true
+    if (!req.session.user){
+      console.log("user not authenticated");
+      return res.redirect("/login")
     }
-    return res.render('profile', {name: req.session.user.email,  streak: req.session.user.streak, aboutme: req.session.user.aboutMe, goals: req.session.user.goals, aboutme : req.session.user.aboutMe , logged_in: true})
+
+    //get user obj
+    let targetUser = await getUser(req.session.user.user_id);
+
+    //if user has a profile picture, get the imageSrc
+    if (!targetUser.profileimg || targetUser.profileimg == "default") {
+      var imgSrc = "/public/img/default.jpg";
+    } else {
+      var imgSrc = await getPhotoSrc(targetUser.profileimg);
+    }
+    
+    console.log(req.session.user.profileimg)
+    return res.render('profile', {name: req.session.user.firstName,  streak: targetUser.userStreak, aboutme: targetUser.aboutMe, goals: targetUser.goals, imgSrc: imgSrc, isCurr: true, logged_in: true})
     
   })
 
   router
   .route('/edit')
   .get(async (req, res) =>{
+      if (!req.session.user){
+        console.log("user not authenticated");
+        return res.redirect("/login")
+      }
       let userstuff;
       let imgSrc;
       try {
@@ -37,21 +50,25 @@ router
       }
 
       try {
-        if (userstuff.profileimg != "default" && ObjectId.isValid(userstuff.profileimg)) { 
+        if ((userstuff.profileimg == "default") && ObjectId.isValid(userstuff.profileimg)) { 
           const photoColl = await photos();
           let profilePic = await photoColl.findOne({_id: new ObjectId(userstuff.profileimg)})
           imgSrc = profilePic.imageSrc
         }
         else {
-          imgSrc = "/public/img/cutedog.jpg"
+          imgSrc = "/public/img/default.jpg"
         }
       }catch(e) {
         console.log(e);
         return res.status(500).send("could not get profile picture");
       }
-      return res.render('editprofile', {logged_in: true, userid: userstuff.username, imgsrc: imgSrc, aboutme: userstuff.aboutMe, goals:userstuff.goals})
+      return res.render('editprofile', {logged_in: true, userid: userstuff.username, imgsrc: imgSrc, aboutme: userstuff.aboutMe, goals:userstuff.goals, logged_in: true})
     })
    .post(upload.single('photo'), async (req, res, next) => {
+      if (!req.session.user){
+        console.log("user not authenticated");
+        return res.redirect("/login")
+      }
         let fun = "editProfile"
         const updates = req.body;
         let userId = req.session.user.user_id;
@@ -143,8 +160,8 @@ router
           const updatedUser = await updateUser(
             userInfo._id,
             userInfo.username,
-            userInfo.firstName,
-            userInfo.lastName,
+            // userInfo.firstName,
+            // userInfo.lastName,
             userInfo.email,
             userInfo.userPosts,
             userInfo.userStreak,
@@ -168,12 +185,20 @@ router
       
     });
     router.get('/get-analytics', async(req,res) =>{
-     
+      if (!req.session.user){
+        console.log("user not authenticated");
+        return res.redirect("/login")
+      }
+      console.log("get analytics route hit")
       res.render('analytics', {logged_in: true});
   
   })
     router.get('/analytics', async (req, res) =>{
-      
+      if (!req.session.user){
+        console.log("user not authenticated");
+        return res.redirect("/login")
+      }
+      console.log("analytics route hit")
           //const data = [100, 50, 300, 40, 350, 250]; // assuming this is coming from the database
           //const data2 = [0.5, 10, 1, 3, 4, 5]
         
@@ -193,10 +218,12 @@ router
     let imgSrc;
     let userInfo;
     let isCurr = false
+    let logged_in = false
     console.log(userId);
     try {
       if (!userId) {
-        userId = req.session.user.user_id
+        userId = req.session.user.user_id;
+        logged_in = true;
       }
       if (!ObjectId.isValid(userId)) {
         userId = req.session.user.user_id
@@ -212,14 +239,14 @@ router
       if (!userInfo) {
         throw `could not retreive user info`
       }
-      if (userInfo.profileimg == "default") {
-        imgSrc = "/public/img/cutedog.jpg"
+      if (!userInfo.profileimg || userInfo.profileimg == "default") {
+        imgSrc = "/public/img/default.jpg"
       }
       else {
         imgSrc = await getPhotoSrc(userInfo.profileimg)
       }
       console.log(`${userInfo.firstName} ${userInfo.lastName}`)
-      res.render("profile", {name: `${userInfo.firstName} ${userInfo.lastName}`, imgSrc: imgSrc, description: userInfo.aboutMe, streak: userInfo.streak, goals: userInfo.goals, isCurr: isCurr })
+      res.render("profile", {name: `${userInfo.firstName} ${userInfo.lastName}`, imgSrc: imgSrc, aboutMe: userInfo.aboutMe, streak: userInfo.streak, goals: userInfo.goals, isCurr: isCurr, logged_in: logged_in})
     }catch(e) {
       return res.status(400).render("error", {message: e});
     }

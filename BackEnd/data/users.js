@@ -219,6 +219,11 @@ export const updateUser = async (
   ) {
     help.err(fun, "expected string inputs are not non-empty strings");
   }
+  let aboutlines = aboutMe.split('\n')
+  let len = aboutMe.length - (aboutlines.length - 1);
+  if (len > 300) {
+    help.err(fun, "aboutme can have a max of 300 characters");
+  }
 
   //test if given id is a valid ObjectId type
   if (!ObjectId.isValid(id)) {
@@ -251,6 +256,11 @@ export const updateUser = async (
   for (let i = 0; i < goals.length; i++) {
     if (!help.isStr(goals[i])) {
       help.err(fun, "an element of goals is not a non-empty string");
+    }
+    let ilines = goals[i].split('\n')
+    let len = goals[i].length - (ilines.length - 1);
+    if (len > 50) {
+      help.err(fun, "goals can have a max of 50 characters")
     }
     goals[i] = goals[i].trim();
   }

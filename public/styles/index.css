@@ -6,19 +6,20 @@
 .navbar {
     display: flex;
     background-color: #0eb358;
-    font-size: 2rem;
+    font-size: 1.5rem;
     height: 2.5rem;
 }
 
 .menu {
-    margin: 0 3rem;
+    margin: 0 1.75rem;
     justify-content: space-around;
     font-family: 'Franklin Gothic Medium',
         'Arial Narrow',
         Arial, sans-serif;
+    word-wrap: break-word !important;
 }
 
-a {
+.menu a {
     text-decoration: none;
     color: #fff;
     padding: 0 4rem;
@@ -206,11 +207,103 @@ textarea {
     display: inline-block;
 }
 
-.comment-username{
+.post-username{
     font-family:  arial, sans-serif;
     text-align: left;
     font-size: 15px;
 }
 .recommendation{
     color: red;
+}
+
+/* .page-header{
+    font-family: 'Franklin Gothic Medium',
+    'Arial Narrow',
+    Arial, sans-serif;
+    font-size: 50px;
+    padding: 20px;
+} */
+
+h1 {
+    font-family: 'Franklin Gothic Medium',
+    'Arial Narrow',
+    Arial, sans-serif;
+    font-size: 50px;
+    padding: 10px;
+}
+.center{
+    margin:auto;
+    text-align: center;
+    
+}
+
+h3 {
+    font-family: 'Franklin Gothic Medium',
+    'Arial Narrow',
+    Arial, sans-serif;
+}
+
+#search-description {
+    font-family:
+    'Arial Narrow',
+    Arial, sans-serif;
+    padding-bottom: 30px;
+    font-weight: normal;
+}
+
+.search-res{
+    font-family:  arial, sans-serif;
+    padding: 15px;
+    font-size: 30px;
+
+}
+
+.search-res-title{
+    font-family:  arial, sans-serif;
+    font-weight: bolder;
+    text-decoration: underline;
+    font-size: 40px;
+    padding-top: 50px;
+    
+}
+
+.join-button .leave-button{
+    text-align: center !important;
+    display: inline-block;
+    cursor:pointer;
+    margin-left: 46.5%;
+}
+
+.follow-button {
+    text-align: center !important;
+    display: inline-block;
+    cursor:pointer;
+    margin-left: 46.5%;
+}
+
+.unfollow-button{
+    text-align: center !important;
+    display: inline-block;
+    cursor:pointer;
+    margin-left: 46.5%;
+}
+
+.leave-button{
+    text-align: center !important;
+    display: inline-block;
+    cursor:pointer;
+    margin-left: 46.5%;
+}
+
+
+/* login and register verify */
+.error {
+	color: red;
+	font-weight: bold;
+}
+
+.inputClass {
+	border: 3px solid red;
+
+	background-color: #eee;
 }

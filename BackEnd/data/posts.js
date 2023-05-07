@@ -84,7 +84,7 @@ export const createPost = async (
     workoutType: workoutType.trim(),
     postDescription: postDescription.trim(),
     postImgs,
-    postTime:  date,
+    postTime: date,
     postLikes,
     comments,
     postToGroup,
@@ -129,8 +129,13 @@ export const createPost = async (
 //returns limits amout of most recent posts by userId
 export const getPostByUser = async (userId, limit) => {
   let fun = "getPostByUser";
-  if (!userId) {
+  if (!userId || !limit) {
     help.err(fun, "no userId provided");
+  }
+
+  //ensure limit is a number
+  if (!help.isNum(limit)) {
+    help.err(fun, "limit is not a number");
   }
 
   if (!ObjectId.isValid(userId)) {
@@ -164,8 +169,13 @@ export const getPostByUser = async (userId, limit) => {
 //returns limits amout of most recent posts by groupId
 export const getPostByGroup = async (groupId, limit) => {
   let fun = "getPostbyGroup";
-  if (!groupId) {
+  if (!groupId || !limit) {
     help.err(fun, "no groupId provided");
+  }
+
+  //ensure limit is a number
+  if (!help.isNum(limit)) {
+    help.err(fun, "limit is not a number");
   }
 
   if (!ObjectId.isValid(groupId)) {
@@ -194,9 +204,60 @@ export const getPostByGroup = async (groupId, limit) => {
   return postList;
 };
 
-export const getAllPosts = async () => {
+export const getAnalytics = async(
+  userId, 
+  start_time_interval
+) =>{
+  let fun = "getPostByUser";
+  if (!userId) {
+    help.err(fun, "no userId provided");
+  }
+
+  if (!ObjectId.isValid(userId)) {
+    help.err(fun, "userId is invalid ObjectId");
+  }
+
+  //if userId is ObjectId in turn into string
+  userId = userId.toString().trim()
+
+
+
+  //get post db
+  const postCollection = await posts();
+
+  //test if userCollection is null
+  if (postCollection == null) {
+    help.err(fun, "could not get posts");
+  }
+  
+  //put db in an array
+  let postList = await postCollection
+    .find({ userId: new ObjectId(userId) })
+    .toArray();
+  let return_list = []
+  for(let i = 0; i < postList.length; i++){
+
+      if(postList[i].postTime > start_time_interval ){
+        return_list.push(postList[i])
+      }
+  }
+
+  //return array of users
+  return return_list;
+};
+export const getAllPosts = async (limit) => {
   //function name to use for error throwing
   let fun = "getAllPosts";
+
+  //ensure limit is provided
+  if (!limit) {
+    help.err(fun, "no limit provided");
+  }
+
+  //ensure limit is a number
+  if (!help.isNum(limit)) {
+    help.err(fun, "limit is not a number");
+  }
 
   //get post db
   const postCollection = await posts();
@@ -207,7 +268,7 @@ export const getAllPosts = async () => {
   }
 
   //put db in an array
-  let postList = await postCollection.find({}).sort({ postTime: -1 }).toArray();
+  let postList = await postCollection.find({}).sort({ postTime: -1 }).limit(limit).toArray();
 
   //return array of users
   return postList;
@@ -275,48 +336,6 @@ export const removePost = async (postId) => {
   );
 
   return "post with postId '" + postId + "' successfully deleted";
-};
-
-export const getAnalytics = async(
-  userId, 
-  start_time_interval
-) =>{
-  let fun = "getPostByUser";
-  if (!userId) {
-    help.err(fun, "no userId provided");
-  }
-
-  if (!ObjectId.isValid(userId)) {
-    help.err(fun, "userId is invalid ObjectId");
-  }
-
-  //if userId is ObjectId in turn into string
-  userId = userId.toString().trim()
-
-
-
-  //get post db
-  const postCollection = await posts();
-
-  //test if userCollection is null
-  if (postCollection == null) {
-    help.err(fun, "could not get posts");
-  }
-  
-  //put db in an array
-  let postList = await postCollection
-    .find({ userId: new ObjectId(userId) })
-    .toArray();
-  let return_list = []
-  for(let i = 0; i < postList.length; i++){
-
-      if(postList[i].postTime > start_time_interval ){
-        return_list.push(postList[i])
-      }
-  }
-
-  //return array of users
-  return return_list;
 };
 
 export const updatePost = async (
@@ -413,3 +432,65 @@ export const updatePost = async (
   return true
 
 };
+
+export const updateLikes = async (postId, userId) => {
+  let fun = "updateLikes";
+
+  //ensure input is valid
+  if (!postId || !userId) {
+    help.err(fun, "missing field(s)");
+  }
+
+  //Ensure postId is a valid ObjectId
+  if (!ObjectId.isValid(postId)) {
+    help.err(fun, "postId is invalid ObjectId");
+  }
+
+  //if postId is ObjectId turn into string
+  postId = postId.toString().trim();
+
+  //Ensure userId is a valid ObjectId
+  if (!ObjectId.isValid(userId)) {
+    help.err(fun, "userId is invalid ObjectId");
+  }
+
+  //if userId is ObjectId turn into string
+  userId = userId.toString().trim();
+
+  //get post db
+  const postCollection = await posts();
+
+  //get post object
+  const targetPost = await getPost(postId);
+
+  //get user object
+  const targetUser = await user.getUser(userId);
+
+
+  let hasliked = false;
+
+  //if user has already liked post, remove like
+  for (let i = 0; i < targetPost.postLikes.length; i++) {
+    if (targetPost.postLikes[i].toString() == userId) {
+      targetPost.postLikes.splice(i, 1);
+      hasliked = true;
+      break;
+    }
+  }
+
+  if (!hasliked) {
+    targetPost.postLikes.push(new ObjectId(userId));
+  }
+
+  //update post in post db
+  const updateInfo = await postCollection.updateOne({ _id: new ObjectId(postId) }, { $set: { postLikes: targetPost.postLikes } });
+
+  //ensure post was updated
+  if (updateInfo.modifiedCount == 0) {
+    help.err(fun, "could not update post with postId '" + postId + "'");
+  }
+
+return true
+
+
+}

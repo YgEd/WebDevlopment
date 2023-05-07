@@ -20,21 +20,25 @@
 		</div>
 		<div class="menu">
 			{{#if logged_in}}
+			<a href="/feed">Feed</a>
+			<a href="/profile">Profile</a>
+			<a href="/posts/create">Post</a>
+			<a href="/">HomePage</a>
+			<a href="/search" >Search</a>
 			<a href = "/logout">Logout</a>
 			{{else}}
 			<a href="/register">Signup</a>
 			<a href="/login" >Login</a>
-			{{/if}}
-			<a href = "/search">Search</a>
-			<a href="/profile">Profile</a>
-			<a href="#">Groups</a>
 			<a href="/">HomePage</a>
-			<a href="/posts/create">Post</a>
+			<a href="/search" >Search</a>
+			{{/if}}
+			
 		</div>
 	</div>
 	<hr>
      <main>
              {{{body}}}
       </main>
+	 <script src="/public/js/login.js"></script>
 </body>
 </html>

@@ -3,12 +3,13 @@
 login form handlebar template
 
 --}}
-<h1>
+<h1 class="center">
     {{title}}
 </h1>
 <p>{{error}}</p>
+
 <main>
-    <form action="/login" method="POST" id="login-form">
+    <form action="/login" method="POST" id="login-form" class="center">
         <label for="emailAddressInput">Email:</label>
         <input id="emailAddressInput" type="email" name="emailAddressInput" placeholder="example@example.com"/>
         <label for="passwordInput">Password:</label>
@@ -16,6 +17,8 @@ login form handlebar template
         <label for="button">Click here to Log in</label>
         <input id='button' type="submit"/>
     </form>
-    <a href="/register">Click here to register!</a> <br>
+    <a href="/register" class="center">Click here to register!</a> 
+    <br>
     <div id="error" class="error" hidden>I'm an error. I will change through Client-Side JS</div>
 </main>
+ <script src="/public/js/login.js"></script>

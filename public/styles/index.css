@@ -212,6 +212,16 @@ textarea {
     text-align: left;
     font-size: 15px;
 }
+
+
+.error{
+    color: red;
+}
+
+p {
+    white-space: pre-wrap;
+}
+
 .recommendation{
     color: red;
 }
@@ -307,3 +317,4 @@ h3 {
 
 	background-color: #eee;
 }
+

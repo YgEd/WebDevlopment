@@ -1,7 +1,8 @@
 <form method="POST" id="recordForm" enctype="multipart/form-data">
     <label for="postTitle">Post Title</label>
     <br>
-    <input name="postTitle" id="postTitle" type="text">
+    <input name="postTitle" id="postTitle" type="text" maxlength="40">
+    <p id="titleErr" class="error" hidden></p>
     <br>
     <label for="workoutType">Workout Type</label>
     <br>
@@ -11,10 +12,12 @@
         <option value="cycling">bike</option>
         <option value="other">other</option>
     </select>
+    <p id="typeErr" class="error" hidden>must select a valid workout type</p>
     <br>
     <label for="postDescription">Workout Description</label>
     <br>
-    <textarea name="postDescription" id="postDescription" rows="5" cols="50">Describe the workout!, include things like sets, reps, breaktime etc...</textarea>
+    <textarea name="postDescription" id="postDescription" rows="5" cols="50" maxlength="500">Describe the workout!, include things like sets, reps, breaktime etc...</textarea>
+    <p id="descErr" class="error" hidden>Must provide a post description with a max of 500 characters</p>
     <br>
     <label for="postImgs">Upload Images</label>
     <div id="imgDiv">

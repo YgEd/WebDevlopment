@@ -38,6 +38,18 @@ export const createPost = async (
     help.err(fun, "expected string inputs to be of non-empty string type");
   }
 
+
+  let titlelines = postTitle.split('\n')
+  let len = postTitle.length - (titlelines.length - 1);
+  if (len > 40) {
+    help.err(fun, "postTitle cannot be over 40 characters")
+  }
+  let desclines = postDescription.split('\n')
+  len = postDescription.length - (desclines.length - 1);
+  if (len > 500) {
+    help.err(fun, "postDescription cannot be over 500 characters")
+  }
+
   //check to see if workoutType is one of the valid types
   let valid = false;
   if (!workoutTypes.includes(workoutType.trim().toLowerCase())) {

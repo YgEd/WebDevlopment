@@ -95,6 +95,15 @@ router.route('/error').get(async (req, res) => {
   }
 });
 
+router.route('/error').get(async (req, res) => {
+  //code here for GET
+  if (req.session.user)
+    return res.status(403).render('error', {title: 'Error', message: 'You must be a group creator to see this page'})
+  else{
+    return res.status(400).render('error', {title: 'Error', message: 'You must log in to see this page'})
+  }
+});
+
 router.route('/logout').get(async (req, res) => {
   //code here for GET
   

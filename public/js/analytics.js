@@ -1,7 +1,10 @@
 
 
 const dataSet = async function getData() {
-    return await axios.get('/profile/analytics');
+    return await axios.get('/profile/analytics', {
+        headers: {
+          'X-Client-Side-Request': true
+        }});
 }
 async function drawChart(value) {
 const set_data = await dataSet();

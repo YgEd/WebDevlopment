@@ -72,7 +72,7 @@ export const createPost = async (
   let date = new Date();
   const offset = date.getTimezoneOffset();
   date = new Date(date.getTime() - offset * 60 * 1000);
-
+  console.log("dateee", date)
   //setup default variables
   let postLikes = [];
   let comments = [];

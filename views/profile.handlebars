@@ -3,7 +3,9 @@
 <img src={{imgSrc}} width=100px height=100px>
 
 <h2> About me</h2>
-<p> {{description}}<p>
+
+<h3> {{aboutme}}</h3>
+
 
 <h2> Streaks</h2>
 <h3> {{streak}}</h3>
@@ -20,9 +22,22 @@
 <h3>
     <a href = "/profile/edit">Edit Profile</a>
 </h3>
+<h3>
+  <a href = "/profile/get-analytics"> Get analytics</a>
+</h3>
 {{/if}}
 
 
 
+<h4>Perfect work out for you</h4>
+{{#with workout}}
+<p>{{workoutName}}</p>
+<p>{{equipment}}</p>
+    <p>{{duration}} minutes</p>
+    <p>{{level}}</p>
+    <p>{{reps}} reps</p>
+    <p>{{rounds}} rounds</p>
+    <p>{{tags}}</p>
+{{/with}}
 
 

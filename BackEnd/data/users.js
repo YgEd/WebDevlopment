@@ -84,6 +84,7 @@ export const createUser = async (
   //create user object to add with trimmed and lowercase fields
   
   let user = {
+    
     username: username.trim(),
     firstName,
     lastName,
@@ -100,8 +101,6 @@ export const createUser = async (
     followers,
     profileimg
   };
-
-
 
   //insert created user object into the db
   const insertInfo = await userCollection.insertOne(user);
@@ -138,9 +137,19 @@ export const getUser = async (id) => {
 };
 
 //returns array of users
-export const getAllUsers = async () => {
+export const getAllUsers = async (limit) => {
   //function name to use for error throwing
   let fun = "getAllUsers";
+
+  //ensure limit is provided
+  if (limit == null) {
+    help.err(fun, "limit not provided");
+  }
+
+  //test if limit is a valid number
+  if (!help.isNum(limit)) {
+    help.err(fun, "limit is not a number");
+  }
   //get users db collection
   const userCollection = await users();
 
@@ -150,7 +159,7 @@ export const getAllUsers = async () => {
   }
 
   //put db in an array
-  let userList = await userCollection.find({}).toArray();
+  let userList = await userCollection.find({}).limit(limit).toArray();
 
   //return array of users
   return userList;
@@ -176,13 +185,13 @@ export const removeUser = async (id) => {
   return "user with id '" + id + "' successfully deleted";
 };
 
-//added back username, firstname, and last as updateable parameters
-//use other function for password updates
+//removed username, firstname, and last as updateable parameters
+//added new function for password updates
 export const updateUser = async (
   id,
   username,
-  firstName,
-  lastName,
+  // firstName,
+  // lastName,
   email,
   //userPassword,
   //DOB,
@@ -201,9 +210,9 @@ export const updateUser = async (
 
   //test if string inputs are valid non-empty strings
   if (
-    !help.isStr(username) ||
+    /*!help.isStr(username) ||
     !help.isStr(firstName) ||
-    !help.isStr(lastName) ||
+    !help.isStr(lastName) ||*/
     !help.isStr(email) ||
     //!help.isStr(userPassword) ||
     typeof aboutMe !== "string" // shouldnt check against empty string because we initialize it as one
@@ -221,6 +230,7 @@ export const updateUser = async (
     help.err(fun, "invalid object ID");
   }
 
+  console.log("profileimg: " + profileimg)
   if (profileimg != "default" && !ObjectId.isValid(profileimg)) {
     help.err(fun, "invalid profile picture");
   }
@@ -263,7 +273,7 @@ export const updateUser = async (
   //get original username for user that is being updated
   let oldUser = await getUser(id);
 
-  
+  /*
   if (oldUser.username.toLowerCase() != username.trim().toLowerCase()) {
     //find if user exists with given username
     const findUser = await userCollection.findOne({
@@ -280,15 +290,15 @@ export const updateUser = async (
       help.err(fun, "username: '" + username.trim() + "' is already in use");
     }
   }
-
-  
+*/
+  /*
   firstName = help.strPrep(firstName);
-  lastName = help.strPrep(lastName);
+  lastName = help.strPrep(lastName);*/
   email = help.strPrep(email).toLowerCase();
 
   //validate firstName, lastName, and Email
-    help.checkName(firstName, "First Name")
-    help.checkName(lastName, "Last Name")
+    /*help.checkName(firstName, "First Name")
+    help.checkName(lastName, "Last Name")*/
     help.checkEmail(email, "Email")
 
   //get original email from user
@@ -310,9 +320,9 @@ export const updateUser = async (
     { _id: id },
     {
       $set: {
-        username,
+/*        username,
         firstName,
-        lastName,
+        lastName,*/
         email,
         //userPassword: hashed,
         userPosts,
@@ -391,7 +401,7 @@ export const updatePass = async (userId, currentPass, newPass) => {
 
 export const checkUser = async (emailAddress, password) => {
   let fun = "checkUser"
-
+  console.log("email", emailAddress)
   if (
     help.strPrep(emailAddress).length == 0 ||
     help.strPrep(password).length == 0
@@ -410,7 +420,7 @@ export const checkUser = async (emailAddress, password) => {
    //connect to db
    const userCollect = await users();
    const user = await userCollect.findOne({email: emailAddress})
-   
+ 
 
    if (user == null){
       console.log("what")
@@ -428,7 +438,8 @@ export const checkUser = async (emailAddress, password) => {
     lastName: user.lastName,
     emailAddress: user.email,
     user_id: user._id,
-    userName: user.username
+    userName: user.username,
+    groupsOwned: user.groupsOwned
    }
   
 
@@ -436,3 +447,180 @@ export const checkUser = async (emailAddress, password) => {
 
 
 };
+
+
+export const addfollower = async (userId, followerId) => {
+  let fun = "addfollow"
+
+  //esnure input is valid
+  if (!userId || !followerId) {
+    help.err(fun, "invalid input: " + userId + " " + followerId)
+  }
+
+  //ensure userId is valid ObjectId
+  if (!ObjectId.isValid(userId)) {
+    help.err(fun, "invalid userId")
+  }
+
+  //ensure followId is valid ObjectId
+  if (!ObjectId.isValid(followerId)) {
+    help.err(fun, "invalid followId")
+  }
+
+  //if userId and followerId are the same, throw error
+  if (userId == followerId) {
+    help.err(fun, "userId and followerId cannot be the same")
+  }
+
+  //if userId and followerId are ObjectID change to string
+  userId = userId.toString().trim()
+  followerId = followerId.toString().trim()
+
+  //get users db
+  const userCollection = await users();
+
+  //make sure db is found
+  if (!userCollection){
+    help.err(fun, "could not get user collection")
+  }
+
+  //get user
+  let target_user = await userCollection.findOne({_id: new ObjectId(userId)})
+
+  //make sure user is found
+  if (!target_user) {
+    help.err(fun, "could not find user with that id")
+  }
+
+  //get follower
+  let follower = await userCollection.findOne({_id: new ObjectId(followerId)})
+
+  //make sure follower is found
+  if (!follower) {
+    help.err(fun, "could not find follower with that id")
+  }
+
+  //check if follower is already following user
+  for (let i = 0; i < follower.following.length; i++) {
+    if (follower.following[i].toString() == userId.toString()) {
+      help.err(fun, "follower is already following user")
+    }
+  }
+ 
+
+  //check if user is in follower's following list
+  for (let i = 0; i < target_user.followers.length; i++) {
+    if (target_user.followers[i].toString() == followerId.toString()) {
+      help.err(fun, "user is already following follower")
+    }
+  }
+
+  //add follower to user's followers list
+  const updateInfo = await userCollection.updateOne({_id: new ObjectId(userId)}, {$push: {followers: new ObjectId(followerId)}})
+
+  //check if update was successful
+  if (!updateInfo.acknowledged) {
+    help.err(fun, "could not update user's followers list")
+  }
+
+  //add user to follower's following list
+  const updateInfo2 = await userCollection.updateOne({_id: new ObjectId(followerId)}, {$push: {following: new ObjectId(userId)}})
+
+  //check if update was successful
+  if (!updateInfo2.acknowledged) {
+    help.err(fun, "could not update follower's following list")
+  }
+
+  return true
+
+}
+
+export const removefollower = async (userId, followerId) => {
+  let fun = "removefollow"
+
+  //esnure input is valid
+  if (!userId || !followerId) {
+    help.err(fun, "invalid input")
+  }
+
+  //ensure userId is valid ObjectId
+  if (!ObjectId.isValid(userId)) {
+    help.err(fun, "invalid userId")
+  }
+
+  //ensure followId is valid ObjectId
+  if (!ObjectId.isValid(followerId)) {
+    help.err(fun, "invalid followId")
+  }
+
+  //if userId and followerId are the same, throw error
+  if (userId == followerId) {
+    help.err(fun, "userId and followerId cannot be the same")
+  }
+
+  //if userId and followerId are ObjectID change to string
+  userId = userId.toString().trim()
+  followerId = followerId.toString().trim()
+
+  //get users db
+  const userCollection = await users();
+
+  //make sure db is found
+  if (!userCollection){
+    help.err(fun, "could not get user collection")
+  }
+
+  //get user
+  let target_user = await userCollection.findOne({_id: new ObjectId(userId)})
+  //make sure user is found
+  if (!target_user) {
+    help.err(fun, "could not find user with that id")
+  }
+
+  //get follower
+  let follower = await userCollection.findOne({_id: new ObjectId(followerId)})
+  //make sure follower is found
+  if (!follower) {
+    help.err(fun, "could not find follower with that id")
+  }
+
+  //check if follower is already following user
+ for (let i = 0; i < follower.following.length; i++) {
+    if (follower.following[i].toString() == userId.toString()) {
+      break
+    }
+    if (i == follower.following.length - 1) {
+      help.err(fun, "follower is not following user")
+    }
+  }
+
+  //check if user is in follower's following list
+  for (let i = 0; i < target_user.followers.length; i++) {
+    if (target_user.followers[i].toString() == followerId.toString()) {
+      break
+    }
+    if (i == target_user.followers.length - 1) {
+      help.err(fun, "user is not following follower")
+    }
+  }
+
+  //remove follower from user's followers list
+  const updateInfo = await userCollection.updateOne({_id: new ObjectId(userId)}, {$pull: {followers: new ObjectId(followerId)}})
+  console.log("remove follower updateInfo: " + updateInfo);
+
+  //check if update was successful
+  if (!updateInfo.acknowledged) {
+    help.err(fun, "could not update user's followers list")
+  }
+
+  //remove user from follower's following list
+  const updateInfo2 = await userCollection.updateOne({_id: new ObjectId(followerId)}, {$pull: {following: new ObjectId(userId)}})
+  console.log("remove following updateInfo2: " + updateInfo2);
+
+  //check if update was successful
+  if (!updateInfo2.acknowledged) {
+    help.err(fun, "could not update follower's following list")
+  }
+
+  return true
+}

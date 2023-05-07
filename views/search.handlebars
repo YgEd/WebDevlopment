@@ -1,0 +1,21 @@
+<h1 class="page-header center">Search DuckFit</h1>
+<p id="search-description"class="center">search by username or groupname</p>
+
+<form action="/search" method="POST" id="search-form" class="search-form center">
+    <label class="center" for="searchType">Search Type</label>
+        <select id="searchType" name="searchType">
+            <option value="user" selected>User</option>
+            <option value="group">Group</option>
+        </select>   
+
+    <label class="center" for="searchInput">Search</label>
+    <input maxlength="30" id="searchInput" type="text" name="searchInput" placeholder="Search for a user or group"/>
+    <button id="search_button" type="submit">submit</button>
+</form>
+<div id="search-wrapper">
+    <p id="search_result"></p>  
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.js"
+		integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+<script src="/public/js/search.js"></script>

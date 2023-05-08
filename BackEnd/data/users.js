@@ -624,3 +624,37 @@ export const removefollower = async (userId, followerId) => {
 
   return true
 }
+
+
+export const getUserByUsername = async (username) => {
+    let fun = "getUserByUsername"
+
+    //ensure input is valid
+    if (!username) {
+      help.err(fun, "invalid input")
+    }
+
+    //ensure username is a non-empty string
+    if (typeof username !== "string" || username.trim().length == 0) {
+      help.err(fun, "invalid username")
+    }
+
+    //get users db
+    const userCollection = await users();
+
+    //make sure db is found
+    if (!userCollection){
+      help.err(fun, "could not get user collection")
+    }
+
+    //get user
+    let user = await userCollection.findOne({username: username})
+
+    //make sure user is found
+    if (!user) {
+      help.err(fun, "could not find user with that username")
+    }
+
+    return user
+
+}

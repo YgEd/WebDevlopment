@@ -1,0 +1,35 @@
+<h1>{{group.groupName}}</h1>
+<p hidden id="group-id">{{group._id}}</p>
+
+<h2>Edit Group</h2>
+<form action "/edit" method="POST" id="group-form">
+    <label for="groupName" >Group Name</label>
+    <input maxlength = "30" id="groupName" type="text" name="groupName" placeholder="Group Name" value="{{group.groupName}}"/>
+    <label for="description">Description</label>
+    <input maxlength = "100" id="description" type="text" name="description" placeholder="Description" value="{{group.groupDescription}}"/>
+    <label for="group-button">Edit Group</label>
+    <input id='group-button' type="submit"/>
+    <input type="hidden" name="groupId" value={{group._id}} />
+</form>
+
+<h2>Group Members</h2>
+<div class="group-member-wrapper">
+{{#each group.groupUsers}}
+    <div class="group-member-item">
+        <p class="mem-user">{{this}}</p>
+        <button type="button" class="remove-button"> Remove </button>
+    </div>
+{{/each}}
+</div>
+
+<br>
+
+<button type="button" id="remove-group-button"> Delete Group </button>
+
+ <script src="https://code.jquery.com/jquery-3.5.1.js"
+		integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+<script src="/public/js/group_edit.js" ></script>
+
+
+
+

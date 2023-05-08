@@ -17,6 +17,9 @@ export const createGroup = async (groupName, groupOwner) => {
         help.err(fun, "groupName needs to be a non-empty string")
     }
 
+    //limit groupName to 30 chars
+    groupName = groupName.trim().substring(0, 30)
+
     //Ensure groupOwner is a valid ObjectId
     if (!ObjectId.isValid(groupOwner)) {
         help.err(fun, "groupOwner is invalid ObjectId")
@@ -29,13 +32,20 @@ export const createGroup = async (groupName, groupOwner) => {
     //Group Obj
     let groupObj = {
         groupOwner: new ObjectId(groupOwner),
+        groupDescription: "",
         groupName: groupName,
         groupMembers: [new ObjectId(groupOwner)],
-        groupPosts: []
+        groupPosts: [],
+        groupMessages: []
     }
 
     //get group db
     const groupCollection = await groups();
+
+    //check if a group with groupName already exists
+    if (groupCollection.findOne({ groupName: groupName })) {
+        help.err(fun, "group with groupName already exists")
+    }
 
     //insert group
     const insertInfo = await groupCollection.insertOne(groupObj);
@@ -52,6 +62,91 @@ export const createGroup = async (groupName, groupOwner) => {
     //return groupObj from DB
     return await groupCollection.findOne({ _id: insertInfo.insertedId })
 
+
+}
+
+export const getGroup = async (groupId) => {
+    let fun = "getGroup";
+
+    //Ensure groupId is a valid ObjectId
+    if (!ObjectId.isValid(groupId)) {
+        help.err(fun, "groupId is invalid ObjectId")
+    }
+
+    //if groupId is ObjectId in turn into string
+    groupId = groupId.toString().trim()
+
+    //get group db
+    const groupCollection = await groups();
+
+    //get group
+    const group = await groupCollection.findOne({ _id: new ObjectId(groupId) })
+
+    //check if group was found
+    if (!group) {
+        help.err(fun, "could not find group")
+    }
+
+    //return group
+    return group
+}
+
+export const addGroupDescription = async (groupId, groupDescription, user_id) => {
+    let fun = "addGroupDescription";
+
+    //Ensure no missing fields
+    if (!groupId || !groupDescription || !user_id) {
+        help.err(fun, "missing field")
+    }
+
+    //Ensure groupId is a valid ObjectId
+    if (!ObjectId.isValid(groupId)) {
+        help.err(fun, "groupId is invalid ObjectId")
+    }
+
+    //Ensure groupId is a valid ObjectId
+    if (!ObjectId.isValid(groupId)) {
+        help.err(fun, "groupId is invalid ObjectId")
+    }
+
+    //if groupId is ObjectId in turn into string
+    groupId = groupId.toString().trim()
+    user_id = user_id.toString().trim()
+
+
+    //Ensure groupDescription is a non-empty string
+    if (help.strPrep(groupDescription).length == 0) {
+        help.err(fun, "groupDescription needs to be a non-empty string")
+    }
+
+    //limit groupDescription to 100 chars
+    groupDescription = groupDescription.trim().substring(0, 100)
+
+    //get group db
+    const groupCollection = await groups();
+
+    //get group
+    const group = await groupCollection.findOne({ _id: new ObjectId(groupId) })
+
+    //check if group was found
+    if (!group) {
+        help.err(fun, "could not find group")
+    }
+
+    //check if user is group owner
+    if (group.groupOwner.toString() != user_id) {
+        help.err(fun, "user is not group owner")
+    }
+
+    //update group
+    const updateInfo = await groupCollection.updateOne({ _id: new ObjectId(groupId) }, { $set: { groupDescription: groupDescription } })
+
+    //check if group was updated
+    if (updateInfo.modifiedCount === 0) {
+        help.err(fun, "could not update group")
+    }
+
+    return true
 
 }
 
@@ -208,9 +303,9 @@ export const memberRemove = async (groupId, userId) => {
         help.err(fun, "user is not in group")
     }
 
-    if (group.groupOwner == userId) {
-        help.err(fun, "owner can't leave the group, delete the group instead")
-    }
+    // if (group.groupOwner.toString() == userId) {
+    //     help.err(fun, "owner can't leave the group, delete the group instead")
+    // }
 
     //update group
     const updateInfo = await groupCollection.updateOne({ _id: new ObjectId(groupId) }, { $pull: { groupMembers: new ObjectId(userId) } })
@@ -242,17 +337,122 @@ export const memberRemove = async (groupId, userId) => {
 
 }
 
-export const updateGroup = async (groupId, groupName, groupOwner, groupMembers, groupPosts) => {
-    let fun = "updateGroup";
+export const addGroupMessage = async (groupId, userId, message) => {
+    let fun = "addGroupMessage";
 
     //Ensure no missing fields
-    if (!groupId || !groupName || !groupOwner || !groupMembers || !groupPosts) {
+    if (!groupId || !userId || !message) {
         help.err(fun, "missing field")
     }
 
     //Ensure groupId is a valid ObjectId
     if (!ObjectId.isValid(groupId)) {
         help.err(fun, "groupId is invalid ObjectId")
+    }
+
+    //Ensure userId is a valid ObjectId
+    if (!ObjectId.isValid(userId)) {
+        help.err(fun, "userId is invalid ObjectId")
+    }
+
+    //if groupId is ObjectId in turn into string
+    groupId = groupId.toString().trim()
+
+    //if userId is ObjectId in turn into string
+    userId = userId.toString().trim()
+
+    //Ensure message is a non-empty string
+    if (help.strPrep(message).length == 0) {
+        help.err(fun, "message needs to be a non-empty string")
+    }
+
+    //get group db
+    const groupCollection = await groups();
+
+    //ensure user is group owner
+    const group = await groupCollection.findOne({ _id: new ObjectId(groupId) })
+
+    if (group.groupOwner.toString() != userId) {
+        help.err(fun, "user is not group owner")
+    }
+
+    //update group
+    const updateInfo = await groupCollection.updateOne({ _id: new ObjectId(groupId) }, { $push: { groupMessages: message } })
+    
+    //check if group was updated
+    if (updateInfo.modifiedCount === 0) {
+        help.err(fun, "could not add message to group")
+    }
+
+    return true
+
+
+}
+
+export const removeGroupMessage = async (groupId, userId, message) => {
+    let fun = "removeGroupMessage";
+
+    //Ensure no missing fields
+    if (!groupId || !userId || !message) {
+        help.err(fun, "missing field")
+    }
+
+    //Ensure groupId is a valid ObjectId
+    if (!ObjectId.isValid(groupId)) {
+        help.err(fun, "groupId is invalid ObjectId")
+    }
+
+    //Ensure userId is a valid ObjectId
+    if (!ObjectId.isValid(userId)) {
+        help.err(fun, "userId is invalid ObjectId")
+    }
+
+    //if groupId is ObjectId in turn into string
+    groupId = groupId.toString().trim()
+
+    //if userId is ObjectId in turn into string
+    userId = userId.toString().trim()
+
+    //Ensure message is a non-empty string
+    if (help.strPrep(message).length == 0) {
+        help.err(fun, "message needs to be a non-empty string")
+    }
+
+    //get group db
+    const groupCollection = await groups();
+
+    //ensure user is group owner
+    const group = await groupCollection.findOne({ _id: new ObjectId(groupId) })
+
+    if (group.groupOwner.toString() != userId) {
+        help.err(fun, "user is not group owner")
+    }
+
+    //update group
+    const updateInfo = await groupCollection.updateOne({ _id: new ObjectId(groupId) }, { $pull: { groupMessages: message } })
+
+   return true
+
+}
+
+export const updateGroup = async (groupId, groupName, groupOwner, groupMembers, groupPosts, groupDescription) => {
+    let fun = "updateGroup";
+
+    //console.log(groupId, groupName, groupOwner, groupMembers, groupPosts, groupDescription)
+
+    //Ensure no missing fields
+    if (!groupId || !groupName || !groupOwner || !groupMembers || !groupPosts || !groupDescription) {
+        help.err(fun, "missing field")
+    }
+
+    //Ensure groupId is a valid ObjectId
+    if (!ObjectId.isValid(groupId)) {
+        help.err(fun, "groupId is invalid ObjectId")
+    }
+
+    //Ensure groupDescription is a non-empty string
+    if (help.strPrep(groupDescription).length == 0) {
+        help.err(fun, "groupDescription needs to be a non-empty string")
     }
 
     //if groupId is ObjectId in turn into string
@@ -281,8 +481,18 @@ export const updateGroup = async (groupId, groupName, groupOwner, groupMembers, 
         help.err(fun, "groupPosts is not an array of valid ObjectIds")
     }
 
+    //trim groupName and groupDescription
+    groupName = groupName.toString().trim().substring(0,30)
+    groupDescription = groupDescription.toString().trim().substring(0,100)
+
+
     //get group db
     const groupCollection = await groups();
+
+    //check if a group with groupName already exists
+    if (groupCollection.findOne({ groupName: groupName })) {
+        help.err(fun, "group with groupName already exists")
+    }
 
     //ensure group db is succesfully fetched
     if (!groupCollection){
@@ -290,7 +500,7 @@ export const updateGroup = async (groupId, groupName, groupOwner, groupMembers, 
     }
 
     //update group
-    const updateInfo = await groupCollection.updateOne({ _id: new ObjectId(groupId) }, { $set: { groupName: groupName, groupOwner: groupOwner, groupMembers: groupMembers, groupPosts: groupPosts } })
+    const updateInfo = await groupCollection.updateOne({ _id: new ObjectId(groupId) }, { $set: { groupName: groupName, groupOwner: groupOwner, groupMembers: groupMembers, groupPosts: groupPosts, groupDescription: groupDescription } })
 
     //ensure group was updated
     if (updateInfo.modifiedCount === 0) {
@@ -339,7 +549,7 @@ export const deleteGroup = async (groupId, userId) => {
 
     
     //ensure user initiating delete is group owner
-    if (groupOwner != userId) {
+    if (groupOwner.toString() != userId) {
         help.err(fun, "user is not group owner")
     }
 
@@ -395,3 +605,33 @@ export const getAllGroups = async (limit) => {
 
     return allGroups
 }
+
+export const getGroupByName = async (groupName) => {
+    let fun = "getGroupByName";
+
+    //Ensure no missing fields
+    if (!groupName) {
+        help.err(fun, "missing field")
+    }
+
+    //Ensure groupName is a non-empty string
+    if (help.strPrep(groupName).length == 0) {
+        help.err(fun, "groupName needs to be a non-empty string")
+    }
+
+    //trim groupName
+    groupName = groupName.toString().trim().substring(0,30)
+
+    //get group db
+    const groupCollection = await groups();
+
+    //get group
+    const group = groupCollection.findOne({ groupName: groupName })
+
+    //ensure group was fetched
+    if (!group) {
+        help.err(fun, "could not get group")
+    }
+
+    return group
+};

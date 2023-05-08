@@ -54,11 +54,13 @@ $( document ).ready(function() {
                         }
                         
                         //add join button
-                        if (response.type == "group" && response.inGroup == false){
-                            if (response.inGroup == true){
-                                $("#search_result").append("<button class='search-res center leave-button' type='submit'>Leave</button>")
-                            } else {
-                                $("#search_result").append("<button class='search-res center join-button' type='submit'>Join</button>")
+                        if (response.type == "group"){
+                            if (!response.groupOwner){
+                                if (response.inGroup == true){
+                                    $("#search_result").append("<button class='search-res center leave-button' type='submit'>Leave</button>")
+                                } else {
+                                    $("#search_result").append("<button class='search-res center join-button' type='submit'>Join</button>")
+                                }
                             }
                         }
                     }

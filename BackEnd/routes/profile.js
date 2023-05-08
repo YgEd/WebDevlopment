@@ -50,7 +50,7 @@ router
       }
 
       try {
-        if ((userstuff.profileimg == "default") && ObjectId.isValid(userstuff.profileimg)) { 
+        if ((userstuff.profileimg != "default") && ObjectId.isValid(userstuff.profileimg)) { 
           const photoColl = await photos();
           let profilePic = await photoColl.findOne({_id: new ObjectId(userstuff.profileimg)})
           imgSrc = profilePic.imageSrc
@@ -224,13 +224,18 @@ router
   router
   .route('/:userid')
   .get(async (req, res) => {
+    if (!req.session.user){
+      console.log("user not authenticated");
+      return res.redirect("/login")
+    }
     let userId = req.params.userid
     let imgSrc;
     let userInfo;
     let isCurr = false
-    let logged_in = false
+    let logged_in = true
     console.log(userId);
     try {
+      //if no user id is passed in, use the current user
       if (!userId) {
         userId = req.session.user.user_id;
         logged_in = true;
@@ -256,7 +261,7 @@ router
         imgSrc = await getPhotoSrc(userInfo.profileimg)
       }
       console.log(`${userInfo.firstName} ${userInfo.lastName}`)
-      res.render("profile", {name: `${userInfo.firstName} ${userInfo.lastName}`, imgSrc: imgSrc, aboutMe: userInfo.aboutMe, streak: userInfo.streak, goals: userInfo.goals, isCurr: isCurr, logged_in: logged_in})
+      res.render("profile", {name: `${userInfo.firstName} ${userInfo.lastName}`, imgSrc: imgSrc, aboutMe: userInfo.aboutMe, streak: userInfo.userStreak, goals: userInfo.goals, isCurr: isCurr, logged_in: logged_in})
     }catch(e) {
       return res.status(400).render("error", {message: e});
     }

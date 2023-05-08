@@ -16,7 +16,7 @@ router.get("/", async (req, res) => {
         // return res.redirect("/login")
     }
 
-    res.render("search", {logged_in: logged_in, user: user})
+    res.render("search", {title: "search", logged_in: logged_in, user: user})
 
 
 })
@@ -24,6 +24,7 @@ router.get("/", async (req, res) => {
 
 router.post("/", async (req, res) => {
     let data = req.body
+    let groupOwner = false;
     console.log("post search route hit")
     console.log(data)
     if (help.strPrep(data.searchType).length == 0 || data.searchType != "user" && data.searchType != "group"){
@@ -74,6 +75,7 @@ router.post("/", async (req, res) => {
     }
 
     if (data.searchType == "group"){
+        let none=false;
         try {
             var groupList = await groupFuns.getAllGroups(100)
         } catch (error) {
@@ -87,26 +89,46 @@ router.post("/", async (req, res) => {
         //get closest group name
         let target_group = closest(data.searchInput, groupname);
 
+        if (!target_group){
+            none = true;
+        }
+
         //get group object
         let groupobj = groupList.find(value => value.groupName == target_group)
 
         //if user is authenticated
         if (req.session.user){
+
+            //if no groups are found
+            if (none){
+                return res.send({response: null, type: "group", auth:true})
+            }
+
             //check if user is already in group
             let curr_user = req.session.user.user_id
             let inGroup = false;
             
             //check if user is already in group
-            for (let i = 0; i < groupobj.members.length; i++){
-                if (groupobj.members[i].toString() == curr_user.toString()){
+            for (let i = 0; i < groupobj.groupMembers.length; i++){
+                if (groupobj.groupMembers[i].toString() == curr_user.toString()){
                     inGroup = true;
+                    break;
                 }
             }
 
+            //check if user is group owner
+            if (groupobj.groupOwner.toString() == curr_user.toString()){
+                groupOwner = true;
+            }
 
-            return res.send({response: target_group, type: "group", groupobj: groupobj, inGroup: inGroup, auth:true})
+
+            return res.send({response: target_group, type: "group", groupobj: groupobj, inGroup: inGroup, auth:true, groupOwner: groupOwner})
         }
 
+        //if no groups are found
+        if (none){
+            return res.send({response: null, type: "group", auth:true})
+        }
         return res.send({response: target_group, type: "group", groupobj: groupobj, auth:false})
     }
 })
@@ -222,7 +244,7 @@ router.post("/join", async (req, res) => {
             }
     
             //add user to target group's members
-            await groupFuns.addMember(target_group._id, user_id)
+            await groupFuns.memberAdd(target_group._id, user_id)
     
             return res.send({response: "success"})
     
@@ -249,9 +271,8 @@ router.post("/leave", async (req, res) => {
 
     try {
             
-            let groupList = await groupFuns.getAllGroups(100)
             //get target group by groupname
-            let target_group = groupList.find(value => value.groupName == data.groupname)
+            let target_group = await groupFuns.getGroupByName(data.groupname)
     
             //check if user is not in group
             for (let i = 0; i < target_group.groupMembers.length; i++){
@@ -276,7 +297,7 @@ router.post("/leave", async (req, res) => {
             }
     
             //remove user from target group's members
-            await groupFuns.removeMember(target_group._id, user_id)
+            await groupFuns.memberRemove(target_group._id, user_id)
     
             return res.send({response: "success"})
     

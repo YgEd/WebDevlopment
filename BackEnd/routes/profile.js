@@ -7,7 +7,7 @@ import {photos} from "../config/mongoCollections.js";
 import help from "../helpers.js"
 import {uploadPhoto, upload, getPhotoSrc } from '../data/photos.js';
 import { getAnalytics } from '../data/posts.js';
-
+import recData from '../data/recommendations.js'
 
 
 router
@@ -28,9 +28,9 @@ router
     } else {
       var imgSrc = await getPhotoSrc(targetUser.profileimg);
     }
-    
+    let workoutRec = await recData.getRandomRec()
     console.log(req.session.user.profileimg)
-    return res.render('profile', {name: req.session.user.firstName,  streak: targetUser.userStreak, aboutme: targetUser.aboutMe, goals: targetUser.goals, imgSrc: imgSrc, isCurr: true, logged_in: true})
+    return res.render('profile', {title: "my profile", name: req.session.user.firstName,  streak: targetUser.userStreak, aboutme: targetUser.aboutMe, goals: targetUser.goals, imgSrc: imgSrc, isCurr: true, logged_in: true, followers: targetUser.followers.length, following: targetUser.following.length, workout: workoutRec})
     
   })
 
@@ -50,7 +50,7 @@ router
       }
 
       try {
-        if ((userstuff.profileimg == "default") && ObjectId.isValid(userstuff.profileimg)) { 
+        if ((userstuff.profileimg != "default") && ObjectId.isValid(userstuff.profileimg)) { 
           const photoColl = await photos();
           let profilePic = await photoColl.findOne({_id: new ObjectId(userstuff.profileimg)})
           imgSrc = profilePic.imageSrc
@@ -62,7 +62,7 @@ router
         console.log(e);
         return res.status(500).send("could not get profile picture");
       }
-      return res.render('editprofile', {logged_in: true, userid: userstuff.username, imgsrc: imgSrc, aboutme: userstuff.aboutMe, goals:userstuff.goals, logged_in: true})
+      return res.render('editprofile', {title: "edit profile", logged_in: true, userid: userstuff.username, imgsrc: imgSrc, aboutme: userstuff.aboutMe, goals:userstuff.goals, logged_in: true})
     })
    .post(upload.single('photo'), async (req, res, next) => {
       if (!req.session.user){
@@ -144,21 +144,6 @@ router
           }
         else {
             //upload image
-            //create doc for mongo storage
-            /*let doc = {
-                imageName: req.file.originalname,
-                //creates src link using bufferdata
-                imageSrc: `data:${req.file.fieldname};base64,${req.file.buffer.toString('base64')}`
-            };
-            const photoColl = await photos();
-            const insertPhoto = await photoColl.insertOne(doc);
-            //test to see if insert was successful
-            if (!insertPhoto.acknowledged || !insertPhoto.insertedId) {
-              throw "error could not upload image"
-            }
-            else {
-              profileimg = insertPhoto.insertedId.toString();
-            }*/
             profileimg = await uploadPhoto(req.file);
         } 
         }catch(e) {
@@ -200,7 +185,7 @@ router
         return res.redirect("/login")
       }
       console.log("get analytics route hit")
-      res.render('analytics', {logged_in: true});
+      res.render('analytics', {title: "analytics", logged_in: true});
   
   })
     router.get('/analytics', async (req, res) =>{
@@ -229,16 +214,19 @@ router
   router
   .route('/:userid')
   .get(async (req, res) => {
+    if (!req.session.user){
+      console.log("user not authenticated");
+      return res.redirect("/login")
+    }
     let userId = req.params.userid
     let imgSrc;
     let userInfo;
     let isCurr = false
-    let logged_in = false
-    console.log(userId);
+    let logged_in = true
     try {
+      //if no user id is passed in, use the current user
       if (!userId) {
         userId = req.session.user.user_id;
-        logged_in = true;
       }
       if (!ObjectId.isValid(userId)) {
         userId = req.session.user.user_id
@@ -261,7 +249,7 @@ router
         imgSrc = await getPhotoSrc(userInfo.profileimg)
       }
       console.log(`${userInfo.firstName} ${userInfo.lastName}`)
-      res.render("profile", {name: `${userInfo.firstName} ${userInfo.lastName}`, imgSrc: imgSrc, aboutMe: userInfo.aboutMe, streak: userInfo.streak, goals: userInfo.goals, isCurr: isCurr, logged_in: logged_in})
+      res.render("profile", {name: `${userInfo.firstName} ${userInfo.lastName}`, imgSrc: imgSrc, aboutMe: userInfo.aboutMe, streak: userInfo.userStreak, goals: userInfo.goals, isCurr: isCurr, logged_in: logged_in})
     }catch(e) {
       return res.status(400).render("error", {message: e});
     }

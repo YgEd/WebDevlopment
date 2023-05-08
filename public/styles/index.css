@@ -6,12 +6,12 @@
 .navbar {
     display: flex;
     background-color: #0eb358;
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     height: 2.5rem;
 }
 
 .menu {
-    margin: 0 1.75rem;
+    margin: 0 1.25rem;
     justify-content: space-around;
     font-family: 'Franklin Gothic Medium',
         'Arial Narrow',
@@ -251,6 +251,7 @@ h3 {
     font-family: 'Franklin Gothic Medium',
     'Arial Narrow',
     Arial, sans-serif;
+    font-size: 30px;
 }
 
 #search-description {
@@ -277,7 +278,14 @@ h3 {
     
 }
 
-.join-button .leave-button{
+.join-button {
+    text-align: center !important;
+    display: inline-block;
+    cursor:pointer;
+    margin-left: 46.5%;
+} 
+
+.leave-button {
     text-align: center !important;
     display: inline-block;
     cursor:pointer;
@@ -314,7 +322,13 @@ h3 {
 
 .inputClass {
 	border: 3px solid red;
-
 	background-color: #eee;
 }
 
+
+.group-item{
+    padding: 20px;
+}
+.block{
+    display: block;
+}

@@ -40,7 +40,7 @@ $( document ).ready(function() {
                     $("#search_result").html("<p class='search-res center search-res-title'>No results found</p>")
                 } else {
                     $("#search_result").append("<p class='search-res center search-res-title'>Result</p>")
-                    $("#search_result").append("<p class='center search-res search-name'>" + response.response + "</p>")
+                    $("#search_result").append(`<a class='center search-res search-name block' href="/profile/${response.userobj._id}"` + "<p>" + response.response + "</p></a>")
                     
                     //if user is authenticated
                     if (response.auth){
@@ -54,11 +54,13 @@ $( document ).ready(function() {
                         }
                         
                         //add join button
-                        if (response.type == "group" && response.inGroup == false){
-                            if (response.inGroup == true){
-                                $("#search_result").append("<button class='search-res center leave-button' type='submit'>Leave</button>")
-                            } else {
-                                $("#search_result").append("<button class='search-res center join-button' type='submit'>Join</button>")
+                        if (response.type == "group"){
+                            if (!response.groupOwner){
+                                if (response.inGroup == true){
+                                    $("#search_result").append("<button class='search-res center leave-button' type='submit'>Leave</button>")
+                                } else {
+                                    $("#search_result").append("<button class='search-res center join-button' type='submit'>Join</button>")
+                                }
                             }
                         }
                     }

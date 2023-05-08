@@ -93,5 +93,9 @@ async getAllRecs() {
 
     //return array of users
     return recsList;
-  }}
+  },
+async getRandomRec(){
+    let allRec = await this.getAllRecs();
+    return validation.getRandomItem(allRec);
+}}
   export default exportedMethods;

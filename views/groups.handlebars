@@ -1,0 +1,61 @@
+
+{{#if groups}}
+    <h2 class="center">Groups for {{username}}</h2>
+
+<div class="center group-wrapper">
+        {{else}}
+            <h2>No groups found for {{username}}</h2>
+        {{/if}}
+            {{#each groups}}
+            <div class="center group-item">
+                <h3 class="group-name">{{this.groupName}}</h3>
+                <p>{{this.groupDescription}}</p>
+                <p>Coach: {{this.OwnerUser}}</p>
+                <table class="center table-striped">
+                    <thead>
+                        <tr>
+                        <th>Group Members</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                            {{#each this.groupMembers}}
+                            <tr>
+                                <td>{{this}}</td>
+                            </tr>
+                            {{/each}}
+                    </tbody>
+                </table>
+                    {{#when this.groupOwner 'eq' ../user_id}}
+                            
+                        <a href="/groups/edit/{{../this._id}}" class="btn btn-primary">Edit</a>
+                            
+                    {{/when}}
+
+                    {{#when this.groupOwner 'noteq' ../user_id}}
+                        <button type="button" class="leave-group-button">Leave Group</button>
+                    {{/when}}
+                </div>
+            {{/each}}   
+</div>
+
+{{#if error}}
+
+    <p class="center error">{{error}}</p>
+
+{{/if}}
+
+<h2 class="center">Create Group</h2>
+<form class="center" action="/groups" method="POST" id="group-form-create">
+    <label maxlength="30" for="groupName">Group Name</label>
+    <input id="groupName" type="text" name="groupName" placeholder="Group Name"/>
+    <label maxlength="100" for="description">Description</label>
+    <input id="description" type="text" name="description" placeholder="Description"/>
+    <label for="group-button">Create Group</label>
+    <input id='group-button' type="submit"/>
+</form>
+
+ <script src="https://code.jquery.com/jquery-3.5.1.js"
+		integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+<script src="/public/js/group_edit.js" ></script>
+
+

@@ -6,6 +6,7 @@ import postRoutes from "./posts.js"
 import feedRoutes from "./feed.js"
 import recommendationRoutes from "./recommendations.js"
 import searchRoutes from "./search.js"
+import groupRoutes from "./groups.js"
 
 
 const constructorMethod = (app) => {
@@ -15,6 +16,7 @@ const constructorMethod = (app) => {
     app.use("/posts", postRoutes )
     app.use("/recommendation", recommendationRoutes)
     app.use("/search", searchRoutes)
+    app.use("/groups", groupRoutes)
 
     app.use('*', (req, res) => {
         res.status(404).json({error: 'Route Not found'});

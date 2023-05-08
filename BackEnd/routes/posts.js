@@ -7,7 +7,7 @@ import {photos} from "../config/mongoCollections.js";
 import { createPost, getPost } from '../data/posts.js';
 import { ObjectId } from 'mongodb';
 import {uploadPhoto, upload, getPhotoSrc } from '../data/photos.js';
-
+import xss from 'xss';
 /*const upload = multer({
     storage: multer.memoryStorage(),
     //max 5 files of 10mb
@@ -38,14 +38,14 @@ router
         let fun = "createPostRoute";
         var workoutTypes = ["running", "lifting", "cycling", "other"];
         //create post
-        const postData = req.body;
+        
         let userId = req.session.user.user_id;
-        let workoutType = postData.workoutType;
-        let postDescription = postData.postDescription;
+        let workoutType = xss(req.body.workoutType);
+        let postDescription = xss(req.body.postDescription);
         let postImgs = []
         //console.log(postImgs);
-        let postToGroup = postData.postToGroup;
-        let postTitle = postData.postTitle;
+        let postToGroup = xss(req.body.postToGroup);
+        let postTitle = xss(req.body.postTitle);
         let badData = {};
         let posted;
 

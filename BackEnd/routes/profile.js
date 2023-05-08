@@ -2,7 +2,7 @@ import {Router} from 'express';
 import { ObjectId } from 'mongodb';
 const router = Router();
 import multer from 'multer';
-
+import xss from 'xss';
 
 import {createUser,checkUser,getUser,updateUser}  from '../data/users.js'
 import {photos} from "../config/mongoCollections.js";
@@ -53,8 +53,8 @@ router
         let fun = "editProfile"
         const updates = req.body;
         let userId = req.session.user.user_id;
-        let aboutme = updates.aboutme;
-        let goals = updates.goals;
+        let aboutme = xss(req.body.aboutme);
+        let goals = xss(req.body.goals);
         let badData = {};
         let profileimg;
         let userInfo;

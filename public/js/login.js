@@ -35,26 +35,40 @@ let checkPassword = (str, varName) =>{
     if (!/[^a-zA-Z0-9\s]/.test(str)) throw `${varName} must contain at least one special character`;
     return str
   }
-let checkDateFormat = (string) => {
-    let date1 = string;
-    let date = string.split('/');
-    if (date.length != 3) throw 'has to be in MM/DD/YYYY format'
-    date.forEach((value) => parseInt(value,10))
-    for (let i =0; i<date.length;i++){
-      if (isNaN(date[i])) throw 'one of the date is not a number' 
+let checkDOB=(str, varName) =>{
+    if (!str) throw `Error: You must supply a ${varName}!`;
+    if (typeof str !== Date) throw `Error: ${varName} must be a string!`;
+    if (str.length === 0)
+      throw `Error: ${varName} cannot be an empty string or string with just spaces`;
+    if (!validate(str, "boolean", "mm/dd/yyyy")){
+      throw `Error: ${str} is not in proper MM/DD/YYYY form`
     }
-    if (date[1] <1) throw "Not a valid date"
-    if (date[2] <1900 || date[2] > new Date().getFullYear() +1) throw "release Year is not valid"
-    if ([1,3,5,7,8,10,12].includes(date[0])){
-       if (date[1] > 31) throw "Not a valid date"
-    }else if ([4,6,9,11].includes(date[0])){
-       if (date[1] >30) throw "Not a Valid date"
-    }else if (date[0] == 2){
-        if (date[2] % 4 === 0){
-          if (date[1] > 29) throw "Not a Valid date"
-        }
-        if (date[1] >28) throw "Not a valid date"
-    }else throw 'Month is not valid'
+    //get current date
+    const date = new Date();
+  
+    //numerical form of inputted month, day, and year
+    let inMonth = parseInt(str.substring(0, 2));
+    let inDay = parseInt(str.substring(3, 5));
+    let inYear = parseInt(str.substring(6, 10));
+  
+    //Tests to ensure if DOB is at least 18 years of age
+  
+    if (!(inYear <= date.getFullYear() - 18)) {
+      err(fun, "DOB is not 18 years or older: year is too young");
+    }
+  
+    if (inYear == date.getFullYear() - 18 && inMonth > date.getMonth() + 1) {
+      err(fun, "DOB is not 18 years or older: year and month is too young");
+    }
+  
+    if (
+      inMonth == date.getMonth() + 1 &&
+      inYear == date.getFullYear() - 18 &&
+      inDay > date.getDate()
+    ) {
+      err(fun,"DOB is not 18 years or older: year, month, day is too young");
+    }
+    return 
   }
 const loginForm = document.getElementById('login-form');
 let errorDiv = document.getElementById('error');
@@ -99,7 +113,7 @@ if (registrationForm){
     let emailInput = document.getElementById('emailAddressInput');
     let passwordInput = document.getElementById('passwordInput');
     let confirmPasswordInput = document.getElementById('confirmPasswordInput');
-    let dob = document.getElementById('dob');
+    let dobInput = document.getElementById('dob');
 
     try {
       let firstName = checkName(firstNameInput.value, 'first name');
@@ -107,7 +121,7 @@ if (registrationForm){
       let email = checkEmail(emailInput.value, 'email address');
       let password = checkPassword(passwordInput.value, 'password');
       let confirmPassword = checkPassword(confirmPasswordInput.value, 'confirm password');
-      checkDateFormat(dob);
+    //   let dob = checkDOB(dobInput, "DOB");
       if (password !== confirmPassword) {
         throw 'Error: Password and confirm password do not match';
       }
@@ -118,7 +132,7 @@ if (registrationForm){
       emailInput.classList.remove('inputClass');
       passwordInput.classList.remove('inputClass');
       confirmPasswordInput.classList.remove('inputClass');
-      dob.classList.remove('inputClass');
+      dobInput.classList.remove('inputClass');
       errorDivReg.hidden = true;
       registrationForm.classList.remove('error');
     } catch (e) {
@@ -145,9 +159,9 @@ if (registrationForm){
         passwordInput.focus();
         passwordInput.className = 'inputClass';
         confirmPasswordInput.className = 'inputClass';
-      } else if (e.includes('dob')) {
-        dob.focus();
-        dob.className = 'inputClass';
+      } else if (e.includes('DOB')) {
+        dobInput.focus();
+        dobInput.className = 'inputClass';
       }
     }
   });

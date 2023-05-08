@@ -31,7 +31,8 @@ export const createGroup = async (groupName, groupOwner) => {
         groupOwner: new ObjectId(groupOwner),
         groupName: groupName,
         groupMembers: [new ObjectId(groupOwner)],
-        groupPosts: []
+        groupPosts: [],
+        recommendation: []
     }
 
     //get group db

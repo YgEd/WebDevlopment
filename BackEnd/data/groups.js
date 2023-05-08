@@ -41,9 +41,9 @@ export const createGroup = async (groupName, groupOwner) => {
 
     //get group db
     const groupCollection = await groups();
-
+    let target = await groupCollection.findOne({ groupName: groupName })
     //check if a group with groupName already exists
-    if (groupCollection.findOne({ groupName: groupName })) {
+    if (target != null) {
         help.err(fun, "group with groupName already exists")
     }
 

@@ -1,11 +1,11 @@
 import {Router} from 'express';
 const router = Router();
-import validation from "../helpers.js";
+import validation from "../../helpers.js";
 import multer from 'multer';
-import {photos} from "../config/mongoCollections.js";
+import {photos} from "../../config/mongoCollections.js";
 import { ObjectId } from 'mongodb';
-import {uploadPhoto, upload, getPhotoSrc } from '../data/photos.js';
-import recData from "../data/recommendations.js"
+import {uploadPhoto, upload, getPhotoSrc } from '../photos.js';
+import recData from "../recommendations.js"
 router
   .route('/')
   .get(async (req, res) => {

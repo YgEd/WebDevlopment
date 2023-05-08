@@ -1,7 +1,7 @@
-import * as groupFuns from "../data/groups.js";
-import * as userFuns from "../data/users.js";
+import * as groupFuns from "../groups.js";
+import * as userFuns from "../users.js";
 import { ObjectId } from 'mongodb';
-import help from "../helpers.js";
+import help from "../../helpers.js";
 
 import { Router } from "express";
 const router = Router();

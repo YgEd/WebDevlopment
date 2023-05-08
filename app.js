@@ -4,7 +4,7 @@ import * as groupFuns from "./BackEnd/data/groups.js"
 
 import express from 'express';
 const app = express();
-import configRoutes from './BackEnd/routes/index.js';
+import configRoutes from './BackEnd/data/routes/index.js';
 import {fileURLToPath} from 'url';
 import {dirname} from 'path';
 import exphbs from 'express-handlebars';

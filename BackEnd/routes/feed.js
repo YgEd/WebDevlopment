@@ -1,7 +1,7 @@
-import * as postFuns from "../data/posts.js";
-import * as userFuns from "../data/users.js";
-import * as commentFuns from "../data/comment.js";
-import * as photoFuns from "../data/photos.js"
+import * as postFuns from "../posts.js";
+import * as userFuns from "../users.js";
+import * as commentFuns from "../comment.js";
+import * as photoFuns from "../photos.js"
 import xss from 'xss';
 import { Router } from "express";
 const router = Router();

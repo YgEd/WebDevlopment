@@ -16,7 +16,7 @@ router.get("/", async (req, res) => {
         // return res.redirect("/login")
     }
 
-    res.render("search", {logged_in: logged_in, user: user})
+    res.render("search", {title: "search", logged_in: logged_in, user: user})
 
 
 })

@@ -103,7 +103,7 @@ router.post("/", async (req, res) => {
     data.description = help.strPrep(data.description).substring(0, 100);
     //add description if provided
     try {
-        await groupFuns.addGroupDescription(newGroup._id, data.description);
+        await groupFuns.addGroupDescription(newGroup._id, data.description,req.session.user.user_id );
         return res.send({response: true})
     } catch (error) {
         console.log(error);

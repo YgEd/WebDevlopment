@@ -9,7 +9,7 @@ router.route('/')
       logged_in = true;
     }
     console.log(logged_in)
-        return res.render('posts/home', {logged_in: logged_in})
+        return res.render('posts/home', {title: "home", logged_in: logged_in})
   }
 );
 router

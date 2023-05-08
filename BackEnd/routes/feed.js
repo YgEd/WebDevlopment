@@ -120,6 +120,7 @@ try {
   
 
   return res.render("feed", {
+    title: "feed",
     firstName: firstName,
     userName: userName,
     posts: displayPosts,
@@ -149,6 +150,7 @@ router.post("/", async (req, res) => {
   }
 
   return res.render("partials/comment", {
+    title: "comment",
     layout: null,
     userId: userId,
     comment_user: userName,

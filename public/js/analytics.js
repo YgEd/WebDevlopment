@@ -8,6 +8,10 @@ const dataSet = async function getData() {
 }
 async function drawChart(value) {
 const set_data = await dataSet();
+if(set_data.data.e){
+ return  res.json(set_data.data.e)
+}
+else{
 let x_data = set_data.data.data
 let y_data = set_data.data.data2
 let x2_data = set_data.data.month_entries
@@ -42,7 +46,7 @@ Plotly.newPlot("gd", data, layout);
 Plotly.newPlot("gd2", data2, layout);
 Plotly.newPlot("gd3", data3, layout);
 }
-
+}
 
 
 

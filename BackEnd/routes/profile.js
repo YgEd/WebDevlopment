@@ -7,7 +7,7 @@ import {photos} from "../config/mongoCollections.js";
 import help from "../helpers.js"
 import {uploadPhoto, upload, getPhotoSrc } from '../data/photos.js';
 import { getAnalytics } from '../data/posts.js';
-
+import recData from '../data/recommendations.js'
 
 
 router
@@ -28,9 +28,9 @@ router
     } else {
       var imgSrc = await getPhotoSrc(targetUser.profileimg);
     }
-    
+    let workoutRec = await recData.getRandomRec()
     console.log(req.session.user.profileimg)
-    return res.render('profile', {title: "my profile", name: req.session.user.firstName,  streak: targetUser.userStreak, aboutme: targetUser.aboutMe, goals: targetUser.goals, imgSrc: imgSrc, isCurr: true, logged_in: true})
+    return res.render('profile', {title: "my profile", name: req.session.user.firstName,  streak: targetUser.userStreak, aboutme: targetUser.aboutMe, goals: targetUser.goals, imgSrc: imgSrc, isCurr: true, logged_in: true, followers: targetUser.followers.length, following: targetUser.following.length, workout: workoutRec})
     
   })
 

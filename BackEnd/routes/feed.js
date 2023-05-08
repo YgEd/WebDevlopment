@@ -2,7 +2,7 @@ import * as postFuns from "../data/posts.js";
 import * as userFuns from "../data/users.js";
 import * as commentFuns from "../data/comment.js";
 import * as photoFuns from "../data/photos.js"
-
+import xss from 'xss';
 import { Router } from "express";
 const router = Router();
 
@@ -134,15 +134,11 @@ try {
 });
 
 router.post("/", async (req, res) => {
-  if (!req.session.user){
-    console.log("user not logged in")
-    res.redirect("/login");
-  }
   let data = req.body;
   let userName = req.session.user.userName;
   let userId = req.session.user.user_id;
   try {
-    await commentFuns.createComment(data.postId, userId, userName, data.msg);
+    await commentFuns.createComment(postId, userId, userName, msg);
   } catch (error) {
     console.log("Error from post feed route: " + error);
     return res.send({ error: error });
@@ -154,15 +150,11 @@ router.post("/", async (req, res) => {
     layout: null,
     userId: userId,
     comment_user: userName,
-    comment_body: data.msg,
+    comment_body: msg,
   });
 });
 
 router.post("/remove", async (req, res) => {
-  if (!req.session.user){
-    console.log("user not logged in")
-    res.redirect("/login");
-  }
   let postId = req.body.postId;
   let userId = req.session.user.user_id;
  
@@ -181,10 +173,6 @@ router.post("/remove", async (req, res) => {
 });
 
 router.post("/like", async (req, res) => {
-  if (!req.session.user){
-    console.log("user not logged in")
-    res.redirect("/login");
-  }
   let postId = req.body.postId;
   let userId = req.session.user.user_id;
   console.log("current user = " + req.session.user.userName + " is liking post " + postId + "")
@@ -208,10 +196,6 @@ router.post("/like", async (req, res) => {
 });
 
 router.post("/unlike", async (req, res) => {
-  if (!req.session.user){
-    console.log("user not logged in")
-    res.redirect("/login");
-  }
   let postId = req.body.postId;
   let userId = req.session.user.user_id;
   console.log("current user = " + req.session.user.userName + " is unliking post " + postId + "")

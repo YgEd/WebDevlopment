@@ -30,7 +30,7 @@ router
     }
     
     console.log(req.session.user.profileimg)
-    return res.render('profile', {name: req.session.user.firstName,  streak: targetUser.userStreak, aboutme: targetUser.aboutMe, goals: targetUser.goals, imgSrc: imgSrc, isCurr: true, logged_in: true})
+    return res.render('profile', {title: "my profile", name: req.session.user.firstName,  streak: targetUser.userStreak, aboutme: targetUser.aboutMe, goals: targetUser.goals, imgSrc: imgSrc, isCurr: true, logged_in: true})
     
   })
 
@@ -62,7 +62,7 @@ router
         console.log(e);
         return res.status(500).send("could not get profile picture");
       }
-      return res.render('editprofile', {logged_in: true, userid: userstuff.username, imgsrc: imgSrc, aboutme: userstuff.aboutMe, goals:userstuff.goals, logged_in: true})
+      return res.render('editprofile', {title: "edit profile", logged_in: true, userid: userstuff.username, imgsrc: imgSrc, aboutme: userstuff.aboutMe, goals:userstuff.goals, logged_in: true})
     })
    .post(upload.single('photo'), async (req, res, next) => {
       if (!req.session.user){
@@ -144,21 +144,6 @@ router
           }
         else {
             //upload image
-            //create doc for mongo storage
-            /*let doc = {
-                imageName: req.file.originalname,
-                //creates src link using bufferdata
-                imageSrc: `data:${req.file.fieldname};base64,${req.file.buffer.toString('base64')}`
-            };
-            const photoColl = await photos();
-            const insertPhoto = await photoColl.insertOne(doc);
-            //test to see if insert was successful
-            if (!insertPhoto.acknowledged || !insertPhoto.insertedId) {
-              throw "error could not upload image"
-            }
-            else {
-              profileimg = insertPhoto.insertedId.toString();
-            }*/
             profileimg = await uploadPhoto(req.file);
         } 
         }catch(e) {
@@ -200,7 +185,7 @@ router
         return res.redirect("/login")
       }
       console.log("get analytics route hit")
-      res.render('analytics', {logged_in: true});
+      res.render('analytics', {title: "analytics", logged_in: true});
   
   })
     router.get('/analytics', async (req, res) =>{
@@ -233,12 +218,10 @@ router
     let userInfo;
     let isCurr = false
     let logged_in = true
-    console.log(userId);
     try {
       //if no user id is passed in, use the current user
       if (!userId) {
         userId = req.session.user.user_id;
-        logged_in = true;
       }
       if (!ObjectId.isValid(userId)) {
         userId = req.session.user.user_id

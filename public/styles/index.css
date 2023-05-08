@@ -329,3 +329,6 @@ h3 {
 .group-item{
     padding: 20px;
 }
+.block{
+    display: block;
+}

@@ -6,7 +6,7 @@ import {createUser,checkUser,getUser,updateUser}  from '../data/users.js'
 import {photos} from "../config/mongoCollections.js";
 import help from "../helpers.js"
 import {uploadPhoto, upload, getPhotoSrc } from '../data/photos.js';
-import { getAnalytics } from '../data/posts.js';
+import { getAnalytics, getPostByUser} from '../data/posts.js';
 import recData from '../data/recommendations.js'
 
 
@@ -29,8 +29,61 @@ router
       var imgSrc = await getPhotoSrc(targetUser.profileimg);
     }
     let workoutRec = await recData.getRandomRec()
-    console.log(req.session.user.profileimg)
+   // console.log(req.session.user.profileimg)
+    //get the posts collection 
+    try{
+    let streak_param = 0
+    let getthepost= await getPostByUser(req.session.user.user_id, 10000)
+    let old_date = "N/A"
+    if(getthepost.length !== 0){
+    let new_date = new Date()
+    for(let i = 0; i < getthepost.length; i++){
+    let  postime = getthepost[i].postTime 
+    if(i > 0){
+      old_date = getthepost[i-1].postTime
+      const timediff = Math.abs(Date.UTC(old_date.getUTCFullYear(), old_date.getUTCMonth(), old_date.getUTCDate()) - 
+      Date.UTC(postime.getUTCFullYear(), postime.getUTCMonth(), postime.getUTCDate()));
+      const diffDay = Math.ceil(timediff/ (1000 * 60 * 60 * 24));
+      if(diffDay === 0){
+        continue
+      }
+    }
+    const diffTime = Math.abs(Date.UTC(new_date.getUTCFullYear(), new_date.getUTCMonth(), new_date.getUTCDate()) - 
+                         Date.UTC(postime.getUTCFullYear(), postime.getUTCMonth(), postime.getUTCDate()));
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    if(i > 0 && diffDays >= 2){
+      break
+    }
+    if(diffDays < 2){
+      console.log(streak_param)
+      streak_param = streak_param + 1
+    }else{
+      console.log("hmm")
+      streak_param = 0
+    }
+    new_date.setDate(new_date.getDate() - 1); // subtract one day
+  }
+    }else{
+      streak_param = 0
+    }
+    targetUser = await updateUser( targetUser._id,
+      targetUser.username,
+      // userInfo.firstName,
+      // userInfo.lastName,
+      targetUser.email,
+      targetUser.userPosts,
+      streak_param,
+      targetUser.aboutMe,
+      targetUser.groupsOwned,
+      targetUser.groupMembers,
+      targetUser.profileimg,
+      targetUser.goals,
+      targetUser.following,
+      targetUser.followers)
     return res.render('profile', {title: "my profile", name: req.session.user.firstName,  streak: targetUser.userStreak, aboutme: targetUser.aboutMe, goals: targetUser.goals, imgSrc: imgSrc, isCurr: true, logged_in: true, followers: targetUser.followers.length, following: targetUser.following.length, workout: workoutRec})
+    }catch(e){
+      return res.render('profile', {error: e})
+    }
     
   })
 

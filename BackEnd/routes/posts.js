@@ -216,7 +216,7 @@ router
             thisPost = await getPost(postId); 
         }catch(e) {
             console.log(e);
-            return res.status(404).send("could not find post");
+            return res.status(404).render("not_found", {title: "Post not found"})
         }
         try {
             //get photos
@@ -228,7 +228,7 @@ router
             }
         }catch(e) {
             console.log(e);
-            return res.status(404).send("could not find image");
+            return res.status(404).render("not_found", {title: "Post not found"})
         }
 
         try {
@@ -430,7 +430,7 @@ router
         }catch(e) {
             return res.status(500).render('error', {title:'error', message:e})
         }
-        
+       
     });
 
 export default router

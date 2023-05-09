@@ -25,6 +25,7 @@ isStr(str) {
 
 isNum(num) {
   //return boolean specifing whether input is a number
+
   return /^\d+$/.test(num);
 },
 
@@ -105,11 +106,11 @@ checkName(str, varName){
 checkNumber(num, varName){
   if (!num) throw `${num} is not supplied`
   if (typeof num !== 'number') {
-    throw `${variableName || 'provided variable'} is not a number`;
+    throw `${varName || 'provided variable'} is not a number`;
   }
 
   if (isNaN(val)) {
-    throw `${variableName || 'provided variable'} is NaN`;
+    throw `${varName || 'provided variable'} is NaN`;
   }
 },
 checkUsername(str, varName){
@@ -137,6 +138,16 @@ checkPassword(str, varName){
   if (!/[0-9]/.test(str)) throw `${varName} must contain at least one number`
   if (!/[^a-zA-Z0-9\s]/.test(str)) throw `${varName} must contain at least one special character`;
   return str
+},
+checkKeyword(strVal, varName) {
+  if (typeof strVal !== 'string') throw `Error: ${varName} must be a string!`;
+  strVal = strVal.trim();
+  if (strVal.length === 0)
+    throw `Error: ${varName} cannot be an empty string or string with just spaces`;
+  
+  if (!isNaN(strVal))
+    throw `Error: ${strVal} is not a valid value for ${varName} as it only contains digits`;
+  return strVal;
 },
 
 // checkDate(string){
@@ -211,17 +222,16 @@ async return_week_values(userid){
   const get_stuff = await getAnalytics(userid,lastWeek)
   
   let days_of_week = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]
-  let current_day = new Date().getDay()
+  let current_day = new Date().getUTCDay();
   let reorganized_days = days_of_week.slice(current_day + 1).concat(days_of_week.slice(0, current_day + 1))
   let times_day_occured = [0, 0, 0, 0, 0, 0, 0]
   let index = 0
   for(let i = 0; i < get_stuff.length; i++) {
     let post_date = get_stuff[i].postTime
-    let day_index = post_date.getDay()
+    let day_index = post_date.getUTCDay();
     if (day_index < current_day){
        let indice = day_index + (6- current_day)
       times_day_occured[ indice]++
-      console.log(times_day_occured[indice])
     }
     if(day_index === current_day){
        times_day_occured[6]++
@@ -243,19 +253,17 @@ async return_week_values(userid){
 async return_month_values(userid){
   // Create a new date object for today
   const today = new Date();
-  const prev_month = today.getMonth()
+  const prev_month = today.getUTCMonth()
  
-  const oneMonthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
-  oneMonthAgo.setDate(oneMonthAgo.getDate() - 1); // set the date to one day before to get the last day of the previous month
+  const oneMonthAgo = new Date(today.getUTCFullYear(), today.getUTCMonth() - 1, today.getUTCDate() + 1);
+  
+ // oneMonthAgo.setDate(oneMonthAgo.getUTCDate() - 1); // set the date to one day before to get the last day of the previous month
   const datesArray = [];
   const datestracker = Array(30).fill(0);
-
-  for (let d = oneMonthAgo; d <= today; d.setDate(d.getDate() + 1)) {
+  for (let d = oneMonthAgo; d <= today; d.setUTCDate(d.getUTCDate()  + 1)) {
        let new_date = new Date(d)
-       if((new_date.getDate() > today.getDate() && new_date.getMonth() + 1 === today.getMonth()) || (new_date.getMonth() ===  today.getMonth()
-       && new_date.getDate() <= today.getDate())){
-        datesArray.push(new Date(d));
-       }
+      datesArray.push(new_date);
+      
   }
   
   const get_stuff = await getAnalytics(userid, datesArray[0])
@@ -265,7 +273,7 @@ async return_month_values(userid){
     for(let j = 0; j < datesArray.length; j++){
        
        
-       if((datesArray[j].getMonth() === get_stuff[i].postTime.getMonth()) && (datesArray[j].getDate() === get_stuff[i].postTime.getDate()) ){
+       if((datesArray[j].getUTCMonth() === get_stuff[i].postTime.getUTCMonth()) && (datesArray[j].getUTCDate() === get_stuff[i].postTime.getUTCDate()) ){
          datestracker[j]++
          break;
        }
@@ -288,13 +296,13 @@ async return_year_values(userid){
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 let month_counter = [0, 0, 0, 0, 0,0 ,0 ,0, 0,0,0,0]
 const d = new Date();
-const currentMonth = d.getMonth(); // get the current month, represented as a number from 0 to 11
+const currentMonth = d.getUTCMonth(); // get the current month, represented as a number from 0 to 11
 
 // slice the array into two parts and concatenate them in reverse order
 
 
-const lastYear = d.getFullYear() - 1; // get the year before the current year
-const sameDayLastYear = new Date(lastYear, d.getMonth() + 1, d.getDate());
+const lastYear = d.getUTCFullYear() - 1; // get the year before the current year
+const sameDayLastYear = new Date(lastYear, d.getUTCMonth() + 1, d.getUTCDate());
 
 
 
@@ -302,7 +310,7 @@ const sameDayLastYear = new Date(lastYear, d.getMonth() + 1, d.getDate());
 
 const get_stuff = await getAnalytics(userid,sameDayLastYear )
 for(let i = 0; i < get_stuff.length; i++){
-   month_counter[get_stuff[i].postTime.getMonth()]++
+   month_counter[get_stuff[i].postTime.getUTCMonth()]++
 }
 
 const shuffledMonths = months.slice(currentMonth + 1).concat(months.slice(0, currentMonth + 1))

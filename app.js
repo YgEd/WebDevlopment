@@ -108,6 +108,11 @@ app.set('view engine', 'handlebars');
     next();
   });
 
+ 
+  
+  // Add the middleware function to the app
+  
+
   app.use('/profile', async (req, res, next) => {
     if(!req.session.user){
         return res.redirect('/')
@@ -127,17 +132,31 @@ app.set('view engine', 'handlebars');
     if (!req.session.user){
       return res.status(400).redirect('/error')
     }
-    if(req.session.user.groupOwned != 0){
+    if(req.session.user.groupOwned <= 0){
         return res.status(400).redirect('/error')
     }
 
     next();
   });
 
+  app.use('/profile/analytics', async (req, res, next) => {
+    if (!(req.header("X-Client-Side-Request"))) {
+      // This is an API request, so proceed with your code
+      // ...
+      return res.status(403).render('forbidden')
+     
+    } 
+
+    next()
+  });
+
+
   app.use(async (req, res, next) => {
    console.log(`[${new Date().toUTCString()}] ${req.method} ${req.originalUrl} - authenticated: ${req.session.user ? 'true' : 'false'}`);
     next();
   })
+
+ 
   
   
 

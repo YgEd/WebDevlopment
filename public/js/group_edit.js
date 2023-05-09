@@ -105,31 +105,36 @@ $(document).ready(function(){
    $("#remove-group-button").click(function (e){
 
         e.preventDefault();
-        var groupId = $("#group-id").text()
 
-        let data = {
-            "groupId": groupId,
-            "remove": true,
-        }
+        if (confirm("Are you sure you want to remove this group?") == true){
+            var groupId = $("#group-id").text()
 
-        console.log(data)
-        //ajax request to remove the member
-        $.ajax({
-            type: "POST",
-            url: "/groups/delete_group",
-            data: data,
-            success: function (response){
-                if (response.response == true){
-                    alert("group removed succesfully")
-                    window.location.href = "/groups"
-                }else{
-                    alert("group removed unsuccesfully")
-                    window.location.reload()
-                }
+            let data = {
+                "groupId": groupId,
+                "remove": true,
             }
 
+            console.log(data)
+            //ajax request to remove the member
+            $.ajax({
+                type: "POST",
+                url: "/groups/delete_group",
+                data: data,
+                success: function (response){
+                    if (response.response == true){
+                        alert("group removed succesfully")
+                        window.location.href = "/groups"
+                    }else{
+                        alert("group removed unsuccesfully")
+                        window.location.reload()
+                    }
+                }
 
-        })
+
+            })
+        }else{
+            window.location.reload()
+        }
     })
 
 

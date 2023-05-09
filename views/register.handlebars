@@ -7,7 +7,7 @@ registration handelbars
     {{title}}
 </h1>
 <p>{{error}}</p>
-<main>
+
     <form action="/register" method="POST" id="registration-form">
          <label for = "username">Username</label>
         <input id = "username" type = "text" name = "username"  placeholder="MichaelJackson123">
@@ -32,4 +32,5 @@ registration handelbars
     </form>
     <a href="/login" class="center">Already have an account? Click here to log-in</a> <br>
     <div id="error-reg" class="error" hidden>I'm an error. I will change through Client-Side JS</div>
-</main>
+
+<script src="/public/js/login.js"></script>

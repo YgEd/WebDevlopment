@@ -40,8 +40,11 @@ $( document ).ready(function() {
                     $("#search_result").html("<p class='search-res center search-res-title'>No results found</p>")
                 } else {
                     $("#search_result").append("<p class='search-res center search-res-title'>Result</p>")
-                    $("#search_result").append(`<a class='center search-res search-name block' href="/profile/${response.userobj._id}"` + "<p>" + response.response + "</p></a>")
-                    
+                    if (response.type == "user"){
+                        $("#search_result").append(`<a class='center search-res search-name block' href="/profile/${response.userobj._id}"` + "<p>" + response.response + "</p></a>")
+                    } else{
+                        $("#search_result").append(`<a class='center search-res search-name block' href="/groups/${response.groupobj._id}"` + "<p>" + response.response + "</p></a>")
+                    }
                     //if user is authenticated
                     if (response.auth){
                         //add follow button

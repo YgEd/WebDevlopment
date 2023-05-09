@@ -1,3 +1,8 @@
+{{#if error}}
+  <h1> {{error}}</h1>
+
+{{else}}
+
 <h1> {{name}} </h1>
 <h4>Followers: {{followers}}</h4>
 <h4>Following: {{following}}</h4>
@@ -23,6 +28,7 @@
 </ul>
 
 {{#if isCurr}}
+
 <h3>
     <a href = "/profile/edit">Edit Profile</a>
 </h3>
@@ -31,6 +37,7 @@
 </h3>
 <br>
 <br>
+
 <h4>Perfect work out for you</h4>
 {{#with workout}}
 <p>{{workoutName}}</p>
@@ -41,9 +48,29 @@
     <p>{{rounds}} rounds</p>
     <p>{{tags}}</p>
 {{/with}}
+
+<button type="button" id="remove-user-button"> Delete Account</button>
 {{/if}}
 
-<br>
+{{#unless isCurr}}
+  {{#if isFollowing}}
+    <form action="/search/unfollow" method="POST" id="unfollow-form">
+        <input  id="username" type="hidden" name="username" value={{username}} />
+        <input type="submit" value="Unfollow" />
+    </form>
+
+  {{else}}
+
+    <form action="/search/follow" method="POST" id="follow-form">
+        <input id="username" type="hidden" name="username" value={{username}} />
+        <input type="submit" value="Follow" />
+    </form>
+
+  {{/if}}
+{{/unless}}
+
+{{/if}}
+
 <br>
 
 <h2>Recent Posts</h2>
@@ -54,3 +81,9 @@
   </li>
 {{/each}}
 </ul>
+
+ <script src="https://code.jquery.com/jquery-3.5.1.js"
+		integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+<script src="/public/js/profile.js" ></script>
+
+

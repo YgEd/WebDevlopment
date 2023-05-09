@@ -2,13 +2,15 @@ import {Router} from 'express';
 import { ObjectId } from 'mongodb';
 const router = Router();
 import multer from 'multer';
-import {createUser,checkUser,getUser,updateUser}  from '../data/users.js'
-import {photos} from "../config/mongoCollections.js";
+import {createUser,checkUser,getUser,updateUser,deleteAccountAndRemoveAllPosts}  from '../data/users.js'
+import {photos} from "../config/mongoCollections.js"
 import help from "../helpers.js"
 import {uploadPhoto, upload, getPhotoSrc } from '../data/photos.js';
-import { getAnalytics, getPostByUser } from '../data/posts.js';
-import recData from '../data/recommendations.js'
 
+import { getAnalytics, getPostByUser } from '../data/posts.js';
+
+import recData from '../data/recommendations.js'
+import xss from 'xss'
 
 router
   .route('/')
@@ -44,8 +46,64 @@ router
       console.log(e);
       return res.status(500).render('error', )
     }
+  
+    let workoutRec = await recData.getRandomRec()
+   // console.log(req.session.user.profileimg)
+    //get the posts collection 
+    try{
+    let streak_param = 0
+    let getthepost= await getPostByUser(req.session.user.user_id, 10000)
+    let old_date = "N/A"
+    if(getthepost.length !== 0){
+    let new_date = new Date()
+    for(let i = 0; i < getthepost.length; i++){
+    let  postime = getthepost[i].postTime 
+    if(i > 0){
+      old_date = getthepost[i-1].postTime
+      const timediff = Math.abs(Date.UTC(old_date.getUTCFullYear(), old_date.getUTCMonth(), old_date.getUTCDate()) - 
+      Date.UTC(postime.getUTCFullYear(), postime.getUTCMonth(), postime.getUTCDate()));
+      const diffDay = Math.ceil(timediff/ (1000 * 60 * 60 * 24));
+      if(diffDay === 0){
+        continue
+      }
+    }
+    const diffTime = Math.abs(Date.UTC(new_date.getUTCFullYear(), new_date.getUTCMonth(), new_date.getUTCDate()) - 
+                         Date.UTC(postime.getUTCFullYear(), postime.getUTCMonth(), postime.getUTCDate()));
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    if(i > 0 && diffDays >= 2){
+      break
+    }
+    if(diffDays < 2){
+      console.log(streak_param)
+      streak_param = streak_param + 1
+    }else{
+      console.log("hmm")
+      streak_param = 0
+    }
+    new_date.setDate(new_date.getDate() - 1); // subtract one day
+  }
+    }else{
+      streak_param = 0
+    }
+    targetUser = await updateUser( targetUser._id,
+      targetUser.username,
+      // userInfo.firstName,
+      // userInfo.lastName,
+      targetUser.email,
+      targetUser.userPosts,
+      streak_param,
+      targetUser.aboutMe,
+      targetUser.groupsOwned,
+      targetUser.groupMembers,
+      targetUser.profileimg,
+      targetUser.goals,
+      targetUser.following,
+      targetUser.followers)
+      return res.render('profile', {title: "my profile", name: req.session.user.firstName,  streak: targetUser.userStreak, aboutme: targetUser.aboutMe, goals: targetUser.goals, imgSrc: imgSrc, isCurr: true, logged_in: true, followers: targetUser.followers.length, following: targetUser.following.length, workout: workoutRec, userPosts: userPosts})
+    }catch(e){
+      return res.render('profile', {error: e})
+    }
 
-    return res.render('profile', {title: "my profile", name: req.session.user.firstName,  streak: targetUser.userStreak, aboutme: targetUser.aboutMe, goals: targetUser.goals, imgSrc: imgSrc, isCurr: true, logged_in: true, followers: targetUser.followers.length, following: targetUser.following.length, workout: workoutRec, userPosts: userPosts})
   })
 
   router
@@ -210,16 +268,21 @@ router
       console.log("analytics route hit")
           //const data = [100, 50, 300, 40, 350, 250]; // assuming this is coming from the database
           //const data2 = [0.5, 10, 1, 3, 4, 5]
-        
+        try{
          let week_obj = await help.return_week_values(req.session.user.user_id)
          let month_obj = await help.return_month_values(req.session.user.user_id)
          let year_obj = await help.return_year_values(req.session.user.user_id)
          let new_obj = {data: week_obj.data, data2: week_obj.data2, month_entries: month_obj.month_entries, 
           array_val: month_obj.array_val , shuffledMonths: year_obj.shuffledMonths, shuffledcounter: year_obj.shuffledcounter }
           return res.send(new_obj)
+
+         }catch(e){
+            return res.send({e: e})
+         }
          
          // return res.render('editprofile', {logged_in: true, userid: userstuff.username})
-       })
+       
+      })
   router
   .route('/:userid')
   .get(async (req, res) => {
@@ -258,17 +321,69 @@ router
       else {
         imgSrc = await getPhotoSrc(userInfo.profileimg)
       }
+      
       if (userInfo.userPosts.length != 0) {
         userPosts = await getPostByUser(userId, 50)
         for (let x of userPosts) {
           x._id = x._id.toString()
         }
       }
-      res.render("profile", {name: userInfo.firstName, imgSrc: imgSrc, aboutMe: userInfo.aboutMe, streak: userInfo.userStreak, goals: userInfo.goals, isCurr: isCurr, logged_in: logged_in, followers: userInfo.followers.length, following: userInfo.following.length, userPosts: userPosts})
+      
+      let followers = userInfo.followers.length
+      let following = userInfo.following.length
+
+      //see if the current user is following the user
+      let isFollowing = false
+
+      if (req.session.user) {
+        let currUser = await getUser(req.session.user.user_id)
+        for (let x of currUser.following) {
+          if (x.toString() == userId.toString()) {
+            isFollowing = true
+          }
+        }
+      }
+
+      console.log("AHhhhhhhhhhhh " + isFollowing)
+      console.log("isCurr = " + isCurr)
+      console.log(`${userInfo.firstName} ${userInfo.lastName}`)
+      res.render("profile", {name: userInfo.firstName, imgSrc: imgSrc, aboutMe: userInfo.aboutMe, streak: userInfo.userStreak, goals: userInfo.goals, isCurr: isCurr, logged_in: logged_in, followers: followers, following: following, isFollowing: isFollowing, username: userInfo.username, userPosts: userPosts})
+      
     }catch(e) {
       return res.status(400).render("error", {message: e});
     }
   });
+  router.post("/delete", async (req, res) => {
+    console.log("/user/delete")
+    //ensure user is logged in
+    if (!req.session.user){
+        console.log("user not authenticated");
+        return res.redirect("/login")
+    }
+
+    //ensure data was sent
+    if (!req.body){
+        console.log("no data sent");
+        return res.redirect("/profile")
+    }
+
+    
+    let userId = req.session.user.user_id;
+
+    
+    
+    try{
+        //delete user
+        await deleteAccountAndRemoveAllPosts(userId);
+
+        return res.send({response: true})
+    } catch (error) {
+        console.log(error);
+        return res.send({response: false})
+    }
+
+
+})
 
       
 

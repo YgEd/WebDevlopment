@@ -22,7 +22,7 @@ let exportedMethods = {
     validation.isNum(rounds)
     if (rounds <= 0 || rounds >= 20) throw "Invalid rounds number for this work out"
     // tags = validation.checkStringArray(tags, "tags")
-
+    tags = validation.checkString(tags, "tags");
     let recsCollection = await recs()
     let newRec = {
         workoutName: workoutName,
@@ -97,5 +97,25 @@ async getAllRecs() {
 async getRandomRec(){
     let allRec = await this.getAllRecs();
     return validation.getRandomItem(allRec);
-}}
+},
+async searchRecommendationsByKeyword(query) {
+  if (!query) {
+      throw "No search term given"
+  }
+
+  const recsCollection = await recs();
+  const regex = new RegExp([".*", query, ".*"].join(""), "i");
+
+  return recsCollection
+      .find({
+          $or: [
+              { "workoutName": regex },
+              { "equipment": regex },
+              { "level": regex },
+              { "tags": regex },
+          ]
+      })
+      .toArray();
+}
+}
   export default exportedMethods;

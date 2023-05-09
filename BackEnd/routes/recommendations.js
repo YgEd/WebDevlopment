@@ -38,6 +38,7 @@ router
         validation.isNum(rounds)
         if (rounds <= 0 || rounds >= 20) throw "Invalid rounds number for this work out"
         //tag validation
+        tags = validation.checkString(tags, "tags")
         } catch (e){
             return res.status(400).render("coach",{title: "Adding Recommendations", error: e})
           }

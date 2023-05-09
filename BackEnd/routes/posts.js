@@ -1,4 +1,4 @@
-import {createUser,checkUser}  from '../data/users.js'
+import {createUser,checkUser, getUser}  from '../data/users.js'
 import {Router} from 'express';
 const router = Router();
 import help from "../helpers.js";
@@ -7,6 +7,7 @@ import {photos} from "../config/mongoCollections.js";
 import { createPost, getPost, updatePost } from '../data/posts.js';
 import { ObjectId } from 'mongodb';
 import {uploadPhoto, upload, getPhotoSrc } from '../data/photos.js';
+import { getGroup } from '../data/groups.js';
 
 /*const upload = multer({
     storage: multer.memoryStorage(),
@@ -27,13 +28,32 @@ router
     .route('/create')
     .get(async (req, res) => {
         //go to record page for workout creation
+        let groups = [];
         if (!req.session.user){
             console.log("user not authenticated");
             return res.redirect("/login")
         }
-
         try {
-            return res.render("record", {title: "Record an activity!", logged_in: true });
+            const currUser = await getUser(req.session.user.user_id);
+            if (!currUser) {
+                throw `failed to get user`
+            }
+            for (let x of currUser.groupMembers) {
+                let id = x.toString()
+                let currGroup = await getGroup(id)
+                if (!currGroup) {
+                    throw `failed to get group`
+                }
+                //console.log(currGroup);
+                let name = currGroup.groupName
+                //console.log(name);
+                groups.push({id, name});
+            }
+        }catch(e) {
+            return res.status(500).render('error', {title: 'server error', message:e})
+        }
+        try {
+            return res.render("record", {title: "Record an activity!", logged_in: true, groups: groups });
         }catch (e) {
             return res.status(500).render('error', {title: 'Error',message: "Internal Server Error"})
         }
@@ -47,6 +67,7 @@ router
         const postData = req.body;
         let userId = req.session.user.user_id;
         let workoutType = postData.workoutType;
+        console.log(workoutType)
         let postDescription = postData.postDescription;
         let postImgs = []
         //console.log(postImgs);
@@ -114,28 +135,24 @@ router
             return res.status(400).render('error', {title: 'error', message:e})
         }
 
-        /*will need to change this to probably take in groupNames instead of Ids because
-            no user is going to be finding all the proper group ids to input*/
         try {
             if(postToGroup) {
-                if (!help.isStr(postToGroup)) {
-                    throw "postToGroup must be a string of groupIds seperated by commas"
+                if (!Array.isArray(postToGroup)) {
+                    throw "postToGroup must be an array of ObjectIds"
                 }
                 else {
-                    postToGroup = postToGroup.split(',');
                     for (let x of postToGroup) {
                         if (!ObjectId.isValid(x)) {
                             throw "postToGroup contains a non valid group Id";
                         }
                     }
-
                 }
             }
             else {
                 postToGroup = [];
             }
         }catch(e) {
-            res.status(400).render('error', {title: 'error', message:e})
+            return res.status(400).render('error', {title: 'error', message:e})
         }
 
         try {

@@ -23,6 +23,7 @@ error.hidden = true
 week.hidden  = false
 month.hidden = false
 year.hidden = false
+console.log(year.hidden)
 let x_data = set_data.data.data
 let y_data = set_data.data.data2
 let x2_data = set_data.data.month_entries

@@ -10,13 +10,17 @@
 	 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 	  <script src="https://cdn.plot.ly/plotly-2.22.0.min.js" charset="utf-8"></script>
      <link rel="stylesheet" href="/public/styles/index.css">
+	 {{#if title}}
 	<title>{{title}}</title>
+	{{else}}
+	<title> "Default title"</title>
+	{{/if}}
 </head>
 
 <body>
 	<div class="navbar">
 		<div class="brand">
-			<h3>DuckFit</h3>
+			<h1 id = "duckfit">DuckFit</h1>
 		</div>
 		<div class="menu">
 			{{#if logged_in}}
@@ -41,6 +45,5 @@
      <main>
              {{{body}}}
       </main>
-	 
 </body>
 </html>

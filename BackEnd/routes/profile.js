@@ -5,7 +5,7 @@ import multer from 'multer';
 import {createUser,checkUser,getUser,updateUser,deleteAccountAndRemoveAllPosts}  from '../data/users.js'
 import {photos} from "../config/mongoCollections.js"
 import help from "../helpers.js"
-import {uploadPhoto, upload, getPhotoSrc } from '../data/photos.js';
+import {uploadPhoto, upload, getPhotoSrc, getPhotoname } from '../data/photos.js';
 
 import { getAnalytics, getPostByUser } from '../data/posts.js';
 
@@ -46,7 +46,20 @@ router
       }
     }catch(e) {
       console.log(e);
-      return res.status(500).render('error', )
+      return res.status(500).render('error' )
+    }
+    //get user obj
+    targetUser = await getUser(req.session.user.user_id);
+    let noimg = true
+    //if user has a profile picture, get the imageSrc
+    var photo_name = "N/A"
+    if (!targetUser.profileimg || targetUser.profileimg == "default") {
+      var imgSrc = "/public/img/default.jpg";
+    } else {
+      var imgSrc = await getPhotoSrc(targetUser.profileimg);
+       noimg = false
+      photo_name = await getPhotoname(targetUser.profileimg)
+      console.log()
     }
   
     workoutRec = await recData.getRandomRec()
@@ -101,12 +114,13 @@ router
       targetUser.goals,
       targetUser.following,
       targetUser.followers)
-      return res.render('profile', {title: "my profile", name: req.session.user.firstName,  streak: targetUser.userStreak, aboutme: targetUser.aboutMe, goals: targetUser.goals, imgSrc: imgSrc, isCurr: true, logged_in: true, followers: targetUser.followers.length, following: targetUser.following.length, workout: workoutRec, userPosts: userPosts})
+      return res.render('profile', {title: "my profile", name: req.session.user.firstName,  streak: targetUser.userStreak, aboutme: targetUser.aboutMe, goals: targetUser.goals, imgSrc: imgSrc, isCurr: true, logged_in: true, followers: targetUser.followers.length, following: targetUser.following.length, workout: workoutRec, 
+  photo_name: photo_name, noimg: noimg, userPosts: userPosts})
     }catch(e){
       return res.render('profile', {error: e})
     }
 
-  })
+    })
 
   router
   .route('/edit')
@@ -317,10 +331,16 @@ router
       if (!userInfo) {
         throw `could not retreive user info`
       }
+      let noimg = true
+      let photo_name
       if (!userInfo.profileimg || userInfo.profileimg == "default") {
         imgSrc = "/public/img/default.jpg"
+        photo_name = "N/A"
+
       }
       else {
+        noimg = false
+        photo_name = await getPhotoname(targetUser.profileimg)
         imgSrc = await getPhotoSrc(userInfo.profileimg)
       }
       
@@ -349,7 +369,7 @@ router
       console.log("AHhhhhhhhhhhh " + isFollowing)
       console.log("isCurr = " + isCurr)
       console.log(`${userInfo.firstName} ${userInfo.lastName}`)
-      res.render("profile", {name: userInfo.firstName, imgSrc: imgSrc, aboutMe: userInfo.aboutMe, streak: userInfo.userStreak, goals: userInfo.goals, isCurr: isCurr, logged_in: logged_in, followers: followers, following: following, isFollowing: isFollowing, username: userInfo.username, userPosts: userPosts})
+      res.render("profile", {title: "profile page", name: userInfo.firstName, imgSrc: imgSrc, aboutMe: userInfo.aboutMe, streak: userInfo.userStreak, goals: userInfo.goals, isCurr: isCurr, logged_in: logged_in, followers: followers, following: following, isFollowing: isFollowing, username: userInfo.username, userPosts: userPosts, photo_name: photo_name, noimg: noimg})
       
     }catch(e) {
       return res.status(400).render("error", {message: e});

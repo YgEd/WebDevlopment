@@ -149,7 +149,7 @@ app.set('view engine', 'handlebars');
     if (!(req.header("X-Client-Side-Request"))) {
       // This is an API request, so proceed with your code
       // ...
-      return res.status(403).render('forbidden')
+      return res.status(403).render('forbidden', {logged_in: true})
      
     } 
 

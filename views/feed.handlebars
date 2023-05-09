@@ -58,7 +58,8 @@
                 {{!-- {{#if no-comment}} --}}
                     <button type="button" class="remove-comment">Remove Your Comment</button>
                     <div class="error-comment"></div>&nbsp;
-                    <textarea class="comment-body" rows="4" cols="30" maxlength="100"></textarea>
+                     <label for="comment-body-{{@index}}">Comment</label>
+                     <textarea id="comment-body-{{@index}}" class="comment-body" rows="4" cols="30" maxlength="100"></textarea>
                     <br>
                     <button type="button" class="comment-button">Comment</button>
                

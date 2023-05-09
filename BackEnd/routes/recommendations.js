@@ -10,13 +10,17 @@ router
   .route('/')
   .get(async (req, res) => {
     let recs = await recData.getAllRecs()
-    return res.render("recommendations", {title: "All Recommendations", recs: recs})
+    if (!req.session.user) return res.render("recommendations", {title: "All Recommendations", recs: recs})
+    if (req.session.user.groupsOwned.length > 0)
+        return res.render("recommendations", {title: "Adding Recommendations", recs: recs,coach: true, logged_in: true});
+    else return res.render("recommendations", {title: "Adding Recommendations", recs: recs, logged_in: true});
+    
 })
 
 router
   .route('/add')
   .get( async(req, res) =>{
-    return res.render("coach", {title: "Adding Recommendations"});
+    return res.render("coach", {title: "Adding Recommendations", logged_in: true});
 })
 .post(async (req,res) =>{
     let {workoutName,
@@ -38,14 +42,15 @@ router
         validation.isNum(rounds)
         if (rounds <= 0 || rounds >= 20) throw "Invalid rounds number for this work out"
         //tag validation
+        tags = validation.checkString(tags, "tags")
         } catch (e){
-            return res.status(400).render("coach",{title: "Adding Recommendations", error: e})
+            return res.status(400).render("coach",{title: "Adding Recommendations", error: e, logged_in: true})
           }
         try {
             let addRec = recData.createRec(workoutName, equipment, duration, level, reps, rounds, tags);
-            if (addRec) return res.redirect("/recommendations")
+            if (addRec) return res.redirect("/recommendation")
         } catch (e){
-            return res.status(400).render("coach",{title: "Adding Recommendations", error: e})
+            return res.status(400).render("coach",{title: "Adding Recommendations", error: e, logged_in: true})
         }
 })
 router

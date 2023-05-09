@@ -132,7 +132,7 @@ app.set('view engine', 'handlebars');
     if (!req.session.user){
       return res.status(400).redirect('/error')
     }
-    if(req.session.user.groupOwned != 0){
+    if(req.session.user.groupOwned <= 0){
         return res.status(400).redirect('/error')
     }
 

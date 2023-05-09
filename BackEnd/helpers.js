@@ -25,6 +25,7 @@ isStr(str) {
 
 isNum(num) {
   //return boolean specifing whether input is a number
+
   return /^\d+$/.test(num);
 },
 
@@ -105,11 +106,11 @@ checkName(str, varName){
 checkNumber(num, varName){
   if (!num) throw `${num} is not supplied`
   if (typeof num !== 'number') {
-    throw `${variableName || 'provided variable'} is not a number`;
+    throw `${varName || 'provided variable'} is not a number`;
   }
 
   if (isNaN(val)) {
-    throw `${variableName || 'provided variable'} is NaN`;
+    throw `${varName || 'provided variable'} is NaN`;
   }
 },
 checkUsername(str, varName){
@@ -218,11 +219,9 @@ async return_week_values(userid){
   for(let i = 0; i < get_stuff.length; i++) {
     let post_date = get_stuff[i].postTime
     let day_index = post_date.getUTCDay();
-    console.log("post",post_date)
     if (day_index < current_day){
        let indice = day_index + (6- current_day)
       times_day_occured[ indice]++
-      console.log(times_day_occured[indice])
     }
     if(day_index === current_day){
        times_day_occured[6]++
@@ -251,7 +250,6 @@ async return_month_values(userid){
  // oneMonthAgo.setDate(oneMonthAgo.getUTCDate() - 1); // set the date to one day before to get the last day of the previous month
   const datesArray = [];
   const datestracker = Array(30).fill(0);
-  console.log(oneMonthAgo)
   for (let d = oneMonthAgo; d <= today; d.setUTCDate(d.getUTCDate()  + 1)) {
        let new_date = new Date(d)
       datesArray.push(new_date);

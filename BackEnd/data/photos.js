@@ -36,6 +36,10 @@ const uploadPhoto = async (imgObj) => {
         err(fun, "File muse be an image of type png, jpg, or jpeg");
     }
 
+    if (imgObj.size > 10 * 1024 * 1024) {
+        err(fun, "file cannot be larger than 10mb")
+    }
+    
     let doc = {
       imageName: imgObj.originalname,
       //creates src link using bufferdata

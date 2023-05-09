@@ -28,6 +28,13 @@
     <button type="button" onclick="addImg()">add image</button>
     <button type="button" onclick="removeImg()">remove image</button>
     <br>
+    <fieldset>
+        <legend>Post to group(s)</legend>
+        {{#each groups}}
+        <label for={{this.id}}>{{this.name}}</label>
+        <input type="checkbox" name="postToGroup[]" id={{this.id}} value={{this.id}}>
+        {{/each}} 
+    </fieldset>
     <input id="button" type="submit">
 </form>
 

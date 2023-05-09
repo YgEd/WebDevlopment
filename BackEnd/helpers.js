@@ -139,6 +139,16 @@ checkPassword(str, varName){
   if (!/[^a-zA-Z0-9\s]/.test(str)) throw `${varName} must contain at least one special character`;
   return str
 },
+checkKeyword(strVal, varName) {
+  if (typeof strVal !== 'string') throw `Error: ${varName} must be a string!`;
+  strVal = strVal.trim();
+  if (strVal.length === 0)
+    throw `Error: ${varName} cannot be an empty string or string with just spaces`;
+  
+  if (!isNaN(strVal))
+    throw `Error: ${strVal} is not a valid value for ${varName} as it only contains digits`;
+  return strVal;
+},
 
 // checkDate(string){
 //   let date = string.split('/');

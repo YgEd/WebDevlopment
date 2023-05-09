@@ -20,12 +20,13 @@
 <h4>Followers: {{followers}}</h4>
 <h4>Following: {{following}}</h4>
 {{#if isCurr}}
-<h3>
-    <a href = "/profile/edit">Edit Profile</a>
-</h3>
-<h3>
-  <a href = "/profile/get-analytics"> Get analytics</a>
-</h3>
+  <h3>
+      <a href = "/profile/edit">Edit Profile</a>
+  </h3>
+  <h3>
+    <a href = "/profile/get-analytics"> Get analytics</a>
+  </h3>
+
 
 <h4>Perfect work out for you</h4>
 {{#with workout}}
@@ -38,4 +39,26 @@
     <p>{{tags}}</p>
 {{/with}}
 {{/if}}
+
+{{#unless isCurr}}
+  {{#if isFollowing}}
+    <form action="/search/unfollow" method="POST" id="unfollow-form">
+        <input  id="username" type="hidden" name="username" value={{username}} />
+        <input type="submit" value="Unfollow" />
+    </form>
+
+  {{else}}
+
+    <form action="/search/follow" method="POST" id="follow-form">
+        <input id="username" type="hidden" name="username" value={{username}} />
+        <input type="submit" value="Follow" />
+    </form>
+
+  {{/if}}
+{{/unless}}
+
+ <script src="https://code.jquery.com/jquery-3.5.1.js"
+		integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+<script src="/public/js/profile.js" ></script>
+
 

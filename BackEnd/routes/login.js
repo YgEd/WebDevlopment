@@ -2,6 +2,7 @@ import {createUser,checkUser}  from '../data/users.js'
 import {Router} from 'express';
 const router = Router();
 import validation from '../helpers.js';
+import xss from 'xss'
 router.route('/')
   .get(async (req, res) =>{
     let logged_in = false
@@ -20,7 +21,13 @@ router
   })
   .post(async (req, res) => {
     //code here for POST
-    let {username, firstNameInput,lastNameInput,emailAddressInput,passwordInput,confirmPasswordInput, dob} = req.body;
+    let username  = xss(req.body.username)
+     let firstNameInput = xss(req.body.firstNameInput)
+    let lastNameInput = xss(req.body.lastNameInput)
+   let  emailAddressInput = xss(req.body.emailAddressInput)
+    let passwordInput = xss(req.body.passwordInput)
+    let confirmPasswordInput = xss(req.body.confirmPasswordInput)
+    let  dob = xss(req.body.dob)
     let missing = []
     //if any are missing you will re-render the form with a 400 status code explaining to the user which fields are missing. 
     if (!username) missing.push("User name")
@@ -63,7 +70,8 @@ router
   })
   .post(async (req, res) => {
     //code here for POST
-    let {emailAddressInput, passwordInput} = req.body;
+    let emailAddressInput = xss(req.body.emailAddressInput)
+    let passwordInput = xss(req.body.passwordInput)
     try{
       emailAddressInput = validation.checkEmail(emailAddressInput,"Email Address");
       passwordInput = validation.checkPassword(passwordInput, "Password");

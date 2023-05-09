@@ -6,8 +6,11 @@ let description = document.getElementById("postDescription")
 let titleErr = document.getElementById("titleErr")
 let typeErr = document.getElementById("typeErr")
 let descErr = document.getElementById("descErr")
-
+let imgErr = document.getElementById("imgErr")
 let imgCount = 1;
+
+
+
 function removeImg() {
     if (imgCount != 1) {
         imgDiv.removeChild(imgDiv.lastChild)
@@ -17,7 +20,7 @@ function removeImg() {
 }
 
 function addImg() {
-    if (imgCount < 5) {
+    if (imgCount < 3) {
         let newInput = document.createElement("input");
         newInput.type ="file"
         newInput.name = "postImgs[]"
@@ -74,3 +77,14 @@ if (recordForm) {
         }
     })
 }
+
+imgDiv.addEventListener('change', function(event) {
+    input=event.target
+    if (input.files[0].size > 10 * 1024 * 1024) {
+        imgErr.hidden = false;
+        input.value = ""
+    }
+    else {
+        imgErr.hidden =true;
+    }
+});

@@ -4,6 +4,7 @@ import help from "../helpers.js";
 import bcrypt from "bcrypt"
 import { posts } from "../config/mongoCollections.js";
 import { removePost } from "./posts.js";
+import * as groupFuns from "./groups.js";
 //creates user (hashes password using md5)
 export const createUser = async (
   username,
@@ -174,8 +175,45 @@ export const removeUser = async (id) => {
     help.err(fun, "invalid object ID");
   }
 
+
   //get users db collection
   const userCollection = await users();
+
+  //test if userCollection is null
+  if (userCollection == null) {
+    help.err(fun, "could not get users");
+  }
+
+  
+  //remove user from all other user's followers/follwing
+  const target_user = await userCollection.findOne({_id: new ObjectId(id)})
+
+  //remove user from all other user's followers/follwing
+  for (let i = 0; i < target_user.followers.length; i++){
+    let follower = await userCollection.findOne({_id: new ObjectId(target_user.followers[i])})
+    let index = follower.following.indexOf(id)
+    follower.following.splice(index, 1)
+    await userCollection.updateOne({_id: new ObjectId(follower._id)}, {$set: {following: follower.following}})
+  }
+
+  for (let i = 0; i < target_user.following.length; i++){
+    let following = await userCollection.findOne({_id: new ObjectId(target_user.following[i])})
+    let index = following.followers.indexOf(id)
+    following.followers.splice(index, 1)
+    await userCollection.updateOne({_id: new ObjectId(following._id)}, {$set: {followers: following.followers}})
+  }
+
+  //remove user from all groups
+  for (let i = 0; i < target_user.groupMembers.length; i++){
+    let group = await groupFuns.getGroup(target_user.groupMembers[i])
+    if (group.groupOwner.toString() == id.toString()){
+      await groupFuns.deleteGroup(group._id, id)
+    }
+    await groupFuns.memberRemove(group._id, id)
+  }
+
+
+
   const deleteInfo = await userCollection.findOneAndDelete({ _id: new ObjectId(id) });
 
   if (deleteInfo.lastErrorObject.n == 0) {
@@ -678,6 +716,10 @@ export const deleteAccountAndRemoveAllPosts = async (userId) => {
   for (const post of userPosts) {
       await removePost(post._id);
   }
+
+
+
+
   const deleteUserInfo = await removeUser(userId);
 
  

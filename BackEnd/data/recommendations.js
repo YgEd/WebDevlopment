@@ -97,5 +97,25 @@ async getAllRecs() {
 async getRandomRec(){
     let allRec = await this.getAllRecs();
     return validation.getRandomItem(allRec);
-}}
+},
+async searchRecommendationsByKeyword(query) {
+  if (!query) {
+      throw "No search term given"
+  }
+
+  const recsCollection = await recs();
+  const regex = new RegExp([".*", query, ".*"].join(""), "i");
+
+  return recsCollection
+      .find({
+          $or: [
+              { "workoutName": regex },
+              { "equipment": regex },
+              { "level": regex },
+              { "tags": regex },
+          ]
+      })
+      .toArray();
+}
+}
   export default exportedMethods;

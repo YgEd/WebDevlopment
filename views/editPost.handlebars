@@ -1,0 +1,37 @@
+<form method="POST" id="recordForm" enctype="multipart/form-data">
+    <input id="postId" type="hidden" name="postId" value='{{postId}}'>
+    <label for="postTitle">Post Title</label>
+    <br>
+    <input name="postTitle" id="postTitle" type="text" maxlength="40" value='{{postTitle}}'>
+    <p id="titleErr" class="error" hidden></p>
+    <br>
+    <label for="workoutType">Workout Type</label>
+    <br>
+    <select name="workoutType" id="workoutType">
+        <option id="liftOpt" value="lifting">lift</option>
+        <option id="runOpt" value="running">run</option>
+        <option id="cycOpt" value="cycling">bike</option>
+        <option id="othOpt" value="other">other</option>
+    </select>
+    <p id="typeErr" class="error" hidden>must select a valid workout type</p>
+    <br>
+    <label for="postDescription">Workout Description</label>
+    <br>
+    <textarea name="postDescription" id="postDescription" rows="5" cols="50" maxlength="500">{{description}}</textarea>
+    <p id="descErr" class="error" hidden>Must provide a workout description with a max of 500 characters</p>
+    <br>
+    <label for="postImgs">Change Images (must reupload other images to add, upload none for no change)</label>
+    <div id="imgDiv">
+    <input name="postImgs[]" id="postImgs" type="file" accept="image/jpg, image/png, image/jpeg">
+    <br>
+    </div>
+    <p id="imgErr" class="error" hidden>image must be 10mb or less</p>
+    <button type="button" onclick="addImg()">add new image</button>
+    <button type="button" onclick="removeImg()">remove new image</button>
+    <br>
+    <input id="button" type="submit">
+</form>
+
+<script src="/public/js/recordScript.js"></script>
+<br><br>
+<a href = "/posts/{{postId}}">Back to post</a>

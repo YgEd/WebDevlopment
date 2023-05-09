@@ -14,27 +14,32 @@
 
 <h3> {{aboutme}}</h3>
 
+<br>
 
 <h2> Streaks</h2>
 <h3> {{streak}}</h3>
 
+<br>
+
 <h2> Goals</h2>
 <ul>
     {{#each goals}}
-      <li> {{this}} <li>
-
+      <li>{{this}}<li>
     {{/each}}
 </ul>
 <h3>Followers: {{followers}}</h3>
 <h3>Following: {{following}}</h3>
-{{#if isCurr}}
-  <h3>
-      <a href = "/profile/edit">Edit Profile</a>
-  </h3>
-  <h3>
-    <a href = "/profile/get-analytics"> Get analytics</a>
-  </h3>
 
+{{#if isCurr}}
+
+<h3>
+    <a href = "/profile/edit">Edit Profile</a>
+</h3>
+<h3>
+  <a href = "/profile/get-analytics"> Get analytics</a>
+</h3>
+<br>
+<br>
 
 <h4>Perfect work out for you</h4>
 {{#with workout}}
@@ -46,6 +51,8 @@
     <p>{{rounds}} rounds</p>
     <p>{{tags}}</p>
 {{/with}}
+
+<button type="button" id="remove-user-button"> Delete Account</button>
 {{/if}}
 
 {{#unless isCurr}}
@@ -66,9 +73,19 @@
 {{/unless}}
 
 {{/if}}
-<button type="button" id="remove-user-button"> Delete Account</button>
+
+<br>
+
+<h2>Recent Posts</h2>
+<ul>
+{{#each userPosts}}
+  <li>
+    <a href="/posts/{{this._id}}">{{this.postTitle}}</a>
+  </li>
+{{/each}}
+</ul>
+
  <script src="https://code.jquery.com/jquery-3.5.1.js"
 		integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
 <script src="/public/js/profile.js" ></script>
-
 

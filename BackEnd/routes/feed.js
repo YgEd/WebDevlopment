@@ -133,33 +133,55 @@ try {
   
 });
 
-router.post("/", async (req, res) => {
+router.post("/comment", async (req, res) => {
   let data = req.body;
   let userName = req.session.user.userName;
   let userId = req.session.user.user_id;
   let postId = data.postId
   let msg = data.msg
+  let url = data.url
+
+  if (typeof msg !== "string" || msg.trim().length === 0 || msg.trim().length > 100) {
+    console.log("invalid comment")
+    if (!url){
+      return res.send({ error: "invalid comment" });
+    }
+    else{
+      return res.redirect(url);
+    }
+  }
+
+
   try {
     await commentFuns.createComment(postId, userId, userName, msg);
   } catch (error) {
     console.log("Error from post feed route: " + error);
-    return res.send({ error: error });
+    if (!url){
+      return res.send({ error: error });
+    }else{
+      return res.redirect(url)
+    }
     
   }
 
-  return res.render("partials/comment", {
-    title: "comment",
-    layout: null,
-    userId: userId,
-    comment_user: userName,
-    comment_body: msg,
-  });
+  if (!url){
+    return res.render("partials/comment", {
+      title: "comment",
+      layout: null,
+      userId: userId,
+      comment_user: userName,
+      comment_body: msg,
+    })}
+    else{
+      return res.send(url)
+    }
 });
 
 router.post("/remove", async (req, res) => {
   let postId = req.body.postId;
   let userId = req.session.user.user_id;
- 
+  let url = req.body.url;
+
   try {
     await commentFuns.deleteComment(postId, userId);
   } catch (error) {
@@ -167,16 +189,25 @@ router.post("/remove", async (req, res) => {
     console.log(error);
     //clear req.body
     req.body = {};
-    return res.send({ error: error });
+    if (!url){
+      return res.send({ error: error });
+    }else{
+      return res.redirect(url)
+    }
   }
   //clear req.body
   req.body = {};
-  return res.send({ success: true });
+  if (!url){
+    return res.send({ success: true });
+  }else{
+    return res.redirect(url)
+  }
 });
 
 router.post("/like", async (req, res) => {
   let postId = req.body.postId;
   let userId = req.session.user.user_id;
+  let url = req.body.url;
   console.log("current user = " + req.session.user.userName + " is liking post " + postId + "")
 
   try {
@@ -190,16 +221,25 @@ router.post("/like", async (req, res) => {
     }
 
     await postFuns.updateLikes(postId, userId);
-    return res.send({ success: true });
+    if (!url){
+      return res.send({ success: true });
+    }else {
+      return res.redirect(url)
+    }
   } catch (error) {
     console.log("Error from like route: " + error);
-    return res.send({ error: error });
+    if (!url){
+      return res.send({ error: error });
+    }else{
+      return res.redirect(url)
+    }
   }
 });
 
 router.post("/unlike", async (req, res) => {
   let postId = req.body.postId;
   let userId = req.session.user.user_id;
+  let url = req.body.url;
   console.log("current user = " + req.session.user.userName + " is unliking post " + postId + "")
 
   try {
@@ -214,11 +254,48 @@ router.post("/unlike", async (req, res) => {
     }
 
     await postFuns.updateLikes(postId, userId);
-    return res.send({ success: true });
+    if (!url){
+      return res.send({ success: true });
+    }else{
+      return res.redirect(url)
+    }
   } catch (error) {
     console.log("Error from unlike route: " + error);
-    return res.send({ error: error });``
+    if (!url){
+      return res.send({ error: error });
+    }else{
+      return res.redirect(url)
+    }
   }
 });
 
+router.post("/delete-post", async (req, res) => {
+  let postId = req.body.postId;
+  let url = req.body.url;
+
+  try {
+
+    //ensure the user is the owner of the post
+    let target_post = await postFuns.getPost(postId);
+    if (req.session.user.user_id.toString() != target_post.userId.toString()){
+      if (url){
+        return res.redirect(url)
+      }
+        return res.send({ success: false, error: "user is not the owner of the post" });
+    }
+
+    await postFuns.removePost(postId);
+    if (url){
+        return res.redirect(url)
+      }
+        return res.send({ success: true});
+  } catch (error) {
+    console.log("Error from delete post route: " + error);
+    if (url){
+      return res.redirect(url)
+    }
+      return res.send({ success: false, error: "user is not the owner of the post" });
+  }
+
+})
 export default router;

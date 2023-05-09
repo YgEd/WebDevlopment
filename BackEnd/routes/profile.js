@@ -6,33 +6,61 @@ import {createUser,checkUser,getUser,updateUser,deleteAccountAndRemoveAllPosts} 
 import {photos} from "../config/mongoCollections.js"
 import help from "../helpers.js"
 import {uploadPhoto, upload, getPhotoSrc, getPhotoname } from '../data/photos.js';
-import { getAnalytics, getPostByUser} from '../data/posts.js';
+
+import { getAnalytics, getPostByUser } from '../data/posts.js';
+
 import recData from '../data/recommendations.js'
 import xss from 'xss'
 
 router
   .route('/')
   .get(async (req, res) => {
+    let targetUser;
+    var imgSrc
+    let workoutRec
+    let userPosts
     //code here for GET
     if (!req.session.user){
       console.log("user not authenticated");
       return res.redirect("/login")
     }
 
+    try {
+      //get user obj
+      targetUser = await getUser(req.session.user.user_id);
+
+      //if user has a profile picture, get the imageSrc
+      if (!targetUser.profileimg || targetUser.profileimg == "default") {
+        imgSrc = "/public/img/default.jpg";
+      } else {
+        imgSrc = await getPhotoSrc(targetUser.profileimg);
+      }
+      workoutRec = await recData.getRandomRec()
+      if (targetUser.userPosts.length != 0) {
+        userPosts = await getPostByUser(req.session.user.user_id, 50)
+        for (let x of userPosts) {
+          x._id = x._id.toString()
+        }
+      }
+    }catch(e) {
+      console.log(e);
+      return res.status(500).render('error' )
+    }
     //get user obj
-    let targetUser = await getUser(req.session.user.user_id);
+    targetUser = await getUser(req.session.user.user_id);
     let noimg = true
     //if user has a profile picture, get the imageSrc
+    var photo_name = "N/A"
     if (!targetUser.profileimg || targetUser.profileimg == "default") {
       var imgSrc = "/public/img/default.jpg";
-      var photo_name = "N/A"
     } else {
       var imgSrc = await getPhotoSrc(targetUser.profileimg);
        noimg = false
       photo_name = await getPhotoname(targetUser.profileimg)
       console.log()
     }
-    let workoutRec = await recData.getRandomRec()
+  
+    workoutRec = await recData.getRandomRec()
    // console.log(req.session.user.profileimg)
     //get the posts collection 
     try{
@@ -84,13 +112,13 @@ router
       targetUser.goals,
       targetUser.following,
       targetUser.followers)
-    return res.render('profile', {title: "my profile", name: req.session.user.firstName,  streak: targetUser.userStreak, aboutme: targetUser.aboutMe, goals: targetUser.goals, imgSrc: imgSrc, isCurr: true, logged_in: true, followers: targetUser.followers.length, following: targetUser.following.length, workout: workoutRec, 
-  photo_name: photo_name, noimg: noimg})
+      return res.render('profile', {title: "my profile", name: req.session.user.firstName,  streak: targetUser.userStreak, aboutme: targetUser.aboutMe, goals: targetUser.goals, imgSrc: imgSrc, isCurr: true, logged_in: true, followers: targetUser.followers.length, following: targetUser.following.length, workout: workoutRec, 
+  photo_name: photo_name, noimg: noimg, userPosts: userPosts})
     }catch(e){
       return res.render('profile', {error: e})
     }
-    
-  })
+
+    })
 
   router
   .route('/edit')
@@ -232,7 +260,7 @@ router
 
         }catch(e) {
           console.log(e);
-          return res.status(500).render("error", {message: e});
+          return res.status(500).render("error", {title: "error", message: e});
         }
 
       
@@ -281,6 +309,7 @@ router
     let userInfo;
     let isCurr = false
     let logged_in = true
+    let userPosts;
     try {
       //if no user id is passed in, use the current user
       if (!userId) {
@@ -312,7 +341,14 @@ router
         photo_name = await getPhotoname(targetUser.profileimg)
         imgSrc = await getPhotoSrc(userInfo.profileimg)
       }
-
+      
+      if (userInfo.userPosts.length != 0) {
+        userPosts = await getPostByUser(userId, 50)
+        for (let x of userPosts) {
+          x._id = x._id.toString()
+        }
+      }
+      
       let followers = userInfo.followers.length
       let following = userInfo.following.length
 
@@ -331,7 +367,8 @@ router
       console.log("AHhhhhhhhhhhh " + isFollowing)
       console.log("isCurr = " + isCurr)
       console.log(`${userInfo.firstName} ${userInfo.lastName}`)
-      res.render("profile", {title: "profile page", name: `${userInfo.firstName} ${userInfo.lastName}`, imgSrc: imgSrc, aboutMe: userInfo.aboutMe, streak: userInfo.userStreak, goals: userInfo.goals, isCurr: isCurr, logged_in: logged_in, followers: followers, following: following, isFollowing: isFollowing, username: userInfo.username, photo_name: photo_name, noimg: noimg})
+      res.render("profile", {title: "profile page", name: userInfo.firstName, imgSrc: imgSrc, aboutMe: userInfo.aboutMe, streak: userInfo.userStreak, goals: userInfo.goals, isCurr: isCurr, logged_in: logged_in, followers: followers, following: following, isFollowing: isFollowing, username: userInfo.username, userPosts: userPosts, photo_name: photo_name, noimg: noimg})
+      
     }catch(e) {
       return res.status(400).render("error", {message: e});
     }

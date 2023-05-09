@@ -19,7 +19,7 @@ const constructorMethod = (app) => {
     app.use("/groups", groupRoutes)
 
     app.use('*', (req, res) => {
-        res.status(404).json({error: 'Route Not found'});
+        res.status(404).render('not_found', {title: "Page Not Found"})
       });
 }
 

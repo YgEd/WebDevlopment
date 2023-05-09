@@ -141,10 +141,18 @@ router.post("/follow", async (req, res) => {
 
     let user_id = req.session.user.user_id
     let data = req.body
+    console.log("follow route hit")
+    console.log("data.url =")
+    console.log(data.url)
+
 
     if (help.strPrep(data.username).length == 0){
         console.log("invalid username")
-        return res.send({response: "failed"})
+        if (!req.body.url){
+            return res.send({response: "failed"})
+        }else{
+            return res.redirect(req.body.url)       
+        }
     }
 
     try {
@@ -159,18 +167,30 @@ router.post("/follow", async (req, res) => {
         for (let i = 0; i < target_user.followers.length; i++){
             if (target_user.followers[i].toString() == user_id.toString()){
                 console.log("already following")
+                if (!req.body.url){
                 return res.send({response: "failed"})
+                }else{
+                    return res.redirect(req.body.url)
+                }
             }
         }
 
         //add user to target user's followers
         await userFuns.addfollower(target_user._id, user_id)
 
-        return res.send({response: "success"})
+        if (!req.body.url){
+            return res.send({response: "success"})
+        }else{
+            return res.redirect(req.body.url)
+        }
 
     } catch (error) {
         console.log(error)
-        return res.send({response: "failed"})
+        if (!req.body.url){
+            return res.send({response: "failed"})
+        }else{
+            return res.redirect(req.body.url)
+        }
     }
 })
 
@@ -184,11 +204,16 @@ router.post("/unfollow", async (req, res) => {
     let user_id = req.session.user.user_id
     let data = req.body
 
-    console.log(data)
+    console.log("data.url =")
+    console.log(data.url)
 
     if (help.strPrep(data.username).length == 0){
         console.log("invalid username")
-        return res.send({response: "failed"})
+        if (!req.body.url){
+            return res.send({response: "failed"})
+        }else{
+            return res.redirect(req.body.url)
+        }
     }
 
     try {
@@ -200,18 +225,30 @@ router.post("/unfollow", async (req, res) => {
             for (let i = 0; i < target_user.followers.length; i++){
                 if (target_user.followers[i].toString() != user_id.toString() && i == target_user.followers.length - 1){
                     console.log("not following")
-                    return res.send({response: "failed"})
+                    if (!req.body.url){
+                        return res.send({response: "failed"})
+                    }else{
+                        return res.redirect(req.body.url)
+                    }
                 }
             }
     
             //remove user from target user's followers
             await userFuns.removefollower(target_user._id, user_id)
-    
-            return res.send({response: "success"})
+            
+            if (!req.body.url){
+                return res.send({response: "success"})
+            }else{
+                return res.redirect(req.body.url)
+            }
     
         } catch (error) {
             console.log(error)
-            return res.send({response: "failed"})
+            if (!req.body.url){
+                return res.send({response: "failed"})
+            }else{
+                return res.redirect(req.body.url)
+            }
         }
 
 })

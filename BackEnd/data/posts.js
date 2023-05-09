@@ -293,6 +293,9 @@ export const getAllPosts = async (limit) => {
     help.err(fun, "could not get posts");
   }
 
+  if (limit == 999){
+    return await postCollection.find({}).sort({ postTime: -1 }).toArray();
+  }
   //put db in an array
   let postList = await postCollection.find({}).sort({ postTime: -1 }).limit(limit).toArray();
 

@@ -340,7 +340,7 @@ router
       }
       else {
         noimg = false
-        photo_name = await getPhotoname(targetUser.profileimg)
+        photo_name = await getPhotoname(userInfo.profileimg)
         imgSrc = await getPhotoSrc(userInfo.profileimg)
       }
       

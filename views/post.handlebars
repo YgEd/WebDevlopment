@@ -1,16 +1,9 @@
-<h1>{{postTitle}}</h1>
-{{#each images}}
-<img src={{this}} height=300 alt="{{../workoutType}}">
-{{/each}}
-<h2>{{workoutType}}</h2>
-<p>{{postDescription}}</p>
-
 <div hidden id="session-user">{{userId}}</div>
 {{#if isOwner}}
     <a href="{{postId}}/edit">edit this post</a>
 {{/if}}
 <div class="post-item">
-    <a href="/profile/{{userId}}">{{username}}</a>
+    <a href="/profile/{{postOwner}}">{{username}}</a>
     {{#if liked}}
         <div hidden class="liked">true</div>
     {{else}}

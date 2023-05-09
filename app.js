@@ -99,6 +99,7 @@ app.set('view engine', 'handlebars');
     }
     next();
   });
+  
 
   app.use('/register', async (req, res, next) => {
     console.log("nice to meet you")
@@ -138,7 +139,12 @@ app.set('view engine', 'handlebars');
 
     next();
   });
-
+  app.use('/search', async (req, res, next) => {
+    if(!req.session.user){
+        return res.redirect("/login")
+    }
+    next();
+  });
   app.use('/profile/analytics', async (req, res, next) => {
     if (!(req.header("X-Client-Side-Request"))) {
       // This is an API request, so proceed with your code

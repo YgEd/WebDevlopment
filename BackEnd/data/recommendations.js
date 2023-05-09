@@ -98,6 +98,7 @@ async getRandomRec(){
     let allRec = await this.getAllRecs();
     return validation.getRandomItem(allRec);
 },
+//Source: From professor Hill github
 async searchRecommendationsByKeyword(query) {
   if (!query) {
       throw "No search term given"

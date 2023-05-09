@@ -18,7 +18,7 @@ router
       console.log("user not authenticated");
       return res.redirect("/login")
     }
-
+    
     //get user obj
     let targetUser = await getUser(req.session.user.user_id);
 
@@ -343,7 +343,7 @@ router
     let userId = req.session.user.user_id;
 
     
-    
+
     try{
         //delete user
         await deleteAccountAndRemoveAllPosts(userId);

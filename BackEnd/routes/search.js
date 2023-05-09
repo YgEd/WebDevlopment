@@ -3,7 +3,7 @@ import * as userFuns from "../data/users.js";
 import * as groupFuns from "../data/groups.js";
 import help from "../helpers.js";
 import {distance, closest} from "fastest-levenshtein"
-
+import xss from 'xss'
 import { Router } from "express";
 const router = Router();
 
@@ -23,6 +23,7 @@ router.get("/", async (req, res) => {
 
 
 router.post("/", async (req, res) => {
+    if (!req.session.user) return res.redirect("/")
     let data = req.body
     let groupOwner = false;
     console.log("post search route hit")
@@ -32,105 +33,40 @@ router.post("/", async (req, res) => {
         return res.redirect("/search")
     }
 
-    if (help.strPrep(data.searchInput).length == 0 || help.strPrep(data.searchInput).length > 30){
+    if (help.strPrep(xss(data.searchInput)).length == 0 || help.strPrep(xss(data.searchInput)).length > 30){
         console.log("invalid search length")
         return res.redirect("/search")
     }
-
-    if (data.searchType == "user"){
-        try{
-        var userList = await userFuns.getAllUsers(100)
-        } catch (error) {
-            console.log(error)
-            res.send({response: "db error"})
-        }
-        //get usernames
-        let usernames = userList.map(value => value.username);
-
-        //get closest username
-        let target_user = closest(data.searchInput, usernames)
-
-        //get user object
-        let userobj = userList.find(value => value.username == target_user)
-
-        //if user is authenticated
-        if (req.session.user && req.session.user.userName != target_user){
-            //check if user is already following
-            let curr_user = req.session.user.user_id
-            let following = false;
-            console.log("search post/ " + userobj.followers.includes(curr_user))
-            
-            //check if user is already following
-            for (let i = 0; i < userobj.followers.length; i++){
-                if (userobj.followers[i].toString() == curr_user.toString()){
-                    following = true;
-                }
-            }
-
-            return res.send({response: target_user, type: "user", userobj: userobj, following: following, auth:true})
-        }
-
-        return res.send({response: target_user, type: "user", userobj: userobj, auth: false})
-    
-    }
-
-    if (data.searchType == "group"){
-        let none=false;
+    let userobj = await userFuns.getUser(req.session.user.user_id);
+    if (xss(data.searchType) == "user"){
         try {
-            var groupList = await groupFuns.getAllGroups(100)
-        } catch (error) {
-            console.log(error)
-            res.send({response: "db error"})
-        }
-        
-        //get group names
-        let groupname = groupList.map(value => value.groupName);
-
-        //get closest group name
-        let target_group = closest(data.searchInput, groupname);
-
-        if (!target_group){
-            none = true;
-        }
-
-        //get group object
-        let groupobj = groupList.find(value => value.groupName == target_group)
-
-        //if user is authenticated
-        if (req.session.user){
-
-            //if no groups are found
-            if (none){
-                return res.send({response: null, type: "group", auth:true})
-            }
-
-            //check if user is already in group
-            let curr_user = req.session.user.user_id
-            let inGroup = false;
+            let userList = await userFuns.searchUserByKeyword(xss(data.searchInput));
+            userList = userList.filter(user => user._id.toString() != userobj._id);
+            // If the user is authenticated
             
-            //check if user is already in group
-            for (let i = 0; i < groupobj.groupMembers.length; i++){
-                if (groupobj.groupMembers[i].toString() == curr_user.toString()){
-                    inGroup = true;
-                    break;
-                }
-            }
-
-            //check if user is group owner
-            if (groupobj.groupOwner.toString() == curr_user.toString()){
-                groupOwner = true;
-            }
-
-
-            return res.send({response: target_group, type: "group", groupobj: groupobj, inGroup: inGroup, auth:true, groupOwner: groupOwner})
+            let following = userobj.following
+            
+            res.send({response: userList, type: "user", auth:true, following: following, auth: true, userobj: userobj})
+          } catch (error) {
+            console.error(error);
+            res.send({ response: "db error" });
+          }
         }
 
-        //if no groups are found
-        if (none){
-            return res.send({response: null, type: "group", auth:true})
+    if (xss(data.searchType) == "group"){
+        try {
+            let groupList = await groupFuns.searchGroupByKeyword(xss(data.searchInput));
+        
+            // If the user is authenticated
+            
+            let groupsOwned = await groupFuns.allGroupsWithUserId(userobj._id.toString())
+            
+            res.send({response: groupList, type: "group", auth:true, groupOwner: groupsOwned, auth: true, userobj: userobj})
+          } catch (error) {
+            console.error(error);
+            res.send({ response: "db error" });
+          }
         }
-        return res.send({response: target_group, type: "group", groupobj: groupobj, auth:false})
-    }
 })
 
 router.post("/follow", async (req, res) => {

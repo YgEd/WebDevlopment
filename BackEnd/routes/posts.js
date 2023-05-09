@@ -291,7 +291,7 @@ router
         }catch(e) {
             return res.status(500).render('error', {title: 'error', message: e})
         }
-        return res.render("post", {title: thisPost.postTitle, postTitle: thisPost.postTitle, images: postImgs, postDescription: thisPost.postDescription, workoutType: thisPost.workoutType, logged_in: true, comments: thisPost.comments, postLikes: thisPost.postLikes, userId: thisPost.userId.toString(), username: thisPost.username, liked: liked, commented: commented, userId: req.session.user.user_id, postId: postId, isOwner: isOwner});
+        return res.render("post", {title: thisPost.postTitle, postTitle: thisPost.postTitle, images: postImgs, postDescription: thisPost.postDescription, workoutType: thisPost.workoutType, logged_in: true, comments: thisPost.comments, postLikes: thisPost.postLikes, userId: thisPost.userId.toString(), username: thisPost.username, liked: liked, commented: commented, userId: req.session.user.user_id, postId: postId, isOwner: isOwner, postOwner: thisPost.userId});
     })
 router
     .route("/:postId/edit")

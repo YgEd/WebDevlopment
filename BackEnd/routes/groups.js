@@ -116,6 +116,7 @@ router.post("/", async (req, res) => {
 })
 router.get("/:groupId", async (req, res) => {
     //Ensure the user is logged in
+    console.log("in group route")
     if (!req.session.user){
       console.log("user not authenticated");
       return res.redirect("/login")
@@ -144,10 +145,9 @@ router.get("/:groupId", async (req, res) => {
                 groupMatch = true;
                 break;
             }
+            i++
         }
-        if (!groupMatch){
-            return res.redirect("/groups")
-        }
+        
         if (!groupId) {
           return res.redirect("/groups")
         }
@@ -162,8 +162,22 @@ router.get("/:groupId", async (req, res) => {
         if (!groupInfo) {
           throw `could not retrieve group info`
         }
-        console.log(`${groupInfo.groupOwner} ${groupInfo.groupName}`)
-        return res.render("groupId", {logged_in: true,title: `Group ${groupInfo.groupName}`, group: groupInfo, coach: true } )
+
+        //get all the groupIds the target user is a member of
+        //change each userIds to username in the groups
+    
+        let owner = await userFuns.getUser(groupInfo.groupOwner);
+        groupInfo.OwnerUser = owner.username;
+
+        for (let i = 0; i < groupInfo.groupMembers.length; i++) {
+            let user = await userFuns.getUser(groupInfo.groupMembers[i]);
+            groupInfo.groupMembers[i] = user.username;
+            
+        }
+
+
+
+        return res.render("groupId", {logged_in: true,title: `Group ${groupInfo.groupName}`, group: groupInfo, coach: groupMatch } )
       }catch(e) {
         return res.status(400).render("error", {message: e});
       }

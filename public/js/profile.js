@@ -13,10 +13,13 @@ $(document).ready(function(){
 
         else{
 
+            let url = window.location.href.toString()
+                url = url.substring(21, url.length)
             //send ajax request to follow user
             let data = {
                 "username": username,
                 "follow": true,
+                "url": url,
             }
 
             $.ajax({
@@ -24,13 +27,8 @@ $(document).ready(function(){
                 url: "/search/follow",
                 data: data,
                 success: function (response){
-                    if (response.response == "success"){
-                        alert("user followed succesfully")
-                        location.reload()
-                    }else{
-                        alert(response.response)
-                        location.reload()
-                    }
+                       
+                        window.location.reload()
                 }
             })
         }
@@ -39,7 +37,6 @@ $(document).ready(function(){
     })
 
     $("#unfollow-form").on("submit", function (e){
-            
             e.preventDefault();
     
             var username = $("#username").val()
@@ -51,10 +48,13 @@ $(document).ready(function(){
     
             else{
     
+                let url = window.location.href.toString()
+                url = url.substring(21, url.length)
                 //send ajax request to follow user
                 let data = {
                     "username": username,
                     "unfollow": true,
+                    "url": url,
                 }
     
                 $.ajax({
@@ -62,13 +62,8 @@ $(document).ready(function(){
                     url: "/search/unfollow",
                     data: data,
                     success: function (response){
-                        if (response.response == "success"){
-                            alert("user unfollowed succesfully")
-                            location.reload()
-                        }else{
-                            alert(response.response)
-                            location.reload()
-                        }
+                      
+                            window.location.reload()
                     }
                 })
             }
@@ -77,6 +72,8 @@ $(document).ready(function(){
     $("#remove-user-button").click(function (e){
 
         e.preventDefault();
+
+        if (confirm("Are you sure you want to remove this user?") == true){
 
         let data = {
             "remove": true,
@@ -100,6 +97,10 @@ $(document).ready(function(){
 
 
         })
+        }
+        else{
+            window.location.reload()
+        }
     })
 
 })

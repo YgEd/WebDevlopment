@@ -11,8 +11,8 @@
   <h2>Goals</h2>
   <div id="goalDiv">
     {{#each goals}}
-  <label for="goal{{@index}}">Goal {{@index}}:</label>
-  <input type="text" name="goals[]" id="goal{{@index}}" value="{{this}}" maxlength="50">
+  <label for="{{@index}}">Goal {{@index}}:</label>
+  <input type="text" name="goals[]" id="{{@index}}" value="{{this}}" maxlength="50">
   <br>
    {{/each}}
 

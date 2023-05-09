@@ -2,5 +2,19 @@
 {{#each images}}
 <img src={{this}} width="auto" height=300 alt={{workoutType}}>
 {{/each}}
+
+{{#when postObj.postLikes.length 'eq' 1}}
+    <h2>1 Like</h2>
+{{/when}}
+
+{{#when postObj.postLikes.length 'noteq' 1}}
+    <h2>{{postObj.postLikes.length}} Likes</h2>
+{{/when}}
+
+<h2>Comments</h2>
+{{#each postObj.comments}}
+    {{> comment}}
+{{/each}}
+
 <h2>{{workoutType}}</h2>
 <p>{{postDescription}}</p>

@@ -1,3 +1,9 @@
+<h1>{{postTitle}}</h1>
+{{#each images}}
+<img src={{this}} height=300 alt="{{../workoutType}}">
+{{/each}}
+<h2>{{workoutType}}</h2>
+<p>{{postDescription}}</p>
 
 <div hidden id="session-user">{{userId}}</div>
 {{#if isOwner}}
@@ -23,7 +29,7 @@
     
     <br>
     {{#each images}}
-    <img src={{this}} width="auto" height=300 alt={{workoutType}}>
+    <img src={{this}}  height=300 alt={{../workoutType}}>
     {{/each}}
     <p>{{postDescription}}</p>
 

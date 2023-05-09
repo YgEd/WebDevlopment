@@ -5,6 +5,7 @@ let goals = document.getElementsByName("goals[]")
 let aboutErr = document.getElementById("aboutErr")
 let goalErr = document.getElementById("goalErr")
 
+
 function removeGoal() {
     goalDiv.removeChild(goalDiv.lastChild)
     goalDiv.removeChild(goalDiv.lastChild)

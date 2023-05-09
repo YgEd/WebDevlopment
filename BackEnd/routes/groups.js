@@ -49,7 +49,7 @@ router.get("/", async (req, res) => {
        
 
         //load page
-        return res.render("groups", {
+        return res.render("groups", { title: "groups page",
             logged_in: true,
             username: req.session.user.userName,
             user_id: req.session.user.user_id,
@@ -420,6 +420,7 @@ router.get("/edit/:id", async (req, res) => {
 
         //load page
         return res.render("group_edit", {
+            title: "edit groups",
             logged_in: true,
             username: req.session.user.userName,
             user_id: req.session.user.user_id,

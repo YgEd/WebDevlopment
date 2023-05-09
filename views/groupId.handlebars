@@ -1,6 +1,11 @@
-<h2>{{title}}</h2>
 {{#with group}}
-<p>{{groupMembers}}</p>
+<h1>{{groupName}}</h1>
+<h3>Group Coach</h3>
+<p>{{OwnerUser}}</p>
+<h3>Group Members</h3>
+{{#each groupMembers}}
+  <p>{{this}}</p>
+{{/each}}
 <p>{{groupPost}}</p>
 <h4>Recommendations for you</h4>
 {{#each groupRecommendations}}

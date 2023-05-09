@@ -60,6 +60,13 @@ try {
     );
   }
 
+  //remove duplicates
+  displayPosts = displayPosts.filter((value, index, self) =>
+    index === self.findIndex((x) => (
+      x._id.toString() === value._id.toString()
+    ))
+  )
+  
   //iterate through all display posts
   for (let i = 0; i < displayPosts.length; i++) {
 

@@ -5,6 +5,8 @@ import bcrypt from "bcrypt"
 import { posts } from "../config/mongoCollections.js";
 import { removePost } from "./posts.js";
 import * as groupFuns from "./groups.js";
+import * as postFuns from "./posts.js";
+import * as commentFuns from "./comment.js";
 //creates user (hashes password using md5)
 export const createUser = async (
   username,
@@ -717,6 +719,26 @@ export const deleteAccountAndRemoveAllPosts = async (userId) => {
   // Remove each post from the posts collection
   for (const post of userPosts) {
       await removePost(post._id);
+  }
+
+  //delete all user's comments and likes
+  let userInteractions = await postFuns.getAllPosts(999)
+
+  for (let i = 0; i < userInteractions.length; i++) {
+    
+      for (let j = 0; j < userInteractions[i].comments.length; j++) {
+        if (userInteractions[i].comments[j].userId.toString() == userId.toString()) {
+          await commentFuns.deleteComment(userInteractions[i]._id, userId)
+        }
+      }
+    
+    
+      for (let j = 0; j < userInteractions[i].postLikes.length; j++) {
+        if (userInteractions[i].postLikes[j].toString() == userId.toString()) {
+          await postFuns.updateLikes(userInteractions[i]._id, userId)
+        }
+      }
+    
   }
 
 

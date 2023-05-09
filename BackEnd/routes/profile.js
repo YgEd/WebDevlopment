@@ -243,8 +243,26 @@ router
       else {
         imgSrc = await getPhotoSrc(userInfo.profileimg)
       }
+
+      let followers = userInfo.followers.length
+      let following = userInfo.following.length
+
+      //see if the current user is following the user
+      let isFollowing = false
+
+      if (req.session.user) {
+        let currUser = await getUser(req.session.user.user_id)
+        for (let x of currUser.following) {
+          if (x.toString() == userId.toString()) {
+            isFollowing = true
+          }
+        }
+      }
+
+      console.log("AHhhhhhhhhhhh " + isFollowing)
+      console.log("isCurr = " + isCurr)
       console.log(`${userInfo.firstName} ${userInfo.lastName}`)
-      res.render("profile", {name: `${userInfo.firstName} ${userInfo.lastName}`, imgSrc: imgSrc, aboutMe: userInfo.aboutMe, streak: userInfo.userStreak, goals: userInfo.goals, isCurr: isCurr, logged_in: logged_in})
+      res.render("profile", {name: `${userInfo.firstName} ${userInfo.lastName}`, imgSrc: imgSrc, aboutMe: userInfo.aboutMe, streak: userInfo.userStreak, goals: userInfo.goals, isCurr: isCurr, logged_in: logged_in, followers: followers, following: following, isFollowing: isFollowing, username: userInfo.username})
     }catch(e) {
       return res.status(400).render("error", {message: e});
     }

@@ -149,9 +149,10 @@ router.post("/follow", async (req, res) => {
 
     try {
 
-        let userList = await userFuns.getAllUsers(100)
+        
         //get target user by username
-        let target_user = userList.find(value => value.username == data.username)
+        let target_user = await userFuns.getUserByUsername(data.username)
+        
         console.log("target_user: " + target_user._id)
 
         //check if user is already following
@@ -183,6 +184,8 @@ router.post("/unfollow", async (req, res) => {
     let user_id = req.session.user.user_id
     let data = req.body
 
+    console.log(data)
+
     if (help.strPrep(data.username).length == 0){
         console.log("invalid username")
         return res.send({response: "failed"})
@@ -190,10 +193,9 @@ router.post("/unfollow", async (req, res) => {
 
     try {
             
-            let userList = await userFuns.getAllUsers(100)
             //get target user by username
-            let target_user = userList.find(value => value.username == data.username)
-    
+            let target_user = await userFuns.getUserByUsername(data.username)
+           
             //check if user is not following
             for (let i = 0; i < target_user.followers.length; i++){
                 if (target_user.followers[i].toString() != user_id.toString() && i == target_user.followers.length - 1){

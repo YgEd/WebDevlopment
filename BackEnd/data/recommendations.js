@@ -103,11 +103,11 @@ async searchRecommendationsByKeyword(query) {
   if (!query) {
       throw "No search term given"
   }
-
+  query = validation.checkString(query, "keyword")
   const recsCollection = await recs();
   const regex = new RegExp([".*", query, ".*"].join(""), "i");
 
-  return recsCollection
+  let arr = await recsCollection
       .find({
           $or: [
               { "workoutName": regex },
@@ -117,6 +117,8 @@ async searchRecommendationsByKeyword(query) {
           ]
       })
       .toArray();
+
+  return arr
 }
 }
   export default exportedMethods;

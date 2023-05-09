@@ -160,8 +160,8 @@ router
         let fun = "editProfile"
         const updates = req.body;
         let userId = req.session.user.user_id;
-        let aboutme = updates.aboutme;
-        let goals = updates.goals;
+        let aboutme = xss(req.body.aboutme);
+        let goals = xss(req.body.goals);
         let badData = {};
         let profileimg;
         let userInfo;

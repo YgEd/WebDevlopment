@@ -34,13 +34,13 @@ router
     return res.render("coach", {title: "Adding Recommendations", logged_in: true});
 })
 .post(async (req,res) =>{
-    let {workoutName,
-        equipment,
-        duration,
-        level,
-        reps,
-        rounds,
-        tags} = req.body
+    let workoutName = xss(req.body.workoutName)
+    let equipment = xss(req.body.equipment)
+    let duration = xss(req.body.duration)
+    let level = xss(req.body.level)
+    let reps = xss(req.body.reps)
+    let rounds = xss(req.body.rounds)
+    let tags = xss(req.body.tags)
         try{
         workoutName = validation.checkString(workoutName, "Workout name").toUpperCase();
         equipment = validation.checkString(equipment, "Name of equipment");

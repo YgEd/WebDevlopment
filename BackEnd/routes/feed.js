@@ -141,12 +141,12 @@ try {
 });
 
 router.post("/comment", async (req, res) => {
-  let data = req.body;
+  
   let userName = req.session.user.userName;
   let userId = req.session.user.user_id;
-  let postId = data.postId
-  let msg = data.msg
-  let url = data.url
+  let postId = xss(req.body.postId)
+  let msg = xss(req.body.msg)
+  let url = xss(req.body.url)
 
   if (typeof msg !== "string" || msg.trim().length === 0 || msg.trim().length > 100) {
     console.log("invalid comment")
@@ -185,9 +185,9 @@ router.post("/comment", async (req, res) => {
 });
 
 router.post("/remove", async (req, res) => {
-  let postId = req.body.postId;
+  let postId = xss(req.body.postId);
   let userId = req.session.user.user_id;
-  let url = req.body.url;
+  let url = xss(req.body.url);
 
   try {
     await commentFuns.deleteComment(postId, userId);
@@ -212,9 +212,9 @@ router.post("/remove", async (req, res) => {
 });
 
 router.post("/like", async (req, res) => {
-  let postId = req.body.postId;
+  let postId = xss(req.body.postId);
   let userId = req.session.user.user_id;
-  let url = req.body.url;
+  let url = xss(req.body.url);
   console.log("current user = " + req.session.user.userName + " is liking post " + postId + "")
 
   try {
@@ -244,9 +244,9 @@ router.post("/like", async (req, res) => {
 });
 
 router.post("/unlike", async (req, res) => {
-  let postId = req.body.postId;
-  let userId = req.session.user.user_id;
-  let url = req.body.url;
+  let postId = xss(req.body.postId);
+  let userId = xss(req.session.user.user_id);
+  let url = xss(req.body.url);
   console.log("current user = " + req.session.user.userName + " is unliking post " + postId + "")
 
   try {
@@ -277,8 +277,8 @@ router.post("/unlike", async (req, res) => {
 });
 
 router.post("/delete-post", async (req, res) => {
-  let postId = req.body.postId;
-  let url = req.body.url;
+  let postId = xss(req.body.postId);
+  let url = xss(req.body.url);
 
   try {
 

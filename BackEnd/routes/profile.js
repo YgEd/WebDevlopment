@@ -2,13 +2,13 @@ import {Router} from 'express';
 import { ObjectId } from 'mongodb';
 const router = Router();
 import multer from 'multer';
-import {createUser,checkUser,getUser,updateUser}  from '../data/users.js'
+import {createUser,checkUser,getUser,updateUser,deleteAccountAndRemoveAllPosts}  from '../data/users.js'
 import {photos} from "../config/mongoCollections.js"
 import help from "../helpers.js"
 import {uploadPhoto, upload, getPhotoSrc } from '../data/photos.js';
 import { getAnalytics, getPostByUser} from '../data/posts.js';
 import recData from '../data/recommendations.js'
-
+import xss from 'xss'
 
 router
   .route('/')
@@ -325,6 +325,37 @@ router
       return res.status(400).render("error", {message: e});
     }
   });
+  router.post("/delete", async (req, res) => {
+    console.log("/user/delete")
+    //ensure user is logged in
+    if (!req.session.user){
+        console.log("user not authenticated");
+        return res.redirect("/login")
+    }
+
+    //ensure data was sent
+    if (!req.body){
+        console.log("no data sent");
+        return res.redirect("/profile")
+    }
+
+    
+    let userId = req.session.user.user_id;
+
+    
+    
+    try{
+        //delete user
+        await deleteAccountAndRemoveAllPosts(userId);
+
+        return res.send({response: true})
+    } catch (error) {
+        console.log(error);
+        return res.send({response: false})
+    }
+
+
+})
 
       
 

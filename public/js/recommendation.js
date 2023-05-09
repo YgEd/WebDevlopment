@@ -21,17 +21,17 @@ let isNum= (num,varName) => {
     if (!num) throw `You must provide an input for ${varName}`
     return /^\d+$/.test(num);
   }
-const groupRecForm = document.getElementById('newRecFormG');
+const groupRecForm = document.getElementById('newRecForm');
 let errorDivReg = document.getElementById('error-group-rec');
 if (groupRecForm){
   groupRecForm.addEventListener('submit', (event) => {
-    let workoutNameInput = document.getElementById('workoutNameG');
-    let equipmentInput = document.getElementById('equipmentG');
-    let durationInput = document.getElementById('durationG');
-    let levelInput = document.getElementById('levelG');
-    let repsInput = document.getElementById('repsG');
-    let roundInput = document.getElementById('roundsG');
-    let tagsInput = document.getElementById('tagsG')
+    let workoutNameInput = document.getElementById('workoutName');
+    let equipmentInput = document.getElementById('equipment');
+    let durationInput = document.getElementById('duration');
+    let levelInput = document.getElementById('level');
+    let repsInput = document.getElementById('reps');
+    let roundInput = document.getElementById('rounds');
+    let tagsInput = document.getElementById('tags')
     try {
       let workoutName = checkName(workoutNameInput.value, 'workout name');
       let equipment = checkName(equipmentInput.value, 'equipment');

@@ -280,7 +280,7 @@ router.post("/:groupId/add", async (req, res) => {
             help.isNum(reps)
             if (reps <= 0 || reps >1000) throw "Invalid reps number for this work out"
             help.isNum(rounds)
-            if (rounds <= 0 || rounds >= 20) throw "Invalid rounds number for this work out"
+            if (rounds <= 0 || rounds >= 10) throw "Invalid rounds number for this work out"
             //tag help
             tags = help.checkString(tags, "tags")
             } catch (e){

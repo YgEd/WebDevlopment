@@ -197,6 +197,7 @@ router
         let liked = false;
         let commented = false;
         let isOwner = false;
+        var user_id;
         try {
             if (typeof postId !== "string") {
                 throw `postId must be a string`

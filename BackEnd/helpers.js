@@ -25,6 +25,7 @@ isStr(str) {
 
 isNum(num) {
   //return boolean specifing whether input is a number
+
   return /^\d+$/.test(num);
 },
 
@@ -105,11 +106,11 @@ checkName(str, varName){
 checkNumber(num, varName){
   if (!num) throw `${num} is not supplied`
   if (typeof num !== 'number') {
-    throw `${variableName || 'provided variable'} is not a number`;
+    throw `${varName || 'provided variable'} is not a number`;
   }
 
   if (isNaN(val)) {
-    throw `${variableName || 'provided variable'} is NaN`;
+    throw `${varName || 'provided variable'} is NaN`;
   }
 },
 checkUsername(str, varName){

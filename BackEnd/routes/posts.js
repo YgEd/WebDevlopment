@@ -188,6 +188,8 @@ router
         let postId = req.params.postId;
         let thisPost;
         let postImgs = [];
+        let logged_in=true;
+        let user_id;
         try {
             if (typeof postId !== "string") {
                 throw `postId must be a string`
@@ -217,10 +219,36 @@ router
                     postImgs.push(src);
                 }
             }
+
+            if (!req.session.user) {
+                logged_in = false;
+                user_id = null;
+            }else{
+                user_id = req.session.user.user_id;
+                //check if user has liked post
+                for (let x of thisPost.postLikes) {
+                    if (x.toString() == user_id.toString()) {
+                        thisPost.liked = true;
+                    }
+                }
+
+                //check if user has commented on post
+                for (let x of thisPost.comments) {
+                    if (x.userId.toString() == user_id.toString()) {
+                        thisPost.commented = true;
+                    }
+                }
+
+                //check if user is owner of post
+                if (thisPost.userId.toString() == user_id.toString()) {
+                    thisPost.owner = true;
+                }
+            }
         }catch(e) {
             console.log(e);
             return res.status(404).render("not_found", {title: "Post not found"})
         }
-        return res.render("post", {title: thisPost.postTitle, postTitle: thisPost.postTitle, images: postImgs, postDescription: thisPost.postDescription, workoutType: thisPost.workoutType, logged_in: true, postObj: thisPost});
+        
+        return res.render("post", {title: thisPost.postTitle, postTitle: thisPost.postTitle, images: postImgs, postDescription: thisPost.postDescription, workoutType: thisPost.workoutType, logged_in: logged_in, postObj: thisPost, user_id});
     });
 export default router

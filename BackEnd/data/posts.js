@@ -324,14 +324,6 @@ export const removePost = async (postId) => {
   //get post object
   const targetPost = await getPost(postId);
 
-  //get post db and remove the target post
-  const userCollection = await posts();
-  const deleteInfo = await userCollection.findOneAndDelete({ _id: new ObjectId(postId) });
-
-  if (deleteInfo.lastErrorObject.n == 0) {
-    help.err(fun, "could not delete post with postId '" + postId + "'");
-  }
-
   //remove the postobject from the associated user
   const targetUser = await user.getUser(targetPost.userId);
 
@@ -341,11 +333,22 @@ export const removePost = async (postId) => {
   //remove post form user's userPosts array
   targetUser.userPosts.splice(index, 1);
 
+  //get user db
+  const userCollection = await users();
+
   //update the user in the user db
   await userCollection.updateOne(
     { _id: targetUser._id },
     { $set: { userPosts: targetUser.userPosts } }
   );
+
+   //remove the target post
+   const postCollection = await posts();
+   const deleteInfo = await postCollection.findOneAndDelete({ _id: new ObjectId(postId) });
+ 
+   if (deleteInfo.lastErrorObject.n == 0) {
+     help.err(fun, "could not delete post with postId '" + postId + "'");
+   }
 
   return "post with postId '" + postId + "' successfully deleted";
 };

@@ -74,5 +74,32 @@ $(document).ready(function(){
             }
  
     })
+    $("#remove-user-button").click(function (e){
+
+        e.preventDefault();
+
+        let data = {
+            "remove": true,
+        }
+
+        console.log(data)
+        //ajax request to remove the member
+        $.ajax({
+            type: "POST",
+            url: "/profile/delete",
+            data: data,
+            success: function (response){
+                if (response.response == true){
+                    alert("user removed succesfully")
+                    window.location.href = "/logout"
+                }else{
+                    alert("user removed unsuccesfully")
+                    window.location.reload()
+                }
+            }
+
+
+        })
+    })
 
 })

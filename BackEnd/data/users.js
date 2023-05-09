@@ -2,8 +2,8 @@ import { ObjectId } from "mongodb";
 import { users } from "../config/mongoCollections.js";
 import help from "../helpers.js";
 import bcrypt from "bcrypt"
-
-
+import { posts } from "../config/mongoCollections.js";
+import { removePost } from "./posts.js";
 //creates user (hashes password using md5)
 export const createUser = async (
   username,
@@ -176,7 +176,7 @@ export const removeUser = async (id) => {
 
   //get users db collection
   const userCollection = await users();
-  const deleteInfo = await userCollection.findOneAndDelete({ _id: id });
+  const deleteInfo = await userCollection.findOneAndDelete({ _id: new ObjectId(id) });
 
   if (deleteInfo.lastErrorObject.n == 0) {
     help.err(fun, "could not delete user with id '" + id + "'");
@@ -658,3 +658,28 @@ export const getUserByUsername = async (username) => {
     return user
 
 }
+export const deleteAccountAndRemoveAllPosts = async (userId) => {
+  // Function name to use for error throwing
+  let fun = "deleteAccountAndRemoveAllPosts";
+
+  // Test if the given userId is a valid ObjectId type
+  if (!ObjectId.isValid(userId)) {
+      help.err(fun, "invalid object ID");
+  }
+
+  // If userId is ObjectId, turn it into String
+  userId = userId.toString().trim();
+
+
+  // Get the user's posts
+  let postsCollection = await posts();
+  const userPosts = await postsCollection.find({ userId: new ObjectId(userId) }).toArray();
+  // Remove each post from the posts collection
+  for (const post of userPosts) {
+      await removePost(post._id);
+  }
+  const deleteUserInfo = await removeUser(userId);
+
+ 
+  return `User with userId '${userId}' and all their posts were successfully deleted`;
+};

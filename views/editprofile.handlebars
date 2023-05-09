@@ -1,19 +1,21 @@
 
-<label for = "username"> Username:</label>
-<p> {{userid}}</p>
+
+<h1> Username: {{userid}}</h1>
 <img src={{imgsrc}} alt="current profile picture" width=100 height=100>
 <form id ="editForm" method="POST" enctype="multipart/form-data">
   <label for = "aboutme">About me</label>
   <br>
-  <textarea name = "aboutme" id="aboutme"rows="5" cols="50" maxlength="300" >{{aboutme}}</textarea>
+  <textarea name = "aboutme" id="aboutme" rows="5" cols="50" maxlength="300" >{{aboutme}}</textarea>
   <p id = "aboutErr" class="error" hidden>about me must be a string with a max of 300 characters</p>
   <br>
-  <label for = "goals">goals</label>
+  <h2>Goals</h2>
   <div id="goalDiv">
     {{#each goals}}
-    <input type = "text" name = "goals[]" value = "{{this}}" maxlength="50">
-    <br>
-    {{/each}}
+  <label for="{{@index}}">Goal {{@index}}:</label>
+  <input type="text" name="goals[]" id="{{@index}}" value="{{this}}" maxlength="50">
+  <br>
+   {{/each}}
+
   </div>
   <p id ="goalErr" class="error" hidden>goals must all be strings with max 50 characters</p>
   <button type="button" onclick="addGoal()">add goal</button>

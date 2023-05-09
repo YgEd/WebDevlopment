@@ -89,9 +89,19 @@ export const createPost = async (
   let postLikes = [];
   let comments = [];
 
+  const userCollection = await users();
+  //get corresponding user  
+  let targetUser = await user.getUser(userId);
+  //get username  
+  if (!targetUser) {
+    throw `somehow could not get postUser`
+  }
+  let username = targetUser.username
+
   //create the postObj that will be inserted into the db
   let postObj = {
     userId: new ObjectId(userId),
+    username,
     postTitle: postTitle.trim(),
     workoutType: workoutType.trim(),
     postDescription: postDescription.trim(),
@@ -113,12 +123,9 @@ export const createPost = async (
     help.err(fun, "could not add post");
   }
 
+
+
   //add the postId to the corresponding user
-  const userCollection = await users();
-
-  //get corresponding user
-  let targetUser = await user.getUser(userId);
-
   //add id of the post to the user's 'userPosts' field
   let newPosts = targetUser.userPosts;
   newPosts.push(insertInfo.insertedId);
@@ -324,14 +331,6 @@ export const removePost = async (postId) => {
   //get post object
   const targetPost = await getPost(postId);
 
-  //get post db and remove the target post
-  const userCollection = await posts();
-  const deleteInfo = await userCollection.findOneAndDelete({ _id: new ObjectId(postId) });
-
-  if (deleteInfo.lastErrorObject.n == 0) {
-    help.err(fun, "could not delete post with postId '" + postId + "'");
-  }
-
   //remove the postobject from the associated user
   const targetUser = await user.getUser(targetPost.userId);
 
@@ -341,11 +340,22 @@ export const removePost = async (postId) => {
   //remove post form user's userPosts array
   targetUser.userPosts.splice(index, 1);
 
+  //get user db
+  const userCollection = await users();
+
   //update the user in the user db
   await userCollection.updateOne(
     { _id: targetUser._id },
     { $set: { userPosts: targetUser.userPosts } }
   );
+
+   //remove the target post
+   const postCollection = await posts();
+   const deleteInfo = await postCollection.findOneAndDelete({ _id: new ObjectId(postId) });
+ 
+   if (deleteInfo.lastErrorObject.n == 0) {
+     help.err(fun, "could not delete post with postId '" + postId + "'");
+   }
 
   return "post with postId '" + postId + "' successfully deleted";
 };

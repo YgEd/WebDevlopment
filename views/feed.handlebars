@@ -63,7 +63,12 @@
                     <button type="button" class="comment-button">Comment</button>
                
                 {{!-- {{/if}} --}}
-                
+
+                {{#when this.userId 'eq' ../userId}}
+                    <button type="button" class="center remove-post">Remove Post</button>
+                {{/when}}
+
+                <button type="button" class="center share-post">Share Post</button>              
                 
                 
             </div>

@@ -1,20 +1,59 @@
-<h1>{{postTitle}}</h1>
-{{#each images}}
-<img src={{this}} width="auto" height=300 alt={{workoutType}}>
-{{/each}}
 
-{{#when postObj.postLikes.length 'eq' 1}}
-    <h2>1 Like</h2>
-{{/when}}
+<div hidden id="session-user">{{userId}}</div>
+{{#if isOwner}}
+    <a href="{{postId}}/edit">edit this post</a>
+{{/if}}
+<div class="post-item">
+    <a href="/profile/{{userId}}">{{username}}</a>
+    {{#if liked}}
+        <div hidden class="liked">true</div>
+    {{else}}
+        <div hidden class="liked">false</div>
+    {{/if}}
+                        
+    {{#if commented}}
+        <div hidden class="commented">true</div>
+    {{else}}
+        <div hidden class="commented">false</div>
+    {{/if}}
+    <div hidden class="postId">{{postId}}</div>
+    <p class="post-type">{{workoutType}}</p>
+    <br>
+    <p class="post-title">{{postTitle}}</p>
+    
+    <br>
+    {{#each images}}
+    <img src={{this}} width="auto" height=300 alt={{workoutType}}>
+    {{/each}}
+    <p>{{postDescription}}</p>
 
-{{#when postObj.postLikes.length 'noteq' 1}}
-    <h2>{{../postObj.postLikes.length}} Likes</h2>
-{{/when}}
+    <br>
 
-<h2>Comments</h2>
-{{#each postObj.comments}}
-    {{> comment}}
-{{/each}}
+    <img src="/public/img/unfilled_heart.png" alt="like button" class="together like-button">
+    {{#when postLikes.length 'eq' 1}}
+        <p class="together likes"><strong>{{../postLikes.length}}</strong> Like</p>
+    {{/when}}
+    {{#when postLikes.length 'noteq' 1}}
+        <p class="together likes"><strong>{{../postLikes.length}}</strong> Likes</p>
+    {{/when}}
 
-<h2>{{workoutType}}</h2>
-<p>{{postDescription}}</p>
+    <h2>Comments:</h2>
+    <div class="comment-wrapper">
+        {{#each comments}}
+            {{> comment }}
+        {{/each}}
+    </div>
+    <button type="button" class="remove-comment">Remove Your Comment</button>
+    <div class="error-comment"></div>&nbsp;
+    <textarea class="comment-body" rows="4" cols="30" maxlength="100"></textarea>
+    <br>
+    <button type="button" class="comment-button">Comment</button>
+</div>
+
+{{#if isOwner}}
+    <button type="button" class="remove-post">Remove Post</button>
+{{/if}}
+
+<script src="https://code.jquery.com/jquery-3.5.1.js"
+		integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+<script src="/public/js/feed.js" ></script>

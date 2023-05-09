@@ -34,7 +34,8 @@ router.get("/", async (req, res) => {
 
     //change each userIds to username in the groups
     try {
-        groups_mem.forEach(async (group) => {
+        for (let i = 0; i < groups_mem.length; i++) {
+            let group = groups_mem[i];
             let owner = await userFuns.getUser(group.groupOwner);
             group.OwnerUser = owner.username;
 
@@ -43,7 +44,9 @@ router.get("/", async (req, res) => {
                 group.groupMembers[i] = user.username;
                 
             }
-        })
+        }
+            
+       
 
         //load page
         return res.render("groups", {

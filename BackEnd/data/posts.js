@@ -89,9 +89,19 @@ export const createPost = async (
   let postLikes = [];
   let comments = [];
 
+  const userCollection = await users();
+  //get corresponding user  
+  let targetUser = await user.getUser(userId);
+  //get username  
+  if (!targetUser) {
+    throw `somehow could not get postUser`
+  }
+  let username = targetUser.username
+
   //create the postObj that will be inserted into the db
   let postObj = {
     userId: new ObjectId(userId),
+    username,
     postTitle: postTitle.trim(),
     workoutType: workoutType.trim(),
     postDescription: postDescription.trim(),
@@ -113,12 +123,9 @@ export const createPost = async (
     help.err(fun, "could not add post");
   }
 
+
+
   //add the postId to the corresponding user
-  const userCollection = await users();
-
-  //get corresponding user
-  let targetUser = await user.getUser(userId);
-
   //add id of the post to the user's 'userPosts' field
   let newPosts = targetUser.userPosts;
   newPosts.push(insertInfo.insertedId);

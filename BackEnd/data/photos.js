@@ -8,17 +8,17 @@ import { photos } from '../config/mongoCollections.js';
 const upload = multer({
     storage: multer.memoryStorage(),
     //max 5 files of 10mb
-    limits: {fields: 5,
+    /*limits: {fields: 3,
             fileSize: 10 * 1024 * 1024,
             fieldSize: 10 * 1024 * 1024},
-    fileFilter: function (req, file, cb) {
+    fileFilter: function (req, res, file, cb) {
         //console.log(file.mimetype);
         if (file.mimetype != "image/jpg" && file.mimetype != "image/png" && file.mimetype != "image/jpeg") {
             return cb(new Error("Files must be of type jpg, jpeg, or png"));
-
+            //return res.status(400).render('error', {title: "error", message:e})
         }
         cb(null, true);
-    }
+    }*/
 });
 
 //takes in imgObj (req.file)

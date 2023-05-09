@@ -1,4 +1,6 @@
 <h1> {{name}} </h1>
+<h4>Followers: {{followers}}</h4>
+<h4>Following: {{following}}</h4>
 
 <img src={{imgSrc}} width=100 height=100>
 
@@ -6,19 +8,20 @@
 
 <h3> {{aboutme}}</h3>
 
+<br>
 
 <h2> Streaks</h2>
 <h3> {{streak}}</h3>
 
+<br>
+
 <h2> Goals</h2>
 <ul>
     {{#each goals}}
-      <li> {{this}} <li>
-
+      <li>{{this}}<li>
     {{/each}}
 </ul>
-<h4>Followers: {{followers}}</h4>
-<h4>Following: {{following}}</h4>
+
 {{#if isCurr}}
 <h3>
     <a href = "/profile/edit">Edit Profile</a>
@@ -26,7 +29,8 @@
 <h3>
   <a href = "/profile/get-analytics"> Get analytics</a>
 </h3>
-
+<br>
+<br>
 <h4>Perfect work out for you</h4>
 {{#with workout}}
 <p>{{workoutName}}</p>
@@ -39,3 +43,14 @@
 {{/with}}
 {{/if}}
 
+<br>
+<br>
+
+<h2>Recent Posts</h2>
+<ul>
+{{#each userPosts}}
+  <li>
+    <a href="/posts/{{this._id}}">{{this.postTitle}}</a>
+  </li>
+{{/each}}
+</ul>

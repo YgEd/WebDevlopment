@@ -137,6 +137,8 @@ router.post("/", async (req, res) => {
   let data = req.body;
   let userName = req.session.user.userName;
   let userId = req.session.user.user_id;
+  let postId = data.postId
+  let msg = data.msg
   try {
     await commentFuns.createComment(postId, userId, userName, msg);
   } catch (error) {

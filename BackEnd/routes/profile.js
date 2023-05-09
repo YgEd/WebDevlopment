@@ -6,32 +6,46 @@ import {createUser,checkUser,getUser,updateUser}  from '../data/users.js'
 import {photos} from "../config/mongoCollections.js";
 import help from "../helpers.js"
 import {uploadPhoto, upload, getPhotoSrc } from '../data/photos.js';
-import { getAnalytics } from '../data/posts.js';
+import { getAnalytics, getPostByUser } from '../data/posts.js';
 import recData from '../data/recommendations.js'
 
 
 router
   .route('/')
   .get(async (req, res) => {
+    let targetUser;
+    var imgSrc
+    let workoutRec
+    let userPosts
     //code here for GET
     if (!req.session.user){
       console.log("user not authenticated");
       return res.redirect("/login")
     }
 
-    //get user obj
-    let targetUser = await getUser(req.session.user.user_id);
+    try {
+      //get user obj
+      targetUser = await getUser(req.session.user.user_id);
 
-    //if user has a profile picture, get the imageSrc
-    if (!targetUser.profileimg || targetUser.profileimg == "default") {
-      var imgSrc = "/public/img/default.jpg";
-    } else {
-      var imgSrc = await getPhotoSrc(targetUser.profileimg);
+      //if user has a profile picture, get the imageSrc
+      if (!targetUser.profileimg || targetUser.profileimg == "default") {
+        imgSrc = "/public/img/default.jpg";
+      } else {
+        imgSrc = await getPhotoSrc(targetUser.profileimg);
+      }
+      workoutRec = await recData.getRandomRec()
+      if (targetUser.userPosts.length != 0) {
+        userPosts = await getPostByUser(req.session.user.user_id, 50)
+        for (let x of userPosts) {
+          x._id = x._id.toString()
+        }
+      }
+    }catch(e) {
+      console.log(e);
+      return res.status(500).render('error', )
     }
-    let workoutRec = await recData.getRandomRec()
-    console.log(req.session.user.profileimg)
-    return res.render('profile', {title: "my profile", name: req.session.user.firstName,  streak: targetUser.userStreak, aboutme: targetUser.aboutMe, goals: targetUser.goals, imgSrc: imgSrc, isCurr: true, logged_in: true, followers: targetUser.followers.length, following: targetUser.following.length, workout: workoutRec})
-    
+
+    return res.render('profile', {title: "my profile", name: req.session.user.firstName,  streak: targetUser.userStreak, aboutme: targetUser.aboutMe, goals: targetUser.goals, imgSrc: imgSrc, isCurr: true, logged_in: true, followers: targetUser.followers.length, following: targetUser.following.length, workout: workoutRec, userPosts: userPosts})
   })
 
   router
@@ -174,7 +188,7 @@ router
 
         }catch(e) {
           console.log(e);
-          return res.status(500).render("error", {message: e});
+          return res.status(500).render("error", {title: "error", message: e});
         }
 
       
@@ -218,6 +232,7 @@ router
     let userInfo;
     let isCurr = false
     let logged_in = true
+    let userPosts;
     try {
       //if no user id is passed in, use the current user
       if (!userId) {
@@ -243,8 +258,13 @@ router
       else {
         imgSrc = await getPhotoSrc(userInfo.profileimg)
       }
-      console.log(`${userInfo.firstName} ${userInfo.lastName}`)
-      res.render("profile", {name: `${userInfo.firstName} ${userInfo.lastName}`, imgSrc: imgSrc, aboutMe: userInfo.aboutMe, streak: userInfo.userStreak, goals: userInfo.goals, isCurr: isCurr, logged_in: logged_in})
+      if (userInfo.userPosts.length != 0) {
+        userPosts = await getPostByUser(userId, 50)
+        for (let x of userPosts) {
+          x._id = x._id.toString()
+        }
+      }
+      res.render("profile", {name: userInfo.firstName, imgSrc: imgSrc, aboutMe: userInfo.aboutMe, streak: userInfo.userStreak, goals: userInfo.goals, isCurr: isCurr, logged_in: logged_in, followers: userInfo.followers.length, following: userInfo.following.length, userPosts: userPosts})
     }catch(e) {
       return res.status(400).render("error", {message: e});
     }

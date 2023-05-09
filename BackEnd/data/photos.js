@@ -60,5 +60,14 @@ const getPhotoSrc = async (imgId) => {
     }
     return img.imageSrc
 }
+
+const getPhotoname= async (imgId) => {
+    const photoColl = await photos()
+    let img = await photoColl.findOne({_id: imgId})
+    if (!img) {
+        throw `Error: could not find image with id ${imgId}`
+    }
+    return img.imageName
+}
   
-  export {uploadPhoto, upload, getPhotoSrc}
+  export {uploadPhoto, upload, getPhotoSrc,getPhotoname}

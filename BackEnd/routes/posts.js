@@ -47,6 +47,7 @@ router
         const postData = req.body;
         let userId = req.session.user.user_id;
         let workoutType = postData.workoutType;
+        console.log(workoutType)
         let postDescription = postData.postDescription;
         let postImgs = []
         //console.log(postImgs);

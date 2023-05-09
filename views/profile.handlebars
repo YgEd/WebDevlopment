@@ -4,8 +4,11 @@
 {{else}}
 
 <h1> {{name}} </h1>
-
-<img src={{imgSrc}} width=100 height=100>
+{{#if noimg}}
+  <img src={{imgSrc}} alt = {{photo_name}} width=100 height=100>
+{{else}}
+<img src={{imgSrc}} alt = "{{photo_name}}" width=100 height=100>
+{{/if}}
 
 <h2> About me</h2>
 
@@ -22,8 +25,8 @@
 
     {{/each}}
 </ul>
-<h4>Followers: {{followers}}</h4>
-<h4>Following: {{following}}</h4>
+<h3>Followers: {{followers}}</h3>
+<h3>Following: {{following}}</h3>
 {{#if isCurr}}
   <h3>
       <a href = "/profile/edit">Edit Profile</a>

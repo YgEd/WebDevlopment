@@ -22,6 +22,7 @@ router.route('/search').post(async(req,res) =>{
     try{
     keyword = validation.checkString(keyword, "search keyword")
     let results = await recData.searchRecommendationsByKeyword(keyword)
+    if (results.length == 0) throw "No results"
     return res.render("recommendations", {title: "Search result", recs: results})
     } catch (e){
         return res.status(400).render("recommendations",{title: "Search error", error: e})

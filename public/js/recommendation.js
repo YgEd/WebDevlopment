@@ -95,3 +95,26 @@ if (groupRecForm){
     }
   });
 }
+const searchForm = document.getElementById('rec-search');
+let errorDivSearch = document.getElementById('error-search');
+if (searchForm){
+searchForm.addEventListener('submit', (event) => {
+  
+  let keywordInput = document.getElementById('keyword');
+
+  try {
+    let keyword = checkName(keywordInput.value, 'keyword');
+    keywordInput.classList.remove('inputClass');
+    searchForm.classList.remove('error');
+    errorDivSearch.hidden = true;
+  } catch (e) {
+    event.preventDefault();
+    errorDivSearch.hidden = false;
+    errorDivSearch.innerHTML = e;
+    searchForm.className = 'error';
+        keywordInput.value = '';
+        keywordInput.focus();
+        keywordInput.className = 'inputClass';
+    
+  }
+})}

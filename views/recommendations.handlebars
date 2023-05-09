@@ -1,4 +1,4 @@
-<form action="/recommendation/search" method="POST">
+<form action="/recommendation/search" method="POST" id="rec-search">
     <label for="keyword">Search Recommendations by Keyword</label>
     <input id="keyword" type="text" name="keyword" id="keyword" placeholder="chest,bar,easy,etc">
     <label for="search-button">Search</label>
@@ -22,3 +22,4 @@
 {{#if coach}}
     <button onclick="window.location.href='/recommendation/add'">Add a recommendation</button>
 {{/if}}
+<div id="error-search" class="error" hidden>I'm an error. I will change through Client-Side JS</div>

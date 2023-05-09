@@ -55,7 +55,7 @@ let checkDOB = (dob, varName) =>{
 }
   
 const loginForm = document.getElementById('login-form');
-let errorDiv = document.getElementById('error');
+let errorDiv = document.getElementById('error-log');
 if (loginForm){
 loginForm.addEventListener('submit', (event) => {
   

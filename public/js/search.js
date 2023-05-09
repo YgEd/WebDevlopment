@@ -29,47 +29,57 @@ $( document ).ready(function() {
             "searchType": searchType.trim(),
             "searchInput": searchInput.trim(),
         }
-
+        
         $.ajax({
             type: "POST",
             url: "/search",
             data: search_data,
             success: function (response){
                 console.log(response)
-                if (response.response == null){
+                let list = response.response
+                if (response.response == null || response.response.length === 0){
                     $("#search_result").html("<p class='search-res center search-res-title'>No results found</p>")
                 } else {
                     $("#search_result").append("<p class='search-res center search-res-title'>Result</p>")
                     if (response.type == "user"){
-                        $("#search_result").append(`<a class='center search-res search-name block' href="/profile/${response.userobj._id}"` + "<p>" + response.response + "</p></a>")
-                    } else{
-                        $("#search_result").append(`<a class='center search-res search-name block' href="/groups/${response.groupobj._id}"` + "<p>" + response.response + "</p></a>")
-                    }
-                    //if user is authenticated
-                    if (response.auth){
-                        //add follow button
-                        if (response.type == "user"){
-                            if (response.following == true){
-                                $("#search_result").append("<button class='search-res center unfollow-button' type='submit'>Unfollow</button>")
-                            } else {
-                                $("#search_result").append("<button class='search-res center follow-button' type='submit'>Follow</button>")
-                            }
-                        }
-                        
-                        //add join button
-                        if (response.type == "group"){
-                            if (!response.groupOwner){
-                                if (response.inGroup == true){
-                                    $("#search_result").append("<button class='search-res center leave-button' type='submit'>Leave</button>")
-                                } else {
-                                    $("#search_result").append("<button class='search-res center join-button' type='submit'>Join</button>")
+                        list.map((element) => {
+                            {$("#search_result").append(`<a class='center search-res search-name block' href="/profile/${element._id}"` + "<p>" + element.username + "</p></a>");
+                            if (response.auth){
+                                //add follow button
+                                if (response.type == "user"){
+                                    
+                                     if (response.following.includes(element._id.toString()) == true){
+                                        $("#search_result").append("<button class='search-res center unfollow-button' data-username='" + element.username + "' type='submit'>Unfollow</button>")
+
+                                    } else {
+                                        $("#search_result").append("<button class='search-res center follow-button' data-username='" + element.username + "' type='submit'>Follow</button>")
+
+                                    }
                                 }
                             }
+                    }})
+                    } else{
+                        list.map((element) =>{
+                            $("#search_result").append(`<a class='center search-res search-name block' href="/groups/${element._id}"` + "<p>" + element.groupName + "</p></a>")
+                            //add join button
+                            if (response.type == "group"){
+                            if (response.groupOwner.includes(element._id)){
+                                    $("#search_result").append("<button class='search-res center leave-button' data-groupname='" + element.groupName+ "' type='submit'>Leave</button>")
+                                } else {
+                                    $("#search_result").append("<button class='search-res center join-button' data-groupname='" + element.groupName+ "'  type='submit'>Join</button>")
+                                }
+                            }
+                        })
                         }
+                    }
+                    
+                    
+                        
+                        
                     }
                 }
 
-            }})
+            )
 
     })
 
@@ -78,7 +88,7 @@ $( document ).ready(function() {
         console.log("join button clicked");
 
         let postdata = {
-            "groupname": $(".search-name").text()
+            "groupname": $(this).data("groupname")
         }
 
         $.ajax({
@@ -105,7 +115,7 @@ $( document ).ready(function() {
         console.log("leave button clicked");
 
         let postdata = {
-            "groupname": $(".search-name").text()
+            "groupname": $(this).data("groupname")
         }
 
         $.ajax({
@@ -130,11 +140,11 @@ $( document ).ready(function() {
     $(document).on('click', '.follow-button', function (e) {
         e.preventDefault();
         console.log("follow button clicked");
-
+    
         let postdata = {
-            "username": $(".search-name").text()
+            "username": $(this).data("username")
         }
-
+    
         $.ajax({
             type: "POST",
             url: "/search/follow",
@@ -142,18 +152,16 @@ $( document ).ready(function() {
             success: function (response){
                 if (response.response == "success"){
                     alert("Successfully followed user")
-                    window.location.reload()
+                    window.location.href = "/search";
                     
                 } else {
                     alert("Failed to follow user")
                     window.location.reload()
                 }
             }
-
-
-        })
-        
+        })  
     })
+    
 
 
     $(document).on('click', '.unfollow-button', function (e) {
@@ -161,7 +169,7 @@ $( document ).ready(function() {
         console.log("unfollow button clicked");
 
         let postdata = {
-            "username": $(".search-name").text()
+            "username": $(this).data("username")
         }
 
         $.ajax({

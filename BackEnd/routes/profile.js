@@ -25,9 +25,11 @@ router
       return res.redirect("/login")
     }
 
+
     try {
       //get user obj
       targetUser = await getUser(req.session.user.user_id);
+
 
       //if user has a profile picture, get the imageSrc
       if (!targetUser.profileimg || targetUser.profileimg == "default") {
@@ -371,7 +373,7 @@ router
     let userId = req.session.user.user_id;
 
     
-    
+
     try{
         //delete user
         await deleteAccountAndRemoveAllPosts(userId);

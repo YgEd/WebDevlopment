@@ -690,3 +690,29 @@ export const addRecommendationToGroup = async (groupId, workoutName, equipment, 
     // Return the updated group object from the database
     return await groupCollection.findOne({ _id: new ObjectId(groupId) });
 }
+//Source: From professor Hill github
+export const searchGroupByKeyword= async (query) => {
+    if (!query) {
+        throw "No search term given"
+    }
+    const groupCollection = await groups();
+    const regex = new RegExp([".*", query, ".*"].join(""), "i");
+  
+    return groupCollection
+        .find({
+            $or: [
+                { "groupName": regex },
+                { "groupDescription": regex },
+            ]
+        })
+        .toArray();
+  }
+  export const allGroupsWithUserId = async (userId) =>{
+    userId = help.checkId(userId, "user Id")
+    const groupCollection = await groups();
+    let groupsArr = await groupCollection
+        .find({ groupMembers: { $in: [new ObjectId(userId)] } })
+        .project({ _id: 1 })  // project only the _id field
+        .toArray();
+    return groupsArr.map((group) => group._id.toString()); 
+}

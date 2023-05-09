@@ -127,7 +127,10 @@ export const getUser = async (id) => {
 
   //get users db collection
   const userCollection = await users();
-  const findUser = await userCollection.findOne({ _id: new ObjectId(id) });
+  const findUser = await userCollection.findOne(
+    { _id: new ObjectId(id) },
+    { projection: { userPassword: 0 } }
+  );
 
   //if user is not found throw error
   if (findUser == null) {
@@ -136,6 +139,7 @@ export const getUser = async (id) => {
 
   return findUser;
 };
+
 
 //returns array of users
 export const getAllUsers = async (limit) => {
@@ -160,7 +164,7 @@ export const getAllUsers = async (limit) => {
   }
 
   //put db in an array
-  let userList = await userCollection.find({}).limit(limit).toArray();
+  let userList = await userCollection.find({},{ projection: { userPassword: 0 } }).limit(limit).toArray();
 
   //return array of users
   return userList;
@@ -477,7 +481,8 @@ export const checkUser = async (emailAddress, password) => {
     emailAddress: user.email,
     user_id: user._id,
     userName: user.username,
-    groupsOwned: user.groupsOwned
+    groupsOwned: user.groupsOwned,
+    following: user.following
    }
   
 
@@ -671,22 +676,19 @@ export const getUserByUsername = async (username) => {
     if (!username) {
       help.err(fun, "invalid input")
     }
-
     //ensure username is a non-empty string
     if (typeof username !== "string" || username.trim().length == 0) {
       help.err(fun, "invalid username")
     }
-
     //get users db
     const userCollection = await users();
-
     //make sure db is found
     if (!userCollection){
       help.err(fun, "could not get user collection")
     }
 
     //get user
-    let user = await userCollection.findOne({username: username})
+    let user = await userCollection.findOne({username: username},{ projection: { userPassword: 0 } })
 
     //make sure user is found
     if (!user) {
@@ -724,4 +726,26 @@ export const deleteAccountAndRemoveAllPosts = async (userId) => {
 
  
   return `User with userId '${userId}' and all their posts were successfully deleted`;
+};
+//Source: From professor Hill github
+export const searchUserByKeyword = async (query) => {
+  if (!query) {
+    throw "No search term given";
+  }
+  const userCollection = await users();
+  const regex = new RegExp([".*", query, ".*"].join(""), "i");
+
+  return userCollection
+    .find(
+      {
+        $or: [
+          { "username": regex },
+          { "firstName": regex },
+          { "lastName": regex },
+          { "email": regex },
+        ],
+      },
+      { projection: { userPassword: 0 } } // Exclude userPassword field
+    )
+    .toArray();
 };

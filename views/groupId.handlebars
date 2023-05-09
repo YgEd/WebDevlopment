@@ -1,0 +1,24 @@
+<h2>{{title}}</h2>
+{{#with group}}
+<p>{{groupMembers}}</p>
+<p>{{groupPost}}</p>
+<h4>Recommendations for you</h4>
+{{#each groupRecommendations}}
+
+  <div class="recommendation">
+    <h6>{{this.workoutName}}</h6>
+    <p>Equipment: {{this.equipment}}</p>
+    <p>Duration: {{this.duration}} minutes</p>
+    <p>Level: {{this.level}}</p>
+    <p>Intensity: {{this.reps}} reps</p>
+    <p>{{this.rounds}} rounds</p>
+    <p>Tags: {{this.tags}}</p>
+    <br>
+  </div>
+
+{{/each}}
+
+{{/with}}
+{{#if coach}}
+    <button onclick="window.location.href='/groups/${groupId}/add'">Add a recommendation</button>
+{{/if}}

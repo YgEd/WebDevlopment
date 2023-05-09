@@ -36,7 +36,8 @@ export const createGroup = async (groupName, groupOwner) => {
         groupName: groupName,
         groupMembers: [new ObjectId(groupOwner)],
         groupPosts: [],
-        groupMessages: []
+        groupMessages: [],
+        groupRecommendations: []
     }
 
     //get group db
@@ -635,3 +636,57 @@ export const getGroupByName = async (groupName) => {
 
     return group
 };
+export const addRecommendationToGroup = async (groupId, workoutName, equipment, duration, level, reps, rounds, tags) => {
+    let fun = "addRecommendationToGroup";
+
+    // Ensure groupId is a valid ObjectId
+    if (!ObjectId.isValid(groupId)) {
+        help.err(fun, "groupId is invalid ObjectId");
+    }
+    workoutName = help.checkString(workoutName, "Workout name").toUpperCase();
+    equipment = help.checkString(equipment, "name of equipment");
+    help.isNum(duration)
+    if (duration <= 0 || duration >= 60) throw "The work out is too long or invalid number of minutes"
+    level = help.checkString(level, "level").toLowerCase()
+    if (level !== "beginner" && level !== "intermediate" && level !== "advanced" ) throw "not valid level"
+    help.isNum(reps)
+    if (reps <= 0 || reps >1000) throw "Invalid reps number for this work out"
+    help.isNum(rounds)
+    if (rounds <= 0 || rounds >= 20) throw "Invalid rounds number for this work out"
+    // tags = help.checkStringArray(tags, "tags")
+    tags = help.checkString(tags, "tags");
+    let newRec = {
+        workoutName: workoutName,
+        equipment: equipment,
+        duration: duration,
+        level: level,
+        reps: reps,
+        rounds: rounds,
+        tags: tags
+    }
+    const groupCollection = await groups();
+    const existingGroupWithWorkout = await groupCollection.findOne({
+        "groupRecommendations.workoutName": workoutName
+    });
+
+    // Check if a group with the same workoutName already exists
+    if (existingGroupWithWorkout) {
+        help.err(fun, "Workout with the same workoutName already exists in the group");
+    }
+    
+
+    // Add the new recommendation to the groupRecommendations array in the group with the specified groupId
+    
+    const updateInfo = await groupCollection.updateOne(
+        { _id: new ObjectId(groupId) },
+        { $push: { groupRecommendations: newRec } }
+    );
+
+    // Check if the recommendation was added
+    if (updateInfo.modifiedCount === 0) {
+        help.err(fun, "could not add recommendation to group");
+    }
+
+    // Return the updated group object from the database
+    return await groupCollection.findOne({ _id: new ObjectId(groupId) });
+}

@@ -1,11 +1,11 @@
 import {Router} from 'express';
 const router = Router();
-import validation from "../../helpers.js";
+import validation from "../helpers.js";
 import multer from 'multer';
-import {photos} from "../../config/mongoCollections.js";
+import {photos} from "../config/mongoCollections.js";
 import { ObjectId } from 'mongodb';
-import {uploadPhoto, upload, getPhotoSrc } from '../photos.js';
-import recData from "../recommendations.js"
+import {uploadPhoto, upload, getPhotoSrc } from '../data/photos.js';
+import recData from "../data/recommendations.js"
 router
   .route('/')
   .get(async (req, res) => {
@@ -38,6 +38,7 @@ router
         validation.isNum(rounds)
         if (rounds <= 0 || rounds >= 20) throw "Invalid rounds number for this work out"
         //tag validation
+        tags = validation.checkString(tags, "tags")
         } catch (e){
             return res.status(400).render("coach",{title: "Adding Recommendations", error: e})
           }

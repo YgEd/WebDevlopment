@@ -1,7 +1,7 @@
-import {createUser,checkUser}  from '../users.js'
+import {createUser,checkUser}  from '../data/users.js'
 import {Router} from 'express';
 const router = Router();
-import validation from '../../helpers.js';
+import validation from '../helpers.js';
 router.route('/')
   .get(async (req, res) =>{
     let logged_in = false

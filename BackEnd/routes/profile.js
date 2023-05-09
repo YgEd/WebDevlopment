@@ -2,12 +2,12 @@ import {Router} from 'express';
 import { ObjectId } from 'mongodb';
 const router = Router();
 import multer from 'multer';
-import {createUser,checkUser,getUser,updateUser}  from '../users.js'
-import {photos} from "../../config/mongoCollections.js";
-import help from "../../helpers.js"
-import {uploadPhoto, upload, getPhotoSrc } from '../photos.js';
-import { getAnalytics } from '../posts.js';
-import recData from '../recommendations.js'
+import {createUser,checkUser,getUser,updateUser}  from '../data/users.js'
+import {photos} from "../config/mongoCollections.js"
+import help from "../helpers.js"
+import {uploadPhoto, upload, getPhotoSrc } from '../data/photos.js';
+import { getAnalytics } from '../data/posts.js';
+import recData from '../data/recommendations.js'
 
 
 router

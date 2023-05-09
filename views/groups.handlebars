@@ -8,7 +8,8 @@
         {{/if}}
             {{#each groups}}
             <div class="center group-item">
-                <h3 class="group-name">{{this.groupName}}</h3>
+                <a href="/groups/{{this._id}}"><h3 class="group-name">{{this.groupName}}</h3></a>
+                
                 <p>{{this.groupDescription}}</p>
                 <p>Coach: {{this.OwnerUser}}</p>
                 <table class="center table-striped">

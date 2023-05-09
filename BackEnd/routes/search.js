@@ -1,7 +1,7 @@
-import * as postFuns from "../posts.js";
-import * as userFuns from "../users.js";
-import * as groupFuns from "../groups.js";
-import help from "../../helpers.js";
+import * as postFuns from "../data/posts.js";
+import * as userFuns from "../data/users.js";
+import * as groupFuns from "../data/groups.js";
+import help from "../helpers.js";
 import {distance, closest} from "fastest-levenshtein"
 
 import { Router } from "express";

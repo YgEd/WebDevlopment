@@ -1,12 +1,12 @@
-import {createUser,checkUser}  from '../users.js'
+import {createUser,checkUser}  from '../data/users.js'
 import {Router} from 'express';
 const router = Router();
-import help from "../../helpers.js";
+import help from "../helpers.js";
 import multer from 'multer';
-import {photos} from "../../config/mongoCollections.js";
-import { createPost, getPost } from '../posts.js';
+import {photos} from "../config/mongoCollections.js";
+import { createPost, getPost } from '../data/posts.js';
 import { ObjectId } from 'mongodb';
-import {uploadPhoto, upload, getPhotoSrc } from '../photos.js';
+import {uploadPhoto, upload, getPhotoSrc } from '../data/photos.js';
 
 /*const upload = multer({
     storage: multer.memoryStorage(),

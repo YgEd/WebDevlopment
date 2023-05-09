@@ -1,0 +1,36 @@
+{{error}}
+<h2>Adding reccomendations to {{groupName}}</h2>
+<form method="POST" action="/groups/{{id}}/add" id="newRecFormG">
+  <label for="workoutNameG">Workout Name:</label>
+  <input type="text" name="workoutName" id="workoutNameG">
+  <br>
+  <label for="equipmentG">Equipment:</label>
+  <input type="text" name="equipment" id="equipmentG">
+  <br>
+  <label for="durationG">Duration:</label>
+  <input type="number" name="duration" id="durationG" min="1">
+  <br>
+  <label for="levelG">Level:</label>
+  <select name="level" id="levelG">
+    <option value="beginner">Beginner</option>
+    <option value="intermediate">Intermediate</option>
+    <option value="advanced">Advanced</option>
+  </select>
+  <br>
+  <label for="repsG">Reps:</label>
+  <input type="number" name="reps" id="repsG" min="1">
+  <br>
+  <label for="roundsG">Rounds:</label>
+  <input type="number" name="rounds" id="roundsG" min="1">
+  <br>
+  <label for="tagsG">Tags:</label>
+  <select name="tags" id="tagsG">
+    <option value="Back">Back</option>
+    <option value="Chest">Chest</option>
+    <option value="Legs">Legs</option>
+    <option value="Shoulder">Shoulder</option>
+    <option value="Others">Others</option>
+  </select>
+  <br>
+  <button type="submit">Submit</button>
+</form>

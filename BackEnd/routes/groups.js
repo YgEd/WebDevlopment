@@ -1,8 +1,8 @@
-import * as groupFuns from "../groups.js";
-import * as userFuns from "../users.js";
+import * as groupFuns from "../data/groups.js";
+import * as userFuns from "../data/users.js";
 import { ObjectId } from 'mongodb';
-import help from "../../helpers.js";
-
+import help from "../helpers.js";
+import xss from 'xss'
 import { Router } from "express";
 const router = Router();
 
@@ -111,7 +111,187 @@ router.post("/", async (req, res) => {
     }
 
 })
+router.get("/:groupId", async (req, res) => {
+    //Ensure the user is logged in
+    if (!req.session.user){
+      console.log("user not authenticated");
+      return res.redirect("/login")
+    }
+    
+    try {
+         //get user obj
+        var targetUser = await userFuns.getUser(req.session.user.user_id);
+    } catch (error) {
+        console.log(error);
+        return res.redirect("/login")
+    }
 
+    if (!targetUser){
+      console.log("user not found");
+      return res.redirect("/login")
+    }
+    
+    let groupId = req.params.groupId
+    
+    try {
+        var groupMatch = false
+        let i =0
+        while (i< targetUser.groupsOwned.length){
+            if (targetUser.groupsOwned[i] == groupId){
+                groupMatch = true;
+                break;
+            }
+        }
+        if (!groupMatch){
+            return res.redirect("/groups")
+        }
+        if (!groupId) {
+          return res.redirect("/groups")
+        }
+        if (!ObjectId.isValid(groupId)) {
+            return res.redirect("/groups")
+        }
+      }catch(e) {
+        return res.status(400).render("error", {message: e});
+      }
+      try {
+        let groupInfo = await groupFuns.getGroup(new ObjectId(groupId));
+        if (!groupInfo) {
+          throw `could not retrieve group info`
+        }
+        console.log(`${groupInfo.groupOwner} ${groupInfo.groupName}`)
+        return res.render("groupId", {logged_in: true,title: `Group ${groupInfo.groupName}`, group: groupInfo, coach: true } )
+      }catch(e) {
+        return res.status(400).render("error", {message: e});
+      }
+    });
+router.get("/:groupId/add", async (req, res) => {
+    if (!req.session.user){
+        console.log("user not authenticated");
+        return res.redirect("/login")
+      }
+      
+      try {
+           //get user obj
+          var targetUser = await userFuns.getUser(req.session.user.user_id);
+      } catch (error) {
+          console.log(error);
+          return res.redirect("/login")
+      }
+  
+      if (!targetUser){
+        console.log("user not found");
+        return res.redirect("/login")
+      }
+      
+      let groupId = req.params.groupId
+      
+      try {
+        let groupMatch = false
+        let i =0
+        while (i< targetUser.groupsOwned.length){
+            if (targetUser.groupsOwned[i] == groupId){
+                groupMatch = true;
+                break;
+            }
+        }
+        if (!groupMatch){
+            return res.redirect("/groups")
+        }
+          if (!groupId) {
+            return res.redirect("/groups")
+          }
+          if (!ObjectId.isValid(groupId)) {
+              return res.redirect("/groups")
+          }
+        }catch(e) {
+          return res.status(400).render("error", {message: e});
+        }
+        try {
+            let groupInfo = await groupFuns.getGroup(new ObjectId(groupId));
+            if (!groupInfo) {
+              throw `could not retrieve group info`
+            }
+            return res.render("groupRecAdd", {title: `Adding Recommendations to ${groupInfo.groupName}`, id: groupId, groupName:groupInfo.groupName })
+          }catch(e) {
+            return res.status(400).render("error", {message: e});
+          }
+        
+    })
+router.post("/:groupId/add", async (req, res) => {
+    if (!req.session.user){
+        console.log("user not authenticated");
+        return res.redirect("/login")
+      }
+      
+      try {
+           //get user obj
+          var targetUser = await userFuns.getUser(req.session.user.user_id);
+      } catch (error) {
+          console.log(error);
+          return res.redirect("/login")
+      }
+  
+      if (!targetUser){
+        console.log("user not found");
+        return res.redirect("/login")
+      }
+      
+      let groupId = req.params.groupId
+      
+      try {
+        let groupMatch = false
+        let i =0
+        while (i< targetUser.groupsOwned.length){
+            if (targetUser.groupsOwned[i] == groupId){
+                groupMatch = true;
+                break;
+            }
+        }
+        if (!groupMatch){
+            return res.redirect("/groups")
+        }
+          if (!groupId) {
+            return res.redirect("/groups")
+          }
+          if (!ObjectId.isValid(groupId)) {
+              return res.redirect("/groups")
+          }
+        }catch(e) {
+          return res.status(400).render("error", {message: e});
+        }
+        let workoutName = xss(req.body.workoutName);
+        let equipment = xss(req.body.equipment);
+        let duration = xss(req.body.duration);
+        let level = xss(req.body.level);
+        let reps = xss(req.body.reps);
+        let rounds = xss(req.body.rounds);
+        let tags = xss(req.body.tags);
+            try{
+            workoutName = help.checkString(workoutName, "Workout name").toUpperCase();
+            equipment = help.checkString(equipment, "Name of equipment");
+            help.isNum(duration)
+            if (duration <= 0 || duration >= 60) throw "The work out is too long or invalid number of minutes"
+            level = help.checkString(level, "level").toLowerCase()
+            if (level !== "beginner" && level !== "intermediate" && level !== "advanced" ) throw "not valid level"
+            help.isNum(reps)
+            if (reps <= 0 || reps >1000) throw "Invalid reps number for this work out"
+            help.isNum(rounds)
+            if (rounds <= 0 || rounds >= 20) throw "Invalid rounds number for this work out"
+            //tag help
+            tags = help.checkString(tags, "tags")
+            } catch (e){
+                return res.status(400).render("groupRecAdd",{title: "Adding Recommendations", error: e})
+              }
+        try{
+            let addRec = groupFuns.addRecommendationToGroup(groupId,workoutName, equipment, duration, level, reps, rounds, tags);
+            if (addRec) return res.redirect(`/groups/${groupId}`)
+        } catch (e){
+            return res.status(400).render("groupRecAdd",{title: "Adding Recommendations", error: e})
+        }
+            
+
+})
 router.post("/edit/:id", async (req, res) => {
     //ensure user is logged in
     if (!req.session.user){

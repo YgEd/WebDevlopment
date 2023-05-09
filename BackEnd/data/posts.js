@@ -3,6 +3,7 @@ import { posts } from "../config/mongoCollections.js";
 import { users } from "../config/mongoCollections.js";
 import help from "../helpers.js";
 import * as user from "./users.js";
+import { postAdd } from "./groups.js";
 
 //defined workout types
 var workoutTypes = ["running", "lifting", "cycling", "other"];
@@ -75,7 +76,7 @@ export const createPost = async (
 
   //test to ensure postToGroup is empty or of full of valid ObjectIds
   for (let i = 0; i < postToGroup.length; i++) {
-    if (!Object.isValid(postToGroup[i])) {
+    if (!ObjectId.isValid(postToGroup[i])) {
       help.err(fun, "postToGroup contains a non valid ObjectId");
     }
   }
@@ -123,6 +124,12 @@ export const createPost = async (
     help.err(fun, "could not add post");
   }
 
+  for (let x of postToGroup) {
+    let added = await postAdd(x, insertInfo.insertedId);
+    if (!added) {
+      throw `could not add post to group`
+    }
+  }
 
 
   //add the postId to the corresponding user

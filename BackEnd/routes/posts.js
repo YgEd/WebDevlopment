@@ -197,6 +197,7 @@ router
         let liked = false;
         let commented = false;
         let isOwner = false;
+        var user_id;
         try {
             if (typeof postId !== "string") {
                 throw `postId must be a string`
@@ -224,6 +225,31 @@ router
                 for (let x of thisPost.postImgs) {
                     let src = await getPhotoSrc(x);
                     postImgs.push(src);
+                }
+            }
+
+            if (!req.session.user) {
+                logged_in = false;
+                user_id = null;
+            }else{
+                user_id = req.session.user.user_id;
+                //check if user has liked post
+                for (let x of thisPost.postLikes) {
+                    if (x.toString() == user_id.toString()) {
+                        thisPost.liked = true;
+                    }
+                }
+
+                //check if user has commented on post
+                for (let x of thisPost.comments) {
+                    if (x.userId.toString() == user_id.toString()) {
+                        thisPost.commented = true;
+                    }
+                }
+
+                //check if user is owner of post
+                if (thisPost.userId.toString() == user_id.toString()) {
+                    thisPost.owner = true;
                 }
             }
         }catch(e) {

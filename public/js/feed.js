@@ -53,7 +53,7 @@ $( document ).ready(function() {
         //ajax request
         $.ajax({
           type: "POST",
-          url: "/feed",
+          url: "/feed/comment",
           data: comment_data,
           success: function (response){
             console.log(response)
@@ -216,6 +216,48 @@ $( document ).ready(function() {
 
   })
 
+  $(".remove-post").click(function (e){
+    e.preventDefault()
+    if (confirm("Are you sure you want to delete this post?")){
+      var parent = $(this).parent()
+      let postId = ""
+      postId = parent.parent().find(".postId").text()
+      //sometimes the the postId is duplicated so this makes sure only one instance of the id is used as postId
+      postId = postId.substring(0,24)
+      let post_data = {
+        "postId": postId
+      }
+      $.ajax({
+        type: "POST",
+        url: "/feed/delete-post",
+        data: post_data,
+        success: function (response){
+          if (response.success){
+            alert("post deleted!")
+            window.location.reload()
+          }else{
+            alert(response.error)
+          }
+      }})
+  }
+  
+  })
+
+  $(".share-post").click(function (e){
+    e.preventDefault()
+    var parent = $(this).parent()
+    let postId = ""
+    postId = parent.parent().find(".postId").text()
+    //sometimes the the postId is duplicated so this makes sure only one instance of the id is used as postId
+    postId = postId.substring(0,24)
+    //make post page url
+    let post_url = "http://localhost:3000/posts/" + postId
+
+    navigator.clipboard.writeText(post_url);
+    alert("post url copied to clipboard!")
+
+  })
+
   //only update db for likes on page reload so no delay
   function updateDb() {
     let like_cache = JSON.parse(sessionStorage.getItem("like_cache"))
@@ -278,6 +320,9 @@ $( document ).ready(function() {
     updateDb()
     window.location = href
 });
+
+
+
 
 
 

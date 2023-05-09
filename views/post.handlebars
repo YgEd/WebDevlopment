@@ -38,7 +38,7 @@
     {{/when}}
 
     <h2>Comments:</h2>
-    <div id="comments">
+    <div class="comment-wrapper">
         {{#each comments}}
             {{> comment }}
         {{/each}}
@@ -49,6 +49,10 @@
     <br>
     <button type="button" class="comment-button">Comment</button>
 </div>
+
+{{#if isOwner}}
+    <button type="button" class="remove-post">Remove Post</button>
+{{/if}}
 
 <script src="https://code.jquery.com/jquery-3.5.1.js"
 		integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>

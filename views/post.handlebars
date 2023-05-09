@@ -1,68 +1,55 @@
-<h1 class="center" >{{postTitle}}</h1>
-<p hidden id="postId">{{postObj._id}}</p>
-<p hidden id="ownerId">{{postObj.userId}}</p>
-<p hidden id="currUser">{{user_id}}</p>
-<p hidden id="liked">{{postObj.liked}}</p>
-<p hidden id="commented">{{postObj.commented}}</p>
-{{#each images}}
-<img src={{this}} class="center-img" height=300 alt={{workoutType}}>
-{{/each}}
 
-
-<br>
-
-{{#when postObj.postLikes.length 'eq' 1}}
-    <h2 class="center" >1 Like</h2>
-{{/when}}
-
-
-{{#when postObj.postLikes.length 'noteq' 1}}
-    <h2 class="center" >{{../postObj.postLikes.length}} Likes</h2>
-{{/when}}
-
-{{#if logged_in}}
- <div class="button-div">
-    {{#if postObj.liked}}
-        <button type="button" id="like-button" class="center" >UnLike</button>
-    {{else}}
-        <button type="button" id="like-button" class="center" >Like</button>
-    {{/if}}
-</div>
+<div hidden id="session-user">{{userId}}</div>
+{{#if isOwner}}
+    <a href="{{postId}}/edit">edit this post</a>
 {{/if}}
-
-<h2 class="center" >Comments</h2>
-<div class="comment-wrapper">
-    {{#each postObj.comments}}
-        {{> comment}}
+<div class="post-item">
+    <a href="/profile/{{userId}}">{{username}}</a>
+    {{#if liked}}
+        <div hidden class="liked">true</div>
+    {{else}}
+        <div hidden class="liked">false</div>
+    {{/if}}
+                        
+    {{#if commented}}
+        <div hidden class="commented">true</div>
+    {{else}}
+        <div hidden class="commented">false</div>
+    {{/if}}
+    <div hidden class="postId">{{postId}}</div>
+    <p class="post-type">{{workoutType}}</p>
+    <br>
+    <p class="post-title">{{postTitle}}</p>
+    
+    <br>
+    {{#each images}}
+    <img src={{this}} width="auto" height=300 alt={{workoutType}}>
     {{/each}}
-</div>
+    <p>{{postDescription}}</p>
 
-<h2 class="center" >{{workoutType}}</h2>
-<p class="center" >{{postDescription}}</p>
+    <br>
 
-{{#if logged_in}}
-    {{#if postObj.commented}}
-    <div class="button-div">
-        <button type="button" class="remove-comment center">Remove Your Comment</button>
+    <img src="/public/img/unfilled_heart.png" alt="like button" class="together like-button">
+    {{#when postLikes.length 'eq' 1}}
+        <p class="together likes"><strong>{{../postLikes.length}}</strong> Like</p>
+    {{/when}}
+    {{#when postLikes.length 'noteq' 1}}
+        <p class="together likes"><strong>{{../postLikes.length}}</strong> Likes</p>
+    {{/when}}
+
+    <h2>Comments:</h2>
+    <div id="comments">
+        {{#each comments}}
+            {{> comment }}
+        {{/each}}
     </div>
-    {{else}}
-        <form  class="center" id="comment-form">
-            <textarea name="comment" class="comment-body" rows="4" cols="30" maxlength="100"></textarea>
-            <div class="button-div">
-                <button type="submit">Comment</button>
-            </div>
-        </form>
-    {{/if}}
-{{/if}}
-
-{{#if postObj.owner}}
- <div class="button-div">
-    <button type="button" class="delete-post-button center">Delete Post</button>
+    <button type="button" class="remove-comment">Remove Your Comment</button>
+    <div class="error-comment"></div>&nbsp;
+    <textarea class="comment-body" rows="4" cols="30" maxlength="100"></textarea>
+    <br>
+    <button type="button" class="comment-button">Comment</button>
 </div>
 
-{{/if}}
-
- <script src="https://code.jquery.com/jquery-3.5.1.js"
+<script src="https://code.jquery.com/jquery-3.5.1.js"
 		integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
-<script src="/public/js/post.js" ></script>
-
+<script src="/public/js/feed.js" ></script>

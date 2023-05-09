@@ -4,7 +4,7 @@ const router = Router();
 import help from "../helpers.js";
 import multer from 'multer';
 import {photos} from "../config/mongoCollections.js";
-import { createPost, getPost } from '../data/posts.js';
+import { createPost, getPost, updatePost } from '../data/posts.js';
 import { ObjectId } from 'mongodb';
 import {uploadPhoto, upload, getPhotoSrc } from '../data/photos.js';
 
@@ -38,7 +38,7 @@ router
             return res.status(500).render('error', {title: 'Error',message: "Internal Server Error"})
         }
     })
-    .post(upload.array('postImgs[]', 5), async (req, res, err) => {
+    .post(upload.any(), async (req, res, err) => {
 
         //console.log(req.file);
         let fun = "createPostRoute";
@@ -56,7 +56,7 @@ router
         let posted;
 
         if(err instanceof multer.MulterError) {
-            res.status(400).render('error', {error: err});
+            return res.status(400).render('error', {error: err});
         }
 
         try {
@@ -68,7 +68,7 @@ router
                 help.err(fun, "userId is not valid")
             }
         }catch (e) {
-            badData.userId = e;
+            return res.status(500).render('error', {title: 'error', message:e})
         }
         try {
             if(!postTitle) {
@@ -83,7 +83,7 @@ router
                 throw `title can be max 40 characters`
             }
         }catch(e) {
-            badData.postTitle = e;
+            return res.status(400).render('error', {title: 'error', message:e})
         }
         try {
             if(!postDescription) {
@@ -98,7 +98,7 @@ router
                 throw "postDescription cannot be over 500 characters"
             }
         } catch(e) {
-            badData.postDescription = e;
+            return  res.status(400).render('error', {title: 'error', message:e})
         }
         try {
             if(!workoutType) {
@@ -111,7 +111,7 @@ router
                 throw "invalid workout type";
             }
         }catch(e) {
-            badData.workoutType = e;
+            return res.status(400).render('error', {title: 'error', message:e})
         }
 
         /*will need to change this to probably take in groupNames instead of Ids because
@@ -135,25 +135,31 @@ router
                 postToGroup = [];
             }
         }catch(e) {
-            badData.postToGroup = e;
+            res.status(400).render('error', {title: 'error', message:e})
         }
 
         try {
-            if (!req.files) {
-                //do nothing because images arent required
-            }
-            else {
+            if (req.files.length != 0) {
                 //upload image
+                postImgs = []
+                if (req.files.length > 3) {
+                    throw `error cannot upload more than 3 files`
+                }
                 for (let x of req.files) {
+                    if (x.mimetype != "image/jpg" && x.mimetype != "image/png" && x.mimetype != "image/jpeg") {
+                        throw `can only upload .jpg, .jpeg, or .png files`
+                    }
+                    if (x.size > 10 * 1024 * 1024) {
+                        throw `image cannot be over 10mb`
+                    }
                     let xId = await uploadPhoto(x)
                     //console.log(xId)
                     postImgs.push(xId);
                 }
                 //console.log(postImgs);
-            }   
+            }      
         }catch(e) {
-            badData.postImgs = e;
-            console.log(e);
+            return  res.status(400).render('error', {title: 'error', message:e})
         }
 
         let postObj = {
@@ -165,18 +171,18 @@ router
             postToGroup: postToGroup
         }
         try {
-            console.log(postObj.userId)
+            /*console.log(postObj.userId)
             console.log("is userId valid " + ObjectId.isValid(postObj.userId))
-            console.log(postObj)
+            console.log(postObj)*/
             posted = await createPost(userId, postTitle, workoutType, postDescription, postImgs, postToGroup);
             if (!posted) {
                 throw `Error: could not post workout`
             }
-            console.log(posted)
+            //console.log(posted)
             let postId = posted._id
-            res.redirect(`/posts/${postId}`)
+            return res.redirect(`/posts/${postId}`)
         }catch(e) {
-            console.log(e);
+            return res.status(500).render('error', {title:e, message:e})
         }
         
     });
@@ -188,8 +194,9 @@ router
         let postId = req.params.postId;
         let thisPost;
         let postImgs = [];
-        let logged_in=true;
-        let user_id;
+        let liked = false;
+        let commented = false;
+        let isOwner = false;
         try {
             if (typeof postId !== "string") {
                 throw `postId must be a string`
@@ -206,7 +213,7 @@ router
             return res.status(400).send(e);
         }
         try {
-            thisPost = await getPost(postId);
+            thisPost = await getPost(postId); 
         }catch(e) {
             console.log(e);
             return res.status(404).render("not_found", {title: "Post not found"})
@@ -248,7 +255,207 @@ router
             console.log(e);
             return res.status(404).render("not_found", {title: "Post not found"})
         }
+
+        try {
+            for(let x of thisPost.postLikes) {
+                if (x.toString() == req.session.user.user_id) {
+                    liked = true;
+                }
+            }   
+            for(let x of thisPost.comments) {
+                if (x.userId.toString() == req.session.user.user_id) {
+                    commented = true;
+                }
+            }
+            if (thisPost.userId == req.session.user.user_id) {
+                isOwner = true;
+            }
+        }catch(e) {
+            return res.status(500).render('error', {title: 'error', message: e})
+        }
+        return res.render("post", {title: thisPost.postTitle, postTitle: thisPost.postTitle, images: postImgs, postDescription: thisPost.postDescription, workoutType: thisPost.workoutType, logged_in: true, comments: thisPost.comments, postLikes: thisPost.postLikes, userId: thisPost.userId.toString(), username: thisPost.username, liked: liked, commented: commented, userId: req.session.user.user_id, postId: postId, isOwner: isOwner});
+    })
+router
+    .route("/:postId/edit")
+    .get(async (req, res) => {
+        let thisPost;
+        let postImgs = []
+        let postId = req.params.postId;
+        try {
+            if (typeof postId !== "string") {
+                throw `postId must be a string`
+            }
+            postId = postId.trim();
+            if (postId == "") {
+                throw `postId cannot be empty`
+            }
+            if (!ObjectId.isValid(new ObjectId(postId))) {
+                throw `invalid postId`
+            }
+            thisPost = await getPost(postId);
+        }catch(e) {
+            console.log(e);
+            return res.status(400).send(e);
+        }
+        try {
+            if (thisPost.userId.toString() !== req.session.user.user_id) {
+                throw `you are not authorized to do this`
+            }
+        }catch(e) {
+            return res.status(401).render('error', {title: 'error', message: e});
+        }
+        try {
+            for (let x of thisPost.postImgs) {
+                const photoColl = await photos();
+                let img = await photoColl.findOne({_id: x})
+                if (!img) {
+                    throw `could not find image with id ${x}`
+                }
+                postImgs.push({id: x, imageName: img.imageName});
+            }
+            return res.render('editPost', {title: 'edit post', postTitle: thisPost.postTitle, description: thisPost.postDescription, postImgs: postImgs, postId: postId})
+        }catch(e) {
+            return res.status(500).render('error', {title: 'error', message: e})
+        }
         
-        return res.render("post", {title: thisPost.postTitle, postTitle: thisPost.postTitle, images: postImgs, postDescription: thisPost.postDescription, workoutType: thisPost.workoutType, logged_in: logged_in, postObj: thisPost, user_id});
+    })
+    .post(upload.any(), async (req, res) => {
+        let fun = "createPostRoute";
+        var workoutTypes = ["running", "lifting", "cycling", "other"];
+        const postData = req.body;
+        let userId = req.session.user.user_id;
+        let workoutType = postData.workoutType;
+        let postDescription = postData.postDescription;
+        let postTitle = postData.postTitle;
+        let badData = {};
+        let originalPost;
+        //let removeImgs = postData.removeImg;
+        //console.log(removeImgs);
+        let postImgs;
+        let postToGroup = [];
+        let postId = postData.postId;
+
+        try {
+            if(!req.params.postId) {
+                throw `must provide postId`
+            }
+            originalPost = await getPost(req.params.postId);
+            if (!originalPost) {
+                throw `Could not retreive original post`
+            }
+            postImgs = originalPost.postImgs;
+        }catch(e) {
+            return res.status(400).render('error', {title: 'error', message: e})
+        }
+        try {
+            if(originalPost.userId.toString() !== req.session.user.user_id) {
+                throw `You cannot do this`
+            }
+        }catch(e) {
+            return res.status(401).render('error', {title:'error', message:e})
+        }
+        try {
+            //none of these should ever really error because its just pulled from the cookie
+            if(!userId) {
+                help.err(fun, "could not get user id");
+            }
+            else if(!ObjectId.isValid(userId)){
+                help.err(fun, "userId is not valid")
+            }
+        }catch (e) {
+            return res.status(400).render('error', {title:'error', message:e})
+        }
+        try {
+            if(!postTitle) {
+                throw "must provide a title";
+            }
+            else if (!help.isStr(postTitle)){
+                throw "title must be a non-empty string";
+            }
+            let titlelines = postTitle.split('\n')
+            let len = postTitle.length - (titlelines.length - 1);
+            if (len > 40) {
+                throw `title can be max 40 characters`
+            }
+        }catch(e) {
+            return res.status(400).render('error', {title:'error', message:e})
+        }
+        try {
+            if(!postDescription) {
+                throw "must provide a description";
+            }
+            else if (!help.isStr(postDescription)) {
+                throw "description must be a non-empty string";
+            }
+            let desclines = postDescription.split('\n')
+            let len = postDescription.length - (desclines.length - 1);
+            if (len > 500) {
+                throw "postDescription cannot be over 500 characters"
+            }
+        } catch(e) {
+            return res.status(400).render('error', {title:'error', message:e})
+        }
+        try {
+            if(!workoutType) {
+                throw "must provide a workout type";
+            }
+            else if (!help.isStr(workoutType)) {
+                throw "workout type must be a non-empty string";
+            }
+            else if (!workoutTypes.includes(workoutType.trim().toLowerCase())) {
+                throw "invalid workout type";
+            }
+        }catch(e) {
+            return res.status(400).render('error', {title:'error', message:e})
+        }
+
+        /* wanted to be able to select images for removal but multer was being weird about it :(
+        try {
+            if(Array.isArray(removeImgs)) {
+                for (let x of removeImgs) {
+                    let i = postImgs.indexOf(new ObjectId(x));
+                    postImgs.splice(i, 1)
+                }
+                console.log(postImgs);
+            }
+        }catch(e) {
+            return res.status(500).render('error', {title: 'error', message: e})
+        }*/
+        try {
+            //console.log(req.files)
+            if (req.files.length != 0) {
+                //upload image
+                postImgs = []
+                if (req.files.length > 3) {
+                    throw `error cannot upload more than 3 files`
+                }
+                for (let x of req.files) {
+                    if (x.mimetype != "image/jpg" && x.mimetype != "image/png" && x.mimetype != "image/jpeg") {
+                        throw `can only upload .jpg, .jpeg, or .png files`
+                    }
+                    if (x.size > 10 * 1024 * 1024) {
+                        throw `image cannot be over 10mb`
+                    }
+                    let xId = await uploadPhoto(x)
+                    //console.log(xId)
+                    postImgs.push(xId);
+                }
+                //console.log(postImgs);
+            }   
+        }catch(e) {
+            return res.status(400).render('error', {title:'error', message:e})
+        }
+
+        try {
+            let updated = await updatePost(postId, postTitle, workoutType, postDescription, postImgs, originalPost.postLikes, originalPost.comments, postToGroup);
+            if (!updated) {
+                throw `Error: could not update workout`
+            }
+            return res.redirect(`/posts/${postId}`)
+        }catch(e) {
+            return res.status(500).render('error', {title:'error', message:e})
+        }
+       
     });
+
 export default router

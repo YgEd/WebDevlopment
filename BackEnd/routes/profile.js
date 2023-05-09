@@ -47,7 +47,7 @@ router
       return res.status(500).render('error', )
     }
   
-    let workoutRec = await recData.getRandomRec()
+    workoutRec = await recData.getRandomRec()
    // console.log(req.session.user.profileimg)
     //get the posts collection 
     try{

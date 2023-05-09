@@ -6,6 +6,7 @@ import {photos} from "../config/mongoCollections.js";
 import { ObjectId } from 'mongodb';
 import {uploadPhoto, upload, getPhotoSrc } from '../data/photos.js';
 import recData from "../data/recommendations.js"
+import xss from 'xss'
 router
   .route('/')
   .get(async (req, res) => {
@@ -16,7 +17,16 @@ router
     else return res.render("recommendations", {title: "Adding Recommendations", recs: recs, logged_in: true});
     
 })
-
+router.route('/search').post(async(req,res) =>{
+    let keyword = xss(req.body.keyword)
+    try{
+    keyword = validation.checkString(keyword, "search keyword")
+    let results = await recData.searchRecommendationsByKeyword(keyword)
+    return res.render("recommendations", {title: "Search result", recs: results})
+    } catch (e){
+        return res.status(400).render("recommendations",{title: "Search error", error: e})
+    }
+})
 router
   .route('/add')
   .get( async(req, res) =>{

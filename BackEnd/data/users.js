@@ -245,7 +245,7 @@ export const updateUser = async (
 ) => {
   //function name to use for error throwing
   let fun = "updateUser";
-
+  console.log(email)
   //test if string inputs are valid non-empty strings
   if (
     /*!help.isStr(username) ||

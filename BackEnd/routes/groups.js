@@ -525,13 +525,13 @@ router.post("/remove_member", async (req, res) => {
 
     //ensure data is valid
     if (!req.body.groupId || !req.body.userName){
-        console.log("invalid data");
+        console.log("from group route invalid data");
         return res.redirect("/groups")
     }
 
     //ensure valid inputs
-    if (!ObjectId.isValid(req.body.groupId) || help.strPrep(req.body.userName.length) == 0){
-        console.log("invalid data");
+    if (!ObjectId.isValid(req.body.groupId) || help.strPrep(req.body.userName) == 0){
+        console.log("objectId invalid data");
         return res.redirect("/groups")
     }
 

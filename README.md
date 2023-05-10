@@ -1,5 +1,4 @@
 # CS546Project 
-fitness app work in progress
+fitness app (Facebook clone at home)
 
-note: DOB check need fix
-forgot password
+```npm seed.js``` => ```npm start```

@@ -273,9 +273,9 @@ router.post("/comment", async (req, res) => {
   
   let userName = req.session.user.userName;
   let userId = req.session.user.user_id;
-  let postId = xss(req.body.postId)
-  let msg = xss(req.body.msg)
-  let url = xss(req.body.url)
+  let postId = req.body.postId
+  let msg = req.body.msg
+  let url = req.body.url
 
   if (typeof msg !== "string" || msg.trim().length === 0 || msg.trim().length > 100) {
     console.log("invalid comment")
@@ -289,6 +289,10 @@ router.post("/comment", async (req, res) => {
 
 
   try {
+    xss(postId)
+    xss(userId)
+    xss(msg)
+    xss(url)
     await commentFuns.createComment(postId, userId, userName, msg);
   } catch (error) {
     console.log("Error from post feed route: " + error);
@@ -314,11 +318,13 @@ router.post("/comment", async (req, res) => {
 });
 
 router.post("/remove", async (req, res) => {
-  let postId = xss(req.body.postId);
+  let postId = req.body.postId;
   let userId = req.session.user.user_id;
-  let url = xss(req.body.url);
+  let url = req.body.url;
 
   try {
+    xss(postId)
+    xss(url)
     await commentFuns.deleteComment(postId, userId);
   } catch (error) {
     console.log("remove comment failed");
@@ -341,12 +347,14 @@ router.post("/remove", async (req, res) => {
 });
 
 router.post("/like", async (req, res) => {
-  let postId = xss(req.body.postId);
+  let postId = req.body.postId;
   let userId = req.session.user.user_id;
-  let url = xss(req.body.url);
+  let url = req.body.url;
   console.log("current user = " + req.session.user.userName + " is liking post " + postId + "")
 
   try {
+    xss(postId)
+    xss(url)
     let target_post = await postFuns.getPost(postId);
 
     //check if the user already liked the post
@@ -373,12 +381,15 @@ router.post("/like", async (req, res) => {
 });
 
 router.post("/unlike", async (req, res) => {
-  let postId = xss(req.body.postId);
-  let userId = xss(req.session.user.user_id);
-  let url = xss(req.body.url);
+  let postId = req.body.postId;
+  let userId = req.session.user.user_id;
+  let url = req.body.url;
   console.log("current user = " + req.session.user.userName + " is unliking post " + postId + "")
 
   try {
+    xss(postId)
+    xss(userId)
+    xss(url)
     let target_post = await postFuns.getPost(postId);
 
     let newLikes = [];
@@ -406,10 +417,12 @@ router.post("/unlike", async (req, res) => {
 });
 
 router.post("/delete-post", async (req, res) => {
-  let postId = xss(req.body.postId);
-  let url = xss(req.body.url);
+  let postId = req.body.postId;
+  let url = req.body.url;
 
   try {
+    xss(postId)
+    xss(url)
 
     //ensure the user is the owner of the post
     let target_post = await postFuns.getPost(postId);

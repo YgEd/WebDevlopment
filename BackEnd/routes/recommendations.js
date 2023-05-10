@@ -18,8 +18,10 @@ router
     
 })
 router.route('/search').post(async(req,res) =>{
-    let keyword = xss(req.body.keyword)
+    
+    let keyword = req.body.keyword
     try{
+    xss(keyword)
     keyword = validation.checkString(keyword, "search keyword")
     let results = await recData.searchRecommendationsByKeyword(keyword)
     if (results.length == 0) throw "No results"
@@ -34,14 +36,22 @@ router
     return res.render("coach", {title: "Adding Recommendations", logged_in: true});
 })
 .post(async (req,res) =>{
-    let workoutName = xss(req.body.workoutName)
-    let equipment = xss(req.body.equipment)
-    let duration = xss(req.body.duration)
-    let level = xss(req.body.level)
-    let reps = xss(req.body.reps)
-    let rounds = xss(req.body.rounds)
-    let tags = xss(req.body.tags)
+    let workoutName = req.body.workoutName
+    let equipment = req.body.equipment
+    let duration = req.body.duration
+    let level = req.body.level
+    let reps = req.body.reps
+    let rounds = req.body.rounds
+    let tags = req.body.tags
         try{
+
+            xss(workoutName)
+            xss(equipment)
+            xss(duration)
+            xss(level)
+            xss(reps)
+            xss(rounds)
+            xss(tags)
         workoutName = validation.checkString(workoutName, "Workout name").toUpperCase();
         equipment = validation.checkString(equipment, "Name of equipment");
         validation.isNum(duration)

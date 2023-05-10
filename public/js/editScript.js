@@ -9,6 +9,7 @@ let goalErr = document.getElementById("goalErr")
 function removeGoal() {
     goalDiv.removeChild(goalDiv.lastChild)
     goalDiv.removeChild(goalDiv.lastChild)
+    goalDiv.removeChild(goalDiv.lastChild)
 }
 
 function addGoal() {
@@ -16,7 +17,12 @@ function addGoal() {
     newInput.type ="text"
     newInput.name = "goals[]"
     newInput.maxlength="50"
+    newInput.id = `${goals.length}`
     let newBr = document.createElement("br");
+    let newLab = document.createElement("label");
+    newLab.htmlFor = `${goals.length}`
+    newLab.innerHTML = `Goal ${goals.length}:`
+    goalDiv.appendChild(newLab)
     goalDiv.appendChild(newInput);
     goalDiv.appendChild(newBr);
 }

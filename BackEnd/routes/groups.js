@@ -81,33 +81,34 @@ router.post("/", async (req, res) => {
     
 
     //ensure data is valid
-    if (!xss(req.body.groupName) || help.strPrep(xss(req.body.groupName)).length == 0){
+    if (!req.body.groupName || help.strPrep(req.body.groupName).length == 0){
         console.log("invalid data");
         return res.send({response: false, message: "invalid data"})
     }
 
     
      try {
+        xss(req.body.groupName)
          //trim data
-        req.body.groupName = help.strPrep(xss(req.body.groupName)).substring(0, 30);
+        req.body.groupName = help.strPrep(req.body.groupName).substring(0, 30);
         xss(req.body.grouName);
         //create group
-        var newGroup = await groupFuns.createGroup(xss(req.body.groupName), req.session.user.user_id);
+        var newGroup = await groupFuns.createGroup(req.body.groupName, req.session.user.user_id);
      } catch (error) {
         console.log(error);
         return res.send({response: false, message: error})
      }
      
 
-    if (help.strPrep(xss(req.body.description)).length == 0){
+    if (help.strPrep(req.body.description).length == 0){
         return res.send({response: true})
     }
 
     //add description if provided
     try {
-        req.body.description = help.strPrep(xss(req.body.description)).substring(0, 100);
-        xss(req.body.description);
-        await groupFuns.addGroupDescription(newGroup._id, xss(req.body.description),req.session.user.user_id );
+        xss(req.body.description)
+        req.body.description = help.strPrep(req.body.description).substring(0, 100);
+        await groupFuns.addGroupDescription(newGroup._id, req.body.description,req.session.user.user_id );
         return res.send({response: true})
     } catch (error) {
         console.log(error);
@@ -279,14 +280,25 @@ router.post("/:groupId/add", async (req, res) => {
         }catch(e) {
           return res.status(400).render("error", {message: e});
         }
-        let workoutName = xss(req.body.workoutName);
-        let equipment = xss(req.body.equipment);
-        let duration = xss(req.body.duration);
-        let level = xss(req.body.level);
-        let reps = xss(req.body.reps);
-        let rounds = xss(req.body.rounds);
-        let tags = xss(req.body.tags);
+        
             try{
+
+            var workoutName = req.body.workoutName;
+            var equipment = req.body.equipment;
+            var duration = req.body.duration;
+            var level = req.body.level;
+            var reps = req.body.reps;
+            var rounds = req.body.rounds;
+            var tags = req.body.tags;
+
+            xss(workoutName)
+            xss(equipment)
+            xss(duration)
+            xss(level)
+            xss(reps)
+            xss(rounds)
+            xss(tags)
+
             workoutName = help.checkString(workoutName, "Workout name").toUpperCase();
             equipment = help.checkString(equipment, "Name of equipment");
             help.isNum(duration)
@@ -325,23 +337,26 @@ router.post("/edit/:id", async (req, res) => {
     }
 
     let data = req.body;
-    console.log("from post edit group")
-    console.log(xss(req.body.group))
     let user = req.session.user;
 
     //ensure data is valid
-    if (help.strPrep(xss(req.body.groupName)).length == 0 || help.strPrep(xss(req.body.description)) == 0){
+    if (help.strPrep(req.body.groupName).length == 0 || help.strPrep(req.body.description) == 0){
         console.log("invalid data");
         return res.redirect("/groups")
     }
 
-    //trim data
-    xss(req.body.groupName) = help.strPrep(xss(req.body.groupName)).substring(0, 30);
-    xss(req.body.description) = help.strPrep(xss(req.body.description)).substring(0, 100);
+    
 
     //get group
     try {
-        var group = await groupFuns.getGroup(xss(req.body.groupId));
+
+        //trim data
+        req.body.groupName=  help.strPrep(req.body.groupName).substring(0, 30);
+        req.body.description = help.strPrep(req.body.description).substring(0, 100);
+
+        xss(req.body.groupName)
+        xss(req.body.description)
+        var group = await groupFuns.getGroup(req.body.groupId);
 
         //ensure group exists
         if (!group){
@@ -356,7 +371,7 @@ router.post("/edit/:id", async (req, res) => {
         }
 
         //update group
-        await groupFuns.updateGroup(xss(req.body.groupId), xss(req.body.groupName), user.user_id, group.groupMembers, group.groupPosts, xss(req.body.description));
+        await groupFuns.updateGroup(req.body.groupId, req.body.groupName, user.user_id, group.groupMembers, group.groupPosts, req.body.description);
 
         return res.redirect("/groups")
     } catch (error) {
@@ -456,14 +471,15 @@ router.post("/delete_group", async (req, res) => {
     let user = req.session.user;
 
     //ensure data is valid
-    if (help.strPrep(xss(req.body.groupId)).length == 0){
+    if (help.strPrep(req.body.groupId).length == 0){
         console.log("invalid data");
         return res.send({response: false})
     }
 
     //get group
     try {
-        var group = await groupFuns.getGroup(xss(req.body.groupId));
+        xss(req.body.groupId)
+        var group = await groupFuns.getGroup(req.body.groupId);
 
         //ensure group exists
         if (!group){
@@ -478,7 +494,7 @@ router.post("/delete_group", async (req, res) => {
         }
 
         //delete group
-        await groupFuns.deleteGroup(xss(req.body.groupId), user.user_id);
+        await groupFuns.deleteGroup(req.body.groupId, user.user_id);
 
         return res.send({response: true})
     } catch (error) {
@@ -508,20 +524,22 @@ router.post("/remove_member", async (req, res) => {
     console.log(data)
 
     //ensure data is valid
-    if (!xss(req.body.groupId) || !xss(req.body.userName)){
+    if (!req.body.groupId || !req.body.userName){
         console.log("invalid data");
         return res.redirect("/groups")
     }
 
     //ensure valid inputs
-    if (!ObjectId.isValid(xss(req.body.groupId)) || help.strPrep(xss(req.body.userName).length) == 0){
+    if (!ObjectId.isValid(req.body.groupId) || help.strPrep(req.body.userName.length) == 0){
         console.log("invalid data");
         return res.redirect("/groups")
     }
 
     try {
+        xss(req.body.groupId)
+        xss(req.body.userName)
         //get user
-        var user = await userFuns.getUserByUsername(xss(req.body.userName));
+        var user = await userFuns.getUserByUsername(req.body.userName);
 
         //ensure user exists
         if (!user){
@@ -531,7 +549,7 @@ router.post("/remove_member", async (req, res) => {
 
         //get group
         
-        var group = await groupFuns.getGroup(xss(req.body.groupId));
+        var group = await groupFuns.getGroup(req.body.groupId);
 
         //ensure group exists
         if (!group){
@@ -552,7 +570,7 @@ router.post("/remove_member", async (req, res) => {
         }
 
         //remove user from group
-        await groupFuns.memberRemove(xss(req.body.groupId), user._id);
+        await groupFuns.memberRemove(req.body.groupId, user._id);
 
         return res.send({response: true})
     } catch (error) {

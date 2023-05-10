@@ -160,13 +160,18 @@ router
         let fun = "editProfile"
         const updates = req.body;
         let userId = req.session.user.user_id;
-        let aboutme = xss(req.body.aboutme);
-        let goals = req.body.goals.map(element => xss(element));
+        let aboutme = req.body.aboutme;
+        let goals = req.body.goals;
         let badData = {};
         let profileimg;
         let userInfo;
 
         try {
+          xss(aboutme)
+          //xss through all goals
+          for(let i = 0; i < goals.length; i++) {
+            xss(goals[i])
+          }
           //none of these should ever really error because its just pulled from the cookie
           if(!userId) {
               help.err(fun, "could not get user id");

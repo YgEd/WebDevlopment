@@ -112,7 +112,7 @@ export const createUser = async (
   }
 
   const Id = insertInfo.insertedId.toString()
-  let userId = await userCollection.findOne({_id: new ObjectId(Id)})
+  let userId = await userCollection.findOne({_id: new ObjectId(Id)}, { projection: { userPassword: 0 } })
   //return this object if success
   // return {insertedUser: true}
   return userId

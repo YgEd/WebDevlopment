@@ -28,36 +28,67 @@ import recData from './BackEnd/data/recommendations.js'
 import {createUser,checkUser, getUser, updateUser} from './BackEnd/data/users.js';
 import {createPost} from './BackEnd/data/posts.js'
 import { uploadPhoto } from './BackEnd/data/photos.js';
+import { createGroup, memberAdd, addRecommendationToGroup } from './BackEnd/data/groups.js';
 //create a bunch of usrrs
 let first_user = ""
 let second_user = ""
 let third_user = ""
 let fourth_user = ""
+let firstgroup
+let secondgroup 
+let thirdgroup
 try{
      first_user = await createUser("Michael123", "Michael", "Smith", "smith@gmail.com", "Sunnu@3030", "1990-5-30")
+
 }catch(e){
     console.log(e)
 }
 
+try{
+    firstgroup =await createGroup("go eat", first_user._id)
+}catch(e){
+    console.log(e)
+}
 try{
      second_user = await createUser("Sarah12", "sarah", "parker", "parker12@gmail.com", "Crazy@123", "1995-5-30")
 }catch(e){
     console.log(e)
 }
-
+try{
+    secondgroup =await createGroup("go eat 2", first_user._id)
+}catch(e){
+    console.log(e)
+}
+try{
+    thirdgroup =await createGroup("run run", second_user._id)
+}catch(e){
+    console.log(e)
+}
 try{
      third_user = await createUser("Fuslie12", "leslie", "chen", "chen123@gmail.com", "Crazy@123", "1992-10-11")
 }catch(e){
     console.log(e)
 }
-
+try{
+    await createGroup("run run run", third_user._id)
+}catch(e){
+    console.log(e)
+}
 try{
      fourth_user = await createUser("Jennierubyjane", "jenny", "kim", "kim96@gmail.com", "Crazy@123", "1996-10-11")
 }catch(e){
     console.log(e)
 }
-
-
+try{
+    await memberAdd(firstgroup._id,second_user._id)
+}catch(e){
+    console.log(e)
+}
+try{
+    await memberAdd(firstgroup._id,third_user._id)
+}catch(e){
+    console.log(e)
+}
 
 
 let update_first_user = ""
@@ -396,11 +427,32 @@ try{
 }catch(e){
    console.log(e)
 }
-
-
-
-
-
+try{
+    await addRecommendationToGroup(firstgroup._id,"Curl", "Dumbells", "20", 'intermediate', '15', '4', 'Others')
+}catch(e){
+    console.log(e)
+ }
+ try{
+    await addRecommendationToGroup(firstgroup._id,"Dip",
+    "Hang",
+    "15",
+    'advanced',
+    '12',
+    '4',
+    'Back')
+}catch(e){
+    console.log(e)
+ }
+ try{
+    await addRecommendationToGroup(secondgroup._id,"CurlCurl", "Dumbells", "20", 'intermediate', '15', '4', 'Others')
+}catch(e){
+    console.log(e)
+ }
+ try{
+    await addRecommendationToGroup(thirdgroup._id,"CurlTriceps", "Dumbells", "20", 'intermediate', '15', '4', 'Others')
+}catch(e){
+    console.log(e)
+ }
 
 
 await closeConnection();

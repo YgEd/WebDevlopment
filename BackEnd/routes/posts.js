@@ -172,6 +172,7 @@ router
                     throw `error cannot upload more than 3 files`
                 }
                 for (let x of req.files) {
+                    console.log("x is" , x)
                     if (x.mimetype != "image/jpg" && x.mimetype != "image/png" && x.mimetype != "image/jpeg") {
                         throw `can only upload .jpg, .jpeg, or .png files`
                     }

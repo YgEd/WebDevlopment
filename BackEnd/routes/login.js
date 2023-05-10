@@ -39,13 +39,13 @@ router
     if  (!dob) missing.push("enter date of birth")
     if (missing.length >0) return res.status(400).render("register",{title: "Register Form", error: `Missing: ${missing.join(', ')}`})
     try{
-      xss(username)
-      xss(firstNameInput)
-      xss(lastNameInput)
-      xss(emailAddressInput)
-      xss(passwordInput)
-      xss(confirmPasswordInput)
-      xss(dob)
+      username = xss(username)
+      firstNameInput = xss(firstNameInput)
+      lastNameInput = xss(lastNameInput)
+      emailAddressInput = xss(emailAddressInput)
+      passwordInput = xss(passwordInput)
+      confirmPasswordInput = xss(confirmPasswordInput)
+      dob = xss(dob)
       username = validation.checkUsername(username, "UserName");
       firstNameInput = validation.checkName(firstNameInput,"First Name");
       lastNameInput = validation.checkName(lastNameInput,"Last Name");
@@ -82,8 +82,8 @@ router
     let emailAddressInput = req.body.emailAddressInput
     let passwordInput = req.body.passwordInput
     try{
-      xss(emailAddressInput)
-      xss(passwordInput)
+      emailAddressInput = xss(emailAddressInput)
+      passwordInput = xss(passwordInput)
       emailAddressInput = validation.checkEmail(emailAddressInput,"Email Address");
       passwordInput = validation.checkPassword(passwordInput, "Password");
     } catch (e){

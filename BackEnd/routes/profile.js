@@ -167,10 +167,10 @@ router
         let userInfo;
 
         try {
-          xss(aboutme)
+          aboutme = xss(aboutme)
           //xss through all goals
           for(let i = 0; i < goals.length; i++) {
-            xss(goals[i])
+            goals[i] = xss(goals[i])
           }
           //none of these should ever really error because its just pulled from the cookie
           if(!userId) {

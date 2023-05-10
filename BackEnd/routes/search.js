@@ -40,8 +40,8 @@ router.post("/", async (req, res) => {
     let userobj = await userFuns.getUser(req.session.user.user_id);
     if (data.searchType == "user"){
         try {
-            xss(data.searchInput)
-            xss(data.searchType)
+            data.searchInput = xss(data.searchInput)
+            data.searchType = xss(data.searchType)
             let userList = await userFuns.searchUserByKeyword(data.searchInput);
             userList = userList.filter(user => user._id.toString() != userobj._id);
             // If the user is authenticated
@@ -91,9 +91,9 @@ router.post("/follow", async (req, res) => {
     }
 
     try {
-        xss(req.body.username)
-        xss(req.body.url)
-        xss(req.body.username)
+        req.body.username = xss(req.body.username)
+        req.body.url = xss(req.body.url)
+        req.body.username = xss(req.body.username)
         
         //get target user by username
         let target_user = await userFuns.getUserByUsername(req.body.username)
@@ -152,9 +152,9 @@ router.post("/unfollow", async (req, res) => {
     }
 
     try {
-            xss(req.body.username)
-            xss(req.body.url)
-            xss(req.body.username)
+            req.body.username = xss(req.body.username)
+            req.body.url = xss(req.body.url)
+            req.body.username = xss(req.body.username)
             //get target user by username
             let target_user = await userFuns.getUserByUsername(req.body.username)
            
@@ -206,7 +206,7 @@ router.post("/join", async (req, res) => {
     }
 
     try {
-            xss(req.body.groupname)
+        req.body.groupname = xss(req.body.groupname)
 
             let groupList = await groupFuns.getAllGroups(100)
             //get target group by groupname
@@ -247,7 +247,7 @@ router.post("/leave", async (req, res) => {
     }
 
     try {
-            xss(req.body.groupname)
+            req.body.groupname = xss(req.body.groupname)
             //get target group by groupname
             let target_group = await groupFuns.getGroupByName(req.body.groupname)
     

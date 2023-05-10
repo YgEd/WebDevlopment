@@ -45,6 +45,13 @@
     background-color: blue;
 }
 
+.group-filters{
+    font-family:  arial, sans-serif;
+    padding-left: 50px;
+    padding-top: 30px;
+
+}
+
 .post-title{
     font-family:  arial, sans-serif;
     font-size: 20px;

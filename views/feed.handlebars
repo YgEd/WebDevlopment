@@ -3,6 +3,22 @@
 <div class="feed-wrapper">
     <div class="side-bar">
         <h1 id="welcome-msg">Hey {{firstName}}, welcome!</h1>
+
+        <div class="group-filters">
+            {{#unless groupFeed}}
+                <h2>Group Feeds</h2>
+                {{#each groups}}
+
+                    <a href="/feed/{{this._id}}">{{this.groupName}}</a>
+                    <br>
+                {{/each}}
+            
+            {{else}}
+                <br>
+                <h2>Default Feed</h2>
+                <a href="/feed">Normal Feed</a>
+            {{/unless}}
+        </div>
     </div>  
     
     
@@ -58,7 +74,7 @@
                 {{!-- {{#if no-comment}} --}}
                     <button type="button" class="remove-comment">Remove Your Comment</button>
                     <div class="error-comment"></div>&nbsp;
-                     <label for="comment-body-{{@index}}">Comment</label>
+                     <label for="comment-body-{{@index}}" class= "comment-label">Comment</label>
                      <textarea id="comment-body-{{@index}}" class="comment-body" rows="4" cols="30" maxlength="100"></textarea>
                     <br>
                     <button type="button" class="comment-button">Comment</button>

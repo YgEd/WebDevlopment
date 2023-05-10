@@ -101,7 +101,7 @@ router
             console.log(e);
             return res.status(404).send("could not find reccomendation");
         }
-        
+        if (req.session.user) return res.render("rec", {title: thisRec.workoutName, workout: thisRec, logged_in: true})
         return res.render("rec", {title: thisRec.workoutName, workout: thisRec});
     });
 export default router

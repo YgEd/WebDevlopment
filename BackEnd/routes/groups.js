@@ -86,9 +86,11 @@ router.post("/", async (req, res) => {
         return res.send({response: false, message: "invalid data"})
     }
 
-     //trim data
-     xss(req.body.groupName) = help.strPrep(xss(req.body.groupName)).substring(0, 30);
+    
      try {
+         //trim data
+        req.body.groupName = help.strPrep(xss(req.body.groupName)).substring(0, 30);
+        xss(req.body.grouName);
         //create group
         var newGroup = await groupFuns.createGroup(xss(req.body.groupName), req.session.user.user_id);
      } catch (error) {
@@ -101,9 +103,10 @@ router.post("/", async (req, res) => {
         return res.send({response: true})
     }
 
-    xss(req.body.description) = help.strPrep(xss(req.body.description)).substring(0, 100);
     //add description if provided
     try {
+        req.body.description = help.strPrep(xss(req.body.description)).substring(0, 100);
+        xss(req.body.description);
         await groupFuns.addGroupDescription(newGroup._id, xss(req.body.description),req.session.user.user_id );
         return res.send({response: true})
     } catch (error) {

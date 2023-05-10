@@ -18,6 +18,21 @@
                 <h2>Default Feed</h2>
                 <a href="/feed">Normal Feed</a>
             {{/unless}}
+
+            {{#if topGroups}}
+            <br>
+            <br>
+            {{#when topGroups.length 'eq' 1}}
+                <h2>Top Group</h2>
+            {{/when}}
+
+            {{#when topGroups.length 'noteq' 1}}
+                <h2>Top {{../topGroups.length}} Groups</h2>
+            {{/when}}
+                {{#each topGroups}}
+                   <p> {{this.groupName}}</p>
+                {{/each}}
+            {{/if}}
         </div>
     </div>  
     

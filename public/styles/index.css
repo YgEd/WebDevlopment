@@ -26,6 +26,10 @@
     padding: 0 4rem;
 }
 
+.post-button{
+    font-size: 30px
+}
+
 .navbar h1{
     text-decoration: none;
     color: #fff;
@@ -44,6 +48,7 @@
     padding:10px;
     background-color: blue;
 }
+
 
 .group-filters{
     font-family:  arial, sans-serif;

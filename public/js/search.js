@@ -43,7 +43,7 @@ $( document ).ready(function() {
                     $("#search_result").append("<p class='search-res center search-res-title'>Result</p>")
                     if (response.type == "user"){
                         list.map((element) => {
-                            {$("#search_result").append(`<a class='center search-res search-name block' href="/profile/${element._id}"` + "<p>" + element.username + "</p></a>");
+                            {$("#search_result").append(`<a class='center search-res search-name block' href="/profile/${element._id}">Go to profile</a>` + "<p class='center'>" + element.username + "</p>");
                             if (response.auth){
                                 //add follow button
                                 if (response.type == "user"){
@@ -60,7 +60,7 @@ $( document ).ready(function() {
                     }})
                     } else{
                         list.map((element) =>{
-                            $("#search_result").append(`<a class='center search-res search-name block' href="/groups/${element._id}"` + "<p>" + element.groupName + "</p></a>")
+                            $("#search_result").append(`<a class='center search-res search-name block' href="/groups/${element._id}">Go to group </a>` + "<p class ='center'>" + element.groupName + "</p>")
                             //add join button
                             if (response.type == "group"){
                             if (response.groupOwner.includes(element._id)){

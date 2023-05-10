@@ -30,10 +30,10 @@
 
     <img src="/public/img/unfilled_heart.png" alt="like button" class="together like-button">
     {{#when postLikes.length 'eq' 1}}
-        <p class="together likes"><strong>{{../postLikes.length}}</strong> Like</p>
+        <div class="together likes"><strong>{{../postLikes.length}}</strong> Like</div>
     {{/when}}
     {{#when postLikes.length 'noteq' 1}}
-        <p class="together likes"><strong>{{../postLikes.length}}</strong> Likes</p>
+        <div class="together likes"><strong>{{../postLikes.length}}</strong> Likes</div>
     {{/when}}
 
     <h2>Comments:</h2>

@@ -177,9 +177,10 @@ router.get("/:groupId", async (req, res) => {
             
         }
 
+        if (groupInfo.groupOwner == req.session.user.user_id) return res.render("groupId", {logged_in: true,title: `Group ${groupInfo.groupName}`, group: groupInfo, coach: groupMatch } )
+        
 
-
-        return res.render("groupId", {logged_in: true,title: `Group ${groupInfo.groupName}`, group: groupInfo, coach: groupMatch } )
+        return res.render("groupId", {logged_in: true,title: `Group ${groupInfo.groupName}`, group: groupInfo } )
       }catch(e) {
         return res.status(400).render("error", {message: e});
       }

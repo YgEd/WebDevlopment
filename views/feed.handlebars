@@ -72,10 +72,10 @@
                     <img src="/public/img/unfilled_heart.png" alt="like button" class="together like-button">
                     {{!-- <input type="image" class="together like-button" alt="Login" src="/public/img/unfilled_heart.png"> --}}
                     {{#when this.postLikes.length 'eq' 1}}
-                        <p class="together likes"><strong>{{../this.postLikes.length}}</strong> Like</p>
+                        <div class="together likes"><strong>{{../this.postLikes.length}}</strong> Like</div>
                     {{/when}}
                     {{#when this.postLikes.length 'noteq' 1}}
-                        <p class="together likes"><strong>{{../this.postLikes.length}}</strong> Likes</p>
+                        <div class="together likes"><strong>{{../this.postLikes.length}}</strong> Likes</div>
                     {{/when}}
 
                     <p class="together post-des">{{this.postDescription}}</p>

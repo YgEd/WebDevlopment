@@ -199,8 +199,8 @@ router
               help.err(fun, "about me must be a string");
             }
           }
-          let aboutlines = aboutMe.split('\n')
-          let len = aboutMe.length - (aboutlines.length - 1);
+          let aboutlines = aboutme.split('\n')
+          let len = aboutme.length - (aboutlines.length - 1);
           if (len > 300) {
             help.err(fun, "about me can be a max of 300 characters")
           }

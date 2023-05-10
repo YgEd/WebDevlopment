@@ -35,7 +35,7 @@ $(document).ready(function(){
 
 
     })
-
+    
     $("#unfollow-form").on("submit", function (e){
             e.preventDefault();
     

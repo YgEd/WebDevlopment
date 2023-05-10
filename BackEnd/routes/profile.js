@@ -161,7 +161,7 @@ router
         const updates = req.body;
         let userId = req.session.user.user_id;
         let aboutme = xss(req.body.aboutme);
-        let goals = xss(req.body.goals);
+        let goals = req.body.goals.map(element => xss(element));
         let badData = {};
         let profileimg;
         let userInfo;
@@ -194,8 +194,8 @@ router
               help.err(fun, "about me must be a string");
             }
           }
-          let aboutlines = aboutMe.split('\n')
-          let len = aboutMe.length - (aboutlines.length - 1);
+          let aboutlines = aboutme.split('\n')
+          let len = aboutme.length - (aboutlines.length - 1);
           if (len > 300) {
             help.err(fun, "about me can be a max of 300 characters")
           }

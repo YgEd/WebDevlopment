@@ -150,60 +150,51 @@ checkKeyword(strVal, varName) {
   return strVal;
 },
 
-// checkDate(string){
-//   let date = string.split('/');
-//   if (date.length != 3) throw 'has to be in MM/DD/YYYY format'
-//   date.forEach((value) => parseInt(value,10))
-//   for (let i =0; i<date.length;i++){
-//     if (isNaN(date[i])) throw 'one of the date is not a number' 
-//   }
-//   if (date[1] <1) throw "Not a valid date"
-//   if (date[2] <1900 || date[2] > new Date().getFullYear() +1) throw "release Year is not valid"
-//   if ([1,3,5,7,8,10,12].includes(date[0])){
-//      if (date[1] > 31) throw "Not a valid date"
-//   }else if ([4,6,9,11].includes(date[0])){
-//      if (date[1] >30) throw "Not a Valid date"
-//   }else if (date[0] == 2){
-//       if (date[2] % 4 === 0){
-//         if (date[1] > 29) throw "Not a Valid date"
-//       }
-//       if (date[1] >28) throw "Not a valid date"
-//   }else throw 'Month is not valid'
-// },
-checkDOB(str, varName){
-  if (!str) throw `Error: You must supply a ${varName}!`;
-  if (typeof str !== 'string') throw `Error: ${varName} must be a string!`;
-  if (str.length === 0)
-    throw `Error: ${varName} cannot be an empty string or string with just spaces`;
-  if (!validate(str, "boolean", "mm/dd/yyyy")){
-    throw `Error: ${str} is not in proper MM/DD/YYYY form`
+// source: https://stackoverflow.com/questions/18758772/how-do-i-validate-a-date-in-this-format-yyyy-mm-dd-using-jquery
+isValidDate(dateString) {
+  const regex = /^\d{4}-\d{2}-\d{2}$/;
+  if (!dateString.match(regex)) return false;
+
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return false;
+
+  return dateString === date.toISOString().slice(0, 10);
+},
+
+calculateAge(birthday, today){
+  
+  var age = today.getFullYear() - birthday.getFullYear();
+  var monthDifference = today.getMonth() - birthday.getMonth();
+  if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthday.getDate())) {
+      age--;
   }
-  //get current date
-  const date = new Date();
+  return age;
+},
 
-  //numerical form of inputted month, day, and year
-  let inMonth = parseInt(str.substring(0, 2));
-  let inDay = parseInt(str.substring(3, 5));
-  let inYear = parseInt(str.substring(6, 10));
+checkDOB(dob, varName){
+  if (!dob) throw `Error: You must supply a ${varName}!`;
 
-  //Tests to ensure if DOB is at least 18 years of age
+    if (typeof dob !== 'string' || dob.trim() === '') {
+        throw "Error: Date of birth must be a non-empty string!";
+    }
+    dob = dob.trim()
+    if (!this.isValidDate(dob)) {
+        throw "Error: Invalid date format! Use the format 'YYYY-MM-DD'.";
+    }
 
-  if (!(inYear <= date.getFullYear() - 18)) {
-    err(fun, "DOB is not 18 years or older: year is too young");
-  }
+    const dobDate = new Date(dob);
+    const minDate = new Date('1900-01-01');
+    const today = new Date();
+    today = new Date(today.toLocaleString("en-US", { timeZone: "America/New_York" }));
+    if (dobDate < minDate || dobDate > today) {
+        throw "Error: Date of birth must be between 1900-01-01 and today.";
+    }
 
-  if (inYear == date.getFullYear() - 18 && inMonth > date.getMonth() + 1) {
-    err(fun, "DOB is not 18 years or older: year and month is too young");
-  }
-
-  if (
-    inMonth == date.getMonth() + 1 &&
-    inYear == date.getFullYear() - 18 &&
-    inDay > date.getDate()
-  ) {
-    err(fun,"DOB is not 18 years or older: year, month, day is too young");
-  }
-  return 
+    const age = this.calculateAge(dobDate);
+    if (age < 18) {
+        throw "User must be 18 years old or older";
+    }
+    return dob
 },
 getRandomItem(arr) {
 

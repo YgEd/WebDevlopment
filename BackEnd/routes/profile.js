@@ -229,6 +229,7 @@ router
             profileimg = userInfo.profileimg
           }
         else {
+            console.log("req", req.file)
             //upload image
             profileimg = await uploadPhoto(req.file);
         } 

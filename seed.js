@@ -25,6 +25,8 @@ await db.dropDatabase();
 import fs from 'fs';
 
 import {createUser,checkUser, getUser, updateUser} from './BackEnd/data/users.js';
+import {createPost} from './BackEnd/data/posts.js'
+import { uploadPhoto } from './BackEnd/data/photos.js';
 //create a bunch of usrrs
 let first_user = ""
 let second_user = ""
@@ -55,18 +57,126 @@ try{
 }
 
 
-//update the user info
 
-//let update_first_user = ""
-//let profile_img_src = "/public/img/default.jpg"
 
-//try{
-   
-    //const imageBuffer = fs.readFileSync('public/img/default.jpg');
+let update_first_user = ""
+let profile_img_src = "/public/img/filled_heart.jpg"
+
+
+try{
+    let photo_obj = {}
+    let imageBuffer = fs.readFileSync('public/img/filled_heart.png');
+    let original_name = profile_img_src
+    let encoding = imageBuffer.size;
+    let mimeType = 'image/png'
+    photo_obj.fieldname = 'photo'
+    photo_obj.originalname = original_name
+    photo_obj.buffer = imageBuffer
+    photo_obj.encoding = encoding
+    photo_obj.mimetype = mimeType
+    let getphoto = await uploadPhoto(photo_obj)
+    let updateduser = await updateUser(first_user._id, first_user.username, first_user.email, first_user.userPosts, first_user.userStreak, "trying to live a healthy fulfilling life", first_user.groupsOwned, first_user.groupMembers, getphoto, ["Work out", "stay fit", "get healthy"], first_user.following, first_user.followers)
     
-//}catch(e){
-   // console.log(e)
-//}
+
+    
+}catch(e){
+    console.log(e)
+}
+
+try{
+    let photo_obj = {}
+    let imageBuffer = fs.readFileSync('public/img/filled_heart.png');
+    let original_name = profile_img_src
+    let encoding = imageBuffer.size;
+    let mimeType = 'image/png'
+    photo_obj.fieldname = 'photo'
+    photo_obj.originalname = original_name
+    photo_obj.buffer = imageBuffer
+    photo_obj.encoding = encoding
+    photo_obj.mimetype = mimeType
+    let getphoto = await uploadPhoto(photo_obj)
+    let secondupdate = await updateUser(second_user._id, second_user.username, second_user.email, second_user.userPosts, second_user.userStreak, "outdoorsy person and health freak!", second_user.groupsOwned, second_user.groupMembers, getphoto, ["hike the mt.everest", "run a 10k"], second_user.following, second_user.followers)
+    
+
+    
+}catch(e){
+    console.log(e)
+}
+
+
+try{
+    let photo_obj = {}
+    let imageBuffer = fs.readFileSync('public/img/filled_heart.png');
+    let original_name = profile_img_src
+    let encoding = imageBuffer.size;
+    let mimeType = 'image/png'
+    photo_obj.fieldname = 'photo'
+    photo_obj.originalname = original_name
+    photo_obj.buffer = imageBuffer
+    photo_obj.encoding = encoding
+    photo_obj.mimetype = mimeType
+    let getphoto = await uploadPhoto(photo_obj)
+    let thirdupdate = await updateUser(third_user._id, third_user.username, third_user.email, third_user.userPosts, third_user.userStreak, "Happy go lucky person who wants a nice summer body", third_user.groupsOwned, third_user.groupMembers, getphoto, ["do pilates"], third_user.following, third_user.followers)
+    
+
+    
+}catch(e){
+    console.log(e)
+}
+
+try{
+    let photo_obj = {}
+    let imageBuffer = fs.readFileSync('public/img/filled_heart.png');
+    let original_name = profile_img_src
+    let encoding = imageBuffer.size;
+    let mimeType = 'image/png'
+    photo_obj.fieldname = 'photo'
+    photo_obj.originalname = original_name
+    photo_obj.buffer = imageBuffer
+    photo_obj.encoding = encoding
+    photo_obj.mimetype = mimeType
+    let getphoto = await uploadPhoto(photo_obj)
+    let fourthupdate = await updateUser(fourth_user._id, fourth_user.username, fourth_user.email, fourth_user.userPosts, fourth_user.userStreak, "Just vibes tbh", fourth_user.groupsOwned, fourth_user.groupMembers, getphoto, [], fourth_user.following, fourth_user.followers)
+    
+
+    
+}catch(e){
+    console.log(e)
+}
+
+
+
+//get the post stuff 
+
+try{
+    let list = []
+    let photo_obj = {}
+    let imageBuffer = fs.readFileSync('public/img/running-guy-on-road.jpg');
+    let original_name = profile_img_src
+    let encoding = imageBuffer.size;
+    let mimeType = 'image/jpg'
+    photo_obj.fieldname = 'photo'
+    photo_obj.originalname = original_name
+    photo_obj.buffer = imageBuffer
+    photo_obj.encoding = encoding
+    photo_obj.mimetype = mimeType
+    let uploadphoto = await uploadPhoto(photo_obj)
+    list.push(uploadphoto)
+    let uploadpost = await createPost(first_user._id, "first day out", "running", "ran 5 miles", list, [] )
+
+
+}catch(e){
+   console.log(e)
+}
+
+
+
+
+
+
+
+
+
 
 
 

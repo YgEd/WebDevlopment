@@ -21,13 +21,13 @@ router
   })
   .post(async (req, res) => {
     //code here for POST
-    let username  = xss(req.body.username)
-     let firstNameInput = xss(req.body.firstNameInput)
-    let lastNameInput = xss(req.body.lastNameInput)
-   let  emailAddressInput = xss(req.body.emailAddressInput)
-    let passwordInput = xss(req.body.passwordInput)
-    let confirmPasswordInput = xss(req.body.confirmPasswordInput)
-    let  dob = xss(req.body.dob)
+    let username  = req.body.username
+     let firstNameInput = req.body.firstNameInput
+    let lastNameInput = req.body.lastNameInput
+   let  emailAddressInput = req.body.emailAddressInput
+    let passwordInput = req.body.passwordInput
+    let confirmPasswordInput = req.body.confirmPasswordInput
+    let  dob = req.body.dob
     let missing = []
     //if any are missing you will re-render the form with a 400 status code explaining to the user which fields are missing. 
     if (!username) missing.push("User name")
@@ -39,6 +39,13 @@ router
     if  (!dob) missing.push("enter date of birth")
     if (missing.length >0) return res.status(400).render("register",{title: "Register Form", error: `Missing: ${missing.join(', ')}`})
     try{
+      xss(username)
+      xss(firstNameInput)
+      xss(lastNameInput)
+      xss(emailAddressInput)
+      xss(passwordInput)
+      xss(confirmPasswordInput)
+      xss(dob)
       username = validation.checkUsername(username, "UserName");
       firstNameInput = validation.checkName(firstNameInput,"First Name");
       lastNameInput = validation.checkName(lastNameInput,"Last Name");
@@ -70,9 +77,11 @@ router
   })
   .post(async (req, res) => {
     //code here for POST
-    let emailAddressInput = xss(req.body.emailAddressInput)
-    let passwordInput = xss(req.body.passwordInput)
+    let emailAddressInput = req.body.emailAddressInput
+    let passwordInput = req.body.passwordInput
     try{
+      xss(emailAddressInput)
+      xss(passwordInput)
       emailAddressInput = validation.checkEmail(emailAddressInput,"Email Address");
       passwordInput = validation.checkPassword(passwordInput, "Password");
     } catch (e){

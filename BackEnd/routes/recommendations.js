@@ -21,7 +21,7 @@ router.route('/search').post(async(req,res) =>{
     
     let keyword = req.body.keyword
     try{
-    xss(keyword)
+    keyword = xss(keyword)
     keyword = validation.checkString(keyword, "search keyword")
     let results = await recData.searchRecommendationsByKeyword(keyword)
     if (results.length == 0) throw "No results"
@@ -45,13 +45,13 @@ router
     let tags = req.body.tags
         try{
 
-            xss(workoutName)
-            xss(equipment)
-            xss(duration)
-            xss(level)
-            xss(reps)
-            xss(rounds)
-            xss(tags)
+            workoutName = xss(workoutName)
+            equipment = xss(equipment)
+            duration = xss(duration)
+            level = xss(level)
+            reps = xss(reps)
+            rounds = xss(rounds)
+            tags = xss(tags)
         workoutName = validation.checkString(workoutName, "Workout name").toUpperCase();
         equipment = validation.checkString(equipment, "Name of equipment");
         validation.isNum(duration)

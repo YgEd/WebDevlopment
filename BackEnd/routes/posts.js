@@ -84,12 +84,9 @@ router
         }
 
         try {
-            xss(workoutType)
-            xss(postDescription)
-            for (let x of postToGroup) {
-                xss(x)
-            }
-            xss(postTitle)
+            workoutType = xss(workoutType)
+            postDescription = xss(postDescription)
+            postTitle = xss(postTitle)
             //none of these should ever really error because its just pulled from the cookie
             if(!userId) {
                 help.err(fun, "could not get user id");
@@ -159,6 +156,10 @@ router
             }
             else {
                 postToGroup = [];
+                for (let x of postToGroup) {
+                    x = xss(x)
+                }
+
             }
         }catch(e) {
             return res.status(400).render('error', {title: 'error', message:e})
@@ -365,10 +366,10 @@ router
 
         try {
 
-            xss(workoutType)
-            xss(postDescription)
-            xss(postTitle)
-            xss(postId)
+            workoutType = xss(workoutType)
+            postDescription = xss(postDescription)
+            postTitle = xss(postTitle)
+            postId = xss(postId)
 
             
             if(!req.params.postId) {

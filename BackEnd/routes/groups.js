@@ -88,10 +88,10 @@ router.post("/", async (req, res) => {
 
     
      try {
-        xss(req.body.groupName)
+        req.body.groupName = xss(req.body.groupName)
          //trim data
         req.body.groupName = help.strPrep(req.body.groupName).substring(0, 30);
-        xss(req.body.grouName);
+        req.body.groupName = xss(req.body.grouName);
         //create group
         var newGroup = await groupFuns.createGroup(req.body.groupName, req.session.user.user_id);
      } catch (error) {
@@ -106,7 +106,7 @@ router.post("/", async (req, res) => {
 
     //add description if provided
     try {
-        xss(req.body.description)
+        req.body.description = xss(req.body.description)
         req.body.description = help.strPrep(req.body.description).substring(0, 100);
         await groupFuns.addGroupDescription(newGroup._id, req.body.description,req.session.user.user_id );
         return res.send({response: true})
@@ -291,13 +291,13 @@ router.post("/:groupId/add", async (req, res) => {
             var rounds = req.body.rounds;
             var tags = req.body.tags;
 
-            xss(workoutName)
-            xss(equipment)
-            xss(duration)
-            xss(level)
-            xss(reps)
-            xss(rounds)
-            xss(tags)
+            workoutName = xss(workoutName)
+            equipment = xss(equipment)
+            duration = xss(duration)
+            level = xss(level)
+            reps = xss(reps)
+            rounds = xss(rounds)
+            tags = xss(tags)
 
             workoutName = help.checkString(workoutName, "Workout name").toUpperCase();
             equipment = help.checkString(equipment, "Name of equipment");
@@ -354,8 +354,8 @@ router.post("/edit/:id", async (req, res) => {
         req.body.groupName=  help.strPrep(req.body.groupName).substring(0, 30);
         req.body.description = help.strPrep(req.body.description).substring(0, 100);
 
-        xss(req.body.groupName)
-        xss(req.body.description)
+        req.body.groupName = xss(req.body.groupName)
+        req.body.description = xss(req.body.description)
         var group = await groupFuns.getGroup(req.body.groupId);
 
         //ensure group exists
@@ -478,7 +478,7 @@ router.post("/delete_group", async (req, res) => {
 
     //get group
     try {
-        xss(req.body.groupId)
+        req.body.groupId = xss(req.body.groupId)
         var group = await groupFuns.getGroup(req.body.groupId);
 
         //ensure group exists
@@ -536,8 +536,8 @@ router.post("/remove_member", async (req, res) => {
     }
 
     try {
-        xss(req.body.groupId)
-        xss(req.body.userName)
+        req.body.groupId = xss(req.body.groupId)
+        req.body.userName = xss(req.body.userName)
         //get user
         var user = await userFuns.getUserByUsername(req.body.userName);
 

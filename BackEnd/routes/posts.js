@@ -66,13 +66,13 @@ router
         //create post
         const postData = req.body;
         let userId = req.session.user.user_id;
-        let workoutType = xss(req.body.workoutType);
+        let workoutType = req.body.workoutType;
         console.log(workoutType)
-        let postDescription = xss(req.body.postDescription);
+        let postDescription = req.body.postDescription;
         let postImgs = []
         //console.log(postImgs);
-        let postToGroup = xss(req.body.postToGroup);
-        let postTitle = xss(req.body.postTitle);
+        let postToGroup = req.body.postToGroup;
+        let postTitle = req.body.postTitle;
         let badData = {};
         let posted;
 
@@ -81,6 +81,12 @@ router
         }
 
         try {
+            xss(workoutType)
+            xss(postDescription)
+            for (let x of postToGroup) {
+                xss(x)
+            }
+            xss(postTitle)
             //none of these should ever really error because its just pulled from the cookie
             if(!userId) {
                 help.err(fun, "could not get user id");
@@ -342,18 +348,25 @@ router
         var workoutTypes = ["running", "lifting", "cycling", "other"];
         const postData = req.body;
         let userId = req.session.user.user_id;
-        let workoutType = xss(req.body.workoutType);
-        let postDescription = xss(req.body.postDescription);
-        let postTitle = xss(req.body.postTitle);
+        let workoutType = req.body.workoutType;
+        let postDescription = req.body.postDescription;
+        let postTitle = req.body.postTitle;
         let badData = {};
         let originalPost;
         //let removeImgs = xss(req.body.removeImg;
         //console.log(removeImgs);
         let postImgs;
         let postToGroup = [];
-        let postId = xss(req.body.postId);
+        let postId = req.body.postId;
 
         try {
+
+            xss(workoutType)
+            xss(postDescription)
+            xss(postTitle)
+            xss(postId)
+
+            
             if(!req.params.postId) {
                 throw `must provide postId`
             }

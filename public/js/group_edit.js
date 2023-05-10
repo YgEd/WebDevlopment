@@ -74,6 +74,8 @@ $(document).ready(function(){
         var parent = $(this).parent()
         var username = parent.find(".mem-user").text()
 
+        console.log(username, groupId)
+
         let data = {
             "groupId": groupId,
             "userName": username,

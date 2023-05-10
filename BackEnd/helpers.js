@@ -161,8 +161,8 @@ isValidDate(dateString) {
   return dateString === date.toISOString().slice(0, 10);
 },
 
-calculateAge(birthday){
-  var today = new Date();
+calculateAge(birthday, today){
+  
   var age = today.getFullYear() - birthday.getFullYear();
   var monthDifference = today.getMonth() - birthday.getMonth();
   if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthday.getDate())) {
@@ -185,7 +185,7 @@ checkDOB(dob, varName){
     const dobDate = new Date(dob);
     const minDate = new Date('1900-01-01');
     const today = new Date();
-
+    today = new Date(today.toLocaleString("en-US", { timeZone: "America/New_York" }));
     if (dobDate < minDate || dobDate > today) {
         throw "Error: Date of birth must be between 1900-01-01 and today.";
     }

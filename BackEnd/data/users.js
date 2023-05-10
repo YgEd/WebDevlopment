@@ -52,7 +52,7 @@ export const createUser = async (
   
   //check if if user is found with same username
   if (findUser != null) {
-    help.err(fun, "username: '" + username + "' is already in use");
+    help.err(fun, "username: ' " + username + "' is already in use");
   }
 
   //format the input strings (trimming and lowercasing where needed)
@@ -67,7 +67,7 @@ export const createUser = async (
   const userCollect = await users();
   const target = await userCollect.findOne({email: email})
   if (target != null){
-    help.err(fun, "email" + email+ "already in use");
+    help.err(fun, "email " + email+ " already in use");
   }
 
   

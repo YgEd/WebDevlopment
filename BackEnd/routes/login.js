@@ -49,6 +49,8 @@ router
     } catch (e){
       console.log(e)
     }
+    console.log(dob)
+    dob += 1
     try{
       let insertedUser =  (await createUser(username, firstNameInput,lastNameInput,emailAddressInput,passwordInput, dob))
       if(insertedUser){

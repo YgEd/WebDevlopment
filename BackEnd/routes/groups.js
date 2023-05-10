@@ -91,7 +91,7 @@ router.post("/", async (req, res) => {
         req.body.groupName = xss(req.body.groupName)
          //trim data
         req.body.groupName = help.strPrep(req.body.groupName).substring(0, 30);
-        req.body.groupName = xss(req.body.grouName);
+        
         //create group
         var newGroup = await groupFuns.createGroup(req.body.groupName, req.session.user.user_id);
      } catch (error) {

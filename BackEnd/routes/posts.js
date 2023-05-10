@@ -83,7 +83,9 @@ router
         try {
             xss(workoutType)
             xss(postDescription)
-            xss(postToGroup)
+            for (let x of postToGroup) {
+                xss(x)
+            }
             xss(postTitle)
             //none of these should ever really error because its just pulled from the cookie
             if(!userId) {
@@ -363,6 +365,8 @@ router
             xss(postDescription)
             xss(postTitle)
             xss(postId)
+
+            
             if(!req.params.postId) {
                 throw `must provide postId`
             }

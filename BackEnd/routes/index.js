@@ -1,6 +1,5 @@
 
 import loginRoutes from "./login.js"
-import privateRoutes from "./private.js"
 import profileRoutes from "./profile.js"
 import postRoutes from "./posts.js"
 import feedRoutes from "./feed.js"

@@ -716,3 +716,19 @@ export const searchGroupByKeyword= async (query) => {
         .toArray();
     return groupsArr.map((group) => group._id.toString()); 
 }
+
+export const getTopGroups = async () => {
+    let fun = "getTopGroups";
+
+    //get group db
+    const groupCollection = await groups();
+
+    //get all groups
+    const allGroups = await groupCollection.find({}).toArray()
+
+    //get top 3 groups
+    const topGroups = allGroups.sort((a, b) => (a.groupMembers.length < b.groupMembers.length) ? 1 : -1).slice(0, 3)
+
+    return topGroups
+
+}

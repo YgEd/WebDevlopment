@@ -93,6 +93,9 @@ try {
 
   }
 
+    //get Top Groups
+    var topGroups = await groupFuns.getTopGroups();
+
   //add the post owners username to each post object
   try {
     let postUsers = []
@@ -143,6 +146,7 @@ try {
     logged_in: logged_in,
     userObj: targetUser,
     groups: groups,
+    topGroups
   });
 } catch (error) {
   console.log("Error from get feed route: " + error);
@@ -208,6 +212,9 @@ try {
 
   }
 
+  //get Top Groups
+  var topGroups = await groupFuns.getTopGroups();
+
 
   console.log("group posts")
   console.log(displayPosts)
@@ -253,7 +260,8 @@ try {
     userId: userId,
     logged_in: logged_in,
     userObj: targetUser,
-    groupFeed: true
+    groupFeed: true, 
+    topGroups
   });
 } catch (error) {
   console.log("Error from get feed route: " + error);

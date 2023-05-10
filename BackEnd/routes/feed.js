@@ -1,5 +1,6 @@
 import * as postFuns from "../data/posts.js";
 import * as userFuns from "../data/users.js";
+import * as groupFuns from "../data/groups.js";
 import * as commentFuns from "../data/comment.js";
 import * as photoFuns from "../data/photos.js"
 import xss from 'xss';
@@ -124,6 +125,13 @@ try {
   //sort the display posts
   displayPosts.sort(ObjCompare);
 
+  //get all groupNames
+  let groups = [];
+  for (let i = 0; i < groups_mem.length; i++) {
+    let group = await groupFuns.getGroup(groups_mem[i]);
+    groups.push(group);
+  }
+
   
 
   return res.render("feed", {
@@ -132,12 +140,124 @@ try {
     userName: userName,
     posts: displayPosts,
     userId: userId,
-    logged_in: logged_in
+    logged_in: logged_in,
+    userObj: targetUser,
+    groups: groups,
   });
 } catch (error) {
   console.log("Error from get feed route: " + error);
 }
   
+});
+
+
+router.get("/:groupId", async (req, res) => {
+  if (!req.session.user){
+    console.log("user not authenticated");
+    return res.redirect("/login")
+  }
+
+  var logged_in = false;
+  var groupId = req.params.groupId.toString();
+
+  if (req.session.user.user_id){
+    logged_in = true;
+  }
+  let userId = req.session.user.user_id;
+  let userName = req.session.user.userName
+  let firstName = req.session.user.firstName;
+  
+try {
+  let displayPosts = [];
+  var targetUser = await userFuns.getUser(userId);
+
+  //get all the posts from groupId the target user is a member of
+ 
+  
+    displayPosts = await postFuns.getPostByGroup(groupId, 999)
+
+  //remove duplicates
+  displayPosts = displayPosts.filter((value, index, self) =>
+    index === self.findIndex((x) => (
+      x._id.toString() === value._id.toString()
+    ))
+  )
+  
+  //iterate through all display posts
+  for (let i = 0; i < displayPosts.length; i++) {
+
+    //find all the posts the user has liked
+    for (let j=0; j<displayPosts[i].postLikes.length; j++){ 
+      if (displayPosts[i].postLikes[j].toString() == userId.toString()){
+        displayPosts[i].liked = true;
+      }
+    }
+
+    //get image src to be able to display on feed
+    for (let j=0; j<displayPosts[i].postImgs.length; j++){
+      displayPosts[i].postImgs[j]=await photoFuns.getPhotoSrc(displayPosts[i].postImgs[j])
+      
+    }
+    
+    for (let j = 0; j < displayPosts[i].comments.length; j++) {
+      //find all the posts the user commented on
+      if (displayPosts[i].comments[j].userId.toString() == userId.toString()) {
+        displayPosts[i].commented = true;
+      }
+    }
+
+  }
+
+
+  console.log("group posts")
+  console.log(displayPosts)
+
+  //add the post owners username to each post object
+  try {
+    let postUsers = []
+    displayPosts.forEach((post) => {postUsers.push(post.userId)});
+    postUsers.forEach(async (userId) => {
+      let user = await userFuns.getUser(userId);
+      let username = user.username;
+      displayPosts.forEach((post) => {
+        if (post.userId.toString() == userId.toString()) {
+          post.username = username;
+        }
+      });
+    })
+
+  } catch (error) {
+    console.log("Error from get groupID feed route: " + error);
+  }
+  
+  //sort the posts by the most recently posted
+  function ObjCompare( a, b ) {
+    if ( a.postTime < b.postTime ){
+      return 1;
+    }
+    if ( a.postTime > b.postTime ){
+      return -1;
+    }
+    return 0;
+  }
+
+  //sort the display posts
+  displayPosts.sort(ObjCompare);
+
+
+  return res.render("feed", {
+    title: "feed",
+    firstName: firstName,
+    userName: userName,
+    posts: displayPosts,
+    userId: userId,
+    logged_in: logged_in,
+    userObj: targetUser,
+  });
+} catch (error) {
+  console.log("Error from get feed route: " + error);
+}
+
 });
 
 router.post("/comment", async (req, res) => {

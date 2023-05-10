@@ -10,12 +10,14 @@ $( document ).ready(function() {
         $(this).find(".comment-body").css("display", "none")
         $(this).find(".comment-button").css("display", "none")
         $(this).find(".remove-comment").css("display", "block")
+        $(this).find(".comment-label").css("display", "none")
       }
       if ($(this).find(".commented").text() == "false"){
         //console.log("rendering bad  " + $(this).find(".comment-body"))
         $(this).find(".comment-body").css("display", "block")
         $(this).find(".comment-button").css("display", "block")
         $(this).find(".remove-comment").css("display", "none")
+        $(this).find(".comment-label").css("display", "block")
       }
 
       if ($(this).find(".liked").text() == "true"){

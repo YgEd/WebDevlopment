@@ -42,7 +42,7 @@ try {
   for (let i = 0; i < target_following.length; i++) {
     
     displayPosts = displayPosts.concat(
-      await postFuns.getPostByUser(target_following[i], 15)
+      await postFuns.getPostByUser(target_following[i], 999)
     );
     
   }
@@ -50,14 +50,14 @@ try {
   //get user own posts, 15 per user
   for (let i = 0; i < targetUser.userPosts.length; i++) {
     displayPosts = displayPosts.concat(
-      await postFuns.getPost(targetUser.userPosts[i], 15)
+      await postFuns.getPost(targetUser.userPosts[i], 999)
     );
   }
 
   //get group posts, 3 per group
   for (let i = 0; i < groups_mem.length; i++) {
     displayPosts = displayPosts.concat(
-      await postFuns.getPostByGroup(groups_mem[i], 5)
+      await postFuns.getPostByGroup(groups_mem[i], 999)
     );
   }
 
@@ -177,15 +177,14 @@ try {
 
   //get all the posts from groupId the target user is a member of
  
-  
     displayPosts = await postFuns.getPostByGroup(groupId, 999)
 
-  //remove duplicates
-  displayPosts = displayPosts.filter((value, index, self) =>
-    index === self.findIndex((x) => (
-      x._id.toString() === value._id.toString()
-    ))
-  )
+  // //remove duplicates
+  // displayPosts = displayPosts.filter((value, index, self) =>
+  //   index === self.findIndex((x) => (
+  //     x._id.toString() === value._id.toString()
+  //   ))
+  // )
   
   //iterate through all display posts
   for (let i = 0; i < displayPosts.length; i++) {

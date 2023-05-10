@@ -358,8 +358,6 @@ router
         let postTitle = req.body.postTitle;
         let badData = {};
         let originalPost;
-        //let removeImgs = xss(req.body.removeImg;
-        //console.log(removeImgs);
         let postImgs;
         let postToGroup = [];
         let postId = req.body.postId;

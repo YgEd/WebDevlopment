@@ -86,10 +86,10 @@ try{
 
 try{
     let photo_obj = {}
-    let imageBuffer = fs.readFileSync('public/img/filled_heart.png');
+    let imageBuffer = fs.readFileSync('public/img/sarah.jpg');
     let original_name = profile_img_src
     let encoding = imageBuffer.size;
-    let mimeType = 'image/png'
+    let mimeType = 'image/jpg'
     photo_obj.fieldname = 'photo'
     photo_obj.originalname = original_name
     photo_obj.buffer = imageBuffer
@@ -107,10 +107,10 @@ try{
 
 try{
     let photo_obj = {}
-    let imageBuffer = fs.readFileSync('public/img/filled_heart.png');
+    let imageBuffer = fs.readFileSync('public/img/fuslie.jpg');
     let original_name = profile_img_src
     let encoding = imageBuffer.size;
-    let mimeType = 'image/png'
+    let mimeType = 'image/jpg'
     photo_obj.fieldname = 'photo'
     photo_obj.originalname = original_name
     photo_obj.buffer = imageBuffer
@@ -127,10 +127,10 @@ try{
 
 try{
     let photo_obj = {}
-    let imageBuffer = fs.readFileSync('public/img/filled_heart.png');
+    let imageBuffer = fs.readFileSync('public/img/girlpink.jpg');
     let original_name = profile_img_src
     let encoding = imageBuffer.size;
-    let mimeType = 'image/png'
+    let mimeType = 'image/jpg'
     photo_obj.fieldname = 'photo'
     photo_obj.originalname = original_name
     photo_obj.buffer = imageBuffer
@@ -169,6 +169,155 @@ try{
 }catch(e){
    console.log(e)
 }
+
+try{
+    let list = []
+    let photo_obj = {}
+    let imageBuffer = fs.readFileSync('public/img/mountaintop.jpg');
+    let original_name = profile_img_src
+    let encoding = imageBuffer.size;
+    let mimeType = 'image/jpg'
+    photo_obj.fieldname = 'photo'
+    photo_obj.originalname = original_name
+    photo_obj.buffer = imageBuffer
+    photo_obj.encoding = encoding
+    photo_obj.mimetype = mimeType
+    let uploadphoto = await uploadPhoto(photo_obj)
+    list.push(uploadphoto)
+    let uploadpost = await createPost(first_user._id, "at the mountain", "running", "ran 5 miles", list, [] )
+
+
+}catch(e){
+   console.log(e)
+}
+
+try{
+    let list = []
+    let photo_obj = {}
+    let imageBuffer = fs.readFileSync('public/img/OIP.jpg');
+    let original_name = profile_img_src
+    let encoding = imageBuffer.size;
+    let mimeType = 'image/jpg'
+    photo_obj.fieldname = 'photo'
+    photo_obj.originalname = original_name
+    photo_obj.buffer = imageBuffer
+    photo_obj.encoding = encoding
+    photo_obj.mimetype = mimeType
+    let uploadphoto = await uploadPhoto(photo_obj)
+    list.push(uploadphoto)
+    let uploadpost = await createPost(second_user._id, "working out", "lifting", "worked out so much today", list, [] )
+
+
+}catch(e){
+   console.log(e)
+}
+
+try{
+    let list = []
+    let photo_obj = {}
+    let imageBuffer = fs.readFileSync('public/img/walking.jpg');
+    let original_name = profile_img_src
+    let encoding = imageBuffer.size;
+    let mimeType = 'image/jpg'
+    photo_obj.fieldname = 'photo'
+    photo_obj.originalname = original_name
+    photo_obj.buffer = imageBuffer
+    photo_obj.encoding = encoding
+    photo_obj.mimetype = mimeType
+    let uploadphoto = await uploadPhoto(photo_obj)
+    list.push(uploadphoto)
+    let uploadpost = await createPost(second_user._id, "working out", "lifting", "worked out so much today", list, [] )
+
+
+}catch(e){
+   console.log(e)
+}
+
+try{
+    let list = []
+    let photo_obj = {}
+    let imageBuffer = fs.readFileSync('public/img/kayaking.jpg');
+    let original_name = profile_img_src
+    let encoding = imageBuffer.size;
+    let mimeType = 'image/jpg'
+    photo_obj.fieldname = 'photo'
+    photo_obj.originalname = original_name
+    photo_obj.buffer = imageBuffer
+    photo_obj.encoding = encoding
+    photo_obj.mimetype = mimeType
+    let uploadphoto = await uploadPhoto(photo_obj)
+    list.push(uploadphoto)
+    let uploadpost = await createPost(third_user._id, "went kayaking", "other", "worked out so much today", list, [] )
+
+
+}catch(e){
+   console.log(e)
+}
+
+try{
+    let list = []
+    let photo_obj = {}
+    let imageBuffer = fs.readFileSync('public/img/mountainclimbing.jpg');
+    let original_name = profile_img_src
+    let encoding = imageBuffer.size;
+    let mimeType = 'image/jpg'
+    photo_obj.fieldname = 'photo'
+    photo_obj.originalname = original_name
+    photo_obj.buffer = imageBuffer
+    photo_obj.encoding = encoding
+    photo_obj.mimetype = mimeType
+    let uploadphoto = await uploadPhoto(photo_obj)
+    list.push(uploadphoto)
+    let uploadpost = await createPost(third_user._id, "tb to mountain climbing", "other", "had a blast!", list, [] )
+
+
+}catch(e){
+   console.log(e)
+}
+
+try{
+    let list = []
+    let photo_obj = {}
+    let imageBuffer = fs.readFileSync('public/img/running-guy-on-road.jpg');
+    let original_name = profile_img_src
+    let encoding = imageBuffer.size;
+    let mimeType = 'image/jpg'
+    photo_obj.fieldname = 'photo'
+    photo_obj.originalname = original_name
+    photo_obj.buffer = imageBuffer
+    photo_obj.encoding = encoding
+    photo_obj.mimetype = mimeType
+    let uploadphoto = await uploadPhoto(photo_obj)
+    list.push(uploadphoto)
+    let uploadpost = await createPost(fourth_user._id, "love running with family", "running", "good workout", list, [] )
+
+
+}catch(e){
+   console.log(e)
+}
+
+try{
+    let list = []
+    let photo_obj = {}
+    let imageBuffer = fs.readFileSync('public/img/OIP.jpg');
+    let original_name = profile_img_src
+    let encoding = imageBuffer.size;
+    let mimeType = 'image/jpg'
+    photo_obj.fieldname = 'photo'
+    photo_obj.originalname = original_name
+    photo_obj.buffer = imageBuffer
+    photo_obj.encoding = encoding
+    photo_obj.mimetype = mimeType
+    let uploadphoto = await uploadPhoto(photo_obj)
+    list.push(uploadphoto)
+    let uploadpost = await createPost(fourth_user._id, "working out", "lifting", "tiring", list, [] )
+
+
+}catch(e){
+   console.log(e)
+}
+
+
 
 
 try{

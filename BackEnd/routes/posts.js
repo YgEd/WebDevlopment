@@ -71,7 +71,7 @@ router
         let postDescription = xss(req.body.postDescription);
         let postImgs = []
         //console.log(postImgs);
-        let postToGroup = xss(req.body.postToGroup);
+        let postToGroup = req.body.postToGroup.map(element => xss(element));
         let postTitle = xss(req.body.postTitle);
         let badData = {};
         let posted;

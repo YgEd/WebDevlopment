@@ -5,13 +5,19 @@
         <h1 id="welcome-msg">Hey {{firstName}}, welcome!</h1>
 
         <div class="group-filters">
-            <h2>Group Feeds</h2>
-            {{#each groups}}
+            {{#unless groupFeed}}
+                <h2>Group Feeds</h2>
+                {{#each groups}}
 
-                <a href="/feed/{{this._id}}">{{this.groupName}}</a>
+                    <a href="/feed/{{this._id}}">{{this.groupName}}</a>
+                    <br>
+                {{/each}}
+            
+            {{else}}
                 <br>
-            {{/each}}
-            <a href="/feed">Normal Feed</a>
+                <h2>Default Feed</h2>
+                <a href="/feed">Normal Feed</a>
+            {{/unless}}
         </div>
     </div>  
     

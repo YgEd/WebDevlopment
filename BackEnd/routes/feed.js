@@ -253,6 +253,7 @@ try {
     userId: userId,
     logged_in: logged_in,
     userObj: targetUser,
+    groupFeed: true
   });
 } catch (error) {
   console.log("Error from get feed route: " + error);

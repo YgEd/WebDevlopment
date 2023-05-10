@@ -45,7 +45,7 @@ router
       emailAddressInput = validation.checkEmail(emailAddressInput, "Email Address");
       passwordInput = validation.checkPassword(passwordInput,"Password");
       if (passwordInput !== confirmPasswordInput) throw "password and confirm Password must match"
-      // dob = validation.checkDOB(dob,"Date of Birth")
+      dob = validation.checkDOB(dob,"Date of Birth")
     } catch (e){
       console.log(e)
     }

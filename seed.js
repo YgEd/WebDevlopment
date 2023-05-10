@@ -24,6 +24,7 @@ const db = await dbConnection();
 await db.dropDatabase();
 import fs from 'fs';
 
+import recData from './BackEnd/data/recommendations.js'
 import {createUser,checkUser, getUser, updateUser} from './BackEnd/data/users.js';
 import {createPost} from './BackEnd/data/posts.js'
 import { uploadPhoto } from './BackEnd/data/photos.js';
@@ -170,9 +171,82 @@ try{
 }
 
 
+try{
+    let workoutName = "Bench Press"
+    
+    let equipment = "Bar"
+    let duration = "20"
+    let level = 'intermediate'
+    let reps = '15'
+    let rounds = '3'
+    let tags = 'Chest'
+    await recData.createRec(workoutName,equipment,duration,level,reps,rounds,tags);
 
 
+}catch(e){
+   console.log(e)
+}
 
+try{
+    let workoutName = "Dip"
+    
+    let equipment = "Hang"
+    let duration = "15"
+    let level = 'advanced'
+    let reps = '12'
+    let rounds = '4'
+    let tags = 'Back'
+    await recData.createRec(workoutName,equipment,duration,level,reps,rounds,tags);
+
+
+}catch(e){
+   console.log(e)
+}
+try{
+    let workoutName = "Pull up"
+    
+    let equipment = "Hang"
+    let duration = "15"
+    let level = 'intermediate'
+    let reps = '15'
+    let rounds = '4'
+    let tags = 'Back'
+    await recData.createRec(workoutName,equipment,duration,level,reps,rounds,tags);
+
+
+}catch(e){
+   console.log(e)
+}
+try{
+    let workoutName = "Sit up"
+    
+    let equipment = "None"
+    let duration = "10"
+    let level = 'beginner'
+    let reps = '15'
+    let rounds = '2'
+    let tags = 'Others'
+    await recData.createRec(workoutName,equipment,duration,level,reps,rounds,tags);
+
+
+}catch(e){
+   console.log(e)
+}
+try{
+    let workoutName = "Curl"
+    
+    let equipment = "Dumbells"
+    let duration = "20"
+    let level = 'intermediate'
+    let reps = '15'
+    let rounds = '4'
+    let tags = 'Others'
+    await recData.createRec(workoutName,equipment,duration,level,reps,rounds,tags);
+
+
+}catch(e){
+   console.log(e)
+}
 
 
 

@@ -232,9 +232,9 @@ router.get("/:groupId/add", async (req, res) => {
             if (!groupInfo) {
               throw `could not retrieve group info`
             }
-            return res.render("groupRecAdd", {title: `Adding Recommendations to ${groupInfo.groupName}`, id: groupId, groupName:groupInfo.groupName })
+            return res.render("groupRecAdd", {title: `Adding Recommendations to ${groupInfo.groupName}`, id: groupId, groupName:groupInfo.groupName ,logged_in: true})
           }catch(e) {
-            return res.status(400).render("error", {message: e});
+            return res.status(400).render("error", {message: e, logged_in: true});
           }
         
     })

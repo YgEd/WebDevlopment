@@ -71,8 +71,11 @@ router
         let postDescription = req.body.postDescription;
         let postImgs = []
         //console.log(postImgs);
+
+
         let postToGroup = req.body.postToGroup;
         let postTitle = req.body.postTitle;
+
         let badData = {};
         let posted;
 
